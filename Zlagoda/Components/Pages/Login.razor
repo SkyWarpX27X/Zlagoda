@@ -1,0 +1,93 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
+@using Services.Employee
+@inject IEmployeeService EmployeeService
+@inject NavigationManager NavigationManager
+
+<h3>Login</h3>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Login</h3>
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @_errorMessage
+                    </div>
+                }
+                <EditForm Model="@ViewModel" OnValidSubmit="Authenticate" FormName="loginForm">
+                    <div class="mb-3">
+                        <label for="login" class="form-label">Login</label>
+                            <InputText @bind-Value="ViewModel.Username" class="form-control" id="login" placeholder="Enter your login" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <InputText type="password" @bind-Value="ViewModel.Password" class="form-control" id="password" placeholder="Enter your password" />
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Log in</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+    
+    private string? _errorMessage;
+
+    [SupplyParameterFromForm] 
+    public LoginViewModel ViewModel { get; set; } = new();
+    
+    public class LoginViewModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+    
+    private async Task Authenticate()
+    {
+        
+        // TODO: Add hashing with salt
+        if (!string.IsNullOrWhiteSpace(ViewModel.Username) && !string.IsNullOrWhiteSpace(ViewModel.Password))
+        {
+            var data = EmployeeService.GetAuthDataOfAll().FirstOrDefault(x => x.Username == ViewModel.Username);
+            if (data != null)
+            {
+                if (EmployeeService.GetAuthData(data.Id).Password == ViewModel.Password)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, ViewModel.Username),
+                        new Claim(ClaimTypes.Role, data.Role)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+
+                    if (HttpContext != null)
+                    {
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                    }
+
+                    NavigationManager.NavigateTo("/");
+                }
+            }
+            else
+            {
+                _errorMessage = "Invalid login or password.";
+            }
+        }
+        else
+        {
+            _errorMessage = "Please enter login and password.";
+        }
+    }
+}
