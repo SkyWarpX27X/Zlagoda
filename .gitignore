@@ -1,0 +1,25 @@
+﻿# JetBrains Rider and other JetBrains IDEs
+.idea/  # Exclude the entire .idea folder
+
+# Standard .NET build artifacts
+[Bb]in/
+[Oo]bj/
+
+# Rider's own .idea/.gitignore
+# Rider creates a .gitignore inside the .idea folder for its own internal use.
+# It's managed by the IDE and should not be ignored by the project's root .gitignore.
+# But generally, you ignore the top-level .idea folder as shown above.
+
+# Other common files/folders to ignore in .NET/Rider projects
+*.cache
+*.swo
+*.suo
+*.user
+*.pid
+*.log
+*.rpt
+*.pdm
+*.sym
+*.thumbdata
+[Tt]emp/
+[Rr]esult/
