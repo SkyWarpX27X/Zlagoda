@@ -5,11 +5,11 @@ namespace Repositories.Employee;
 
 public class EmployeeRepository : IEmployeeRepository
 {
-    public IEnumerable<EmployeeDb> GetEmployees()
+    public IEnumerable<EmployeeDBModel> GetEmployees()
     {
         //Add other fields after test
-        List<EmployeeDb> employees = new List<EmployeeDb>();
-        using (var connection = new SqliteConnection("Data Source=F:\\Programs\\Zlagoda\\maindb.sqlite"))
+        List<EmployeeDBModel> employees = new List<EmployeeDBModel>();
+        using (var connection = new SqliteConnection("Data Source=C:\\Users\\Naz\\RiderProjects\\Zlagoda\\maindb.sqlite"))
         {
             string query = "SELECT * FROM Employee";
             connection.Open();
@@ -23,7 +23,7 @@ public class EmployeeRepository : IEmployeeRepository
                         string username = reader.GetString(1);
                         string password = reader.GetString(2);
                         string role = reader.GetString(3);
-                        employees.Add(new EmployeeDb(id, username, password, role));
+                        employees.Add(new EmployeeDBModel(id, username, password, role));
                     }
                 }
             }
@@ -31,7 +31,7 @@ public class EmployeeRepository : IEmployeeRepository
         return employees;
     }
 
-    public EmployeeDb GetEmployee(int id)
+    public EmployeeDBModel GetEmployee(int id)
     {
         return GetEmployees().First(e => e.Id == id);
     }

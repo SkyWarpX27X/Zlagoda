@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositorie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{0A0DACE9-5F8D-4905-BF68-88CA56DEFF02}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Storage", "Storage\Storage.csproj", "{CC1DC9C8-5AFB-468D-B032-6659099F122C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{0A0DACE9-5F8D-4905-BF68-88CA56DEFF02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A0DACE9-5F8D-4905-BF68-88CA56DEFF02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A0DACE9-5F8D-4905-BF68-88CA56DEFF02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC1DC9C8-5AFB-468D-B032-6659099F122C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC1DC9C8-5AFB-468D-B032-6659099F122C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC1DC9C8-5AFB-468D-B032-6659099F122C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC1DC9C8-5AFB-468D-B032-6659099F122C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

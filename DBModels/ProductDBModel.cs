@@ -1,6 +1,6 @@
 ﻿namespace DBModels;
 
-public class CustomerDb
+public class ProductDBModel
 {
     
 }

@@ -4,6 +4,6 @@ namespace Repositories.Employee;
 
 public interface IEmployeeRepository
 {
-    IEnumerable<EmployeeDb> GetEmployees();
-    EmployeeDb GetEmployee(int id);
+    IEnumerable<EmployeeDBModel> GetEmployees();
+    EmployeeDBModel GetEmployee(int id);
 }

@@ -6,9 +6,9 @@ namespace Repositories.Category;
 public class CategoryRepository : ICategoryRepository
 {
     
-    public IEnumerable<CategoryDb> GetCategories()
+    public IEnumerable<CategoryDBModel> GetCategories()
     {
-        List<CategoryDb> categories = new List<CategoryDb>();
+        List<CategoryDBModel> categories = new List<CategoryDBModel>();
         using (var connection = new SqliteConnection("Data Source=F:\\Programs\\Zlagoda\\maindb.sqlite"))
         {
             string query = "SELECT * FROM Category";
@@ -21,7 +21,7 @@ public class CategoryRepository : ICategoryRepository
                     {
                         int id = reader.GetInt32(1);
                         string name = reader.GetString(0);
-                        categories.Add(new CategoryDb(id, name));
+                        categories.Add(new CategoryDBModel(id, name));
                     }
                 }
             }

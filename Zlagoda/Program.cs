@@ -3,6 +3,7 @@ using Repositories.Category;
 using Repositories.Employee;
 using Services.Category;
 using Services.Employee;
+using Storage;
 using Zlagoda.Components;
 using Zlagoda.ViewModels;
 
@@ -21,6 +22,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
+
+var dbPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "maindb.sqlite"));
+builder.Services.AddSingleton<IStorageContext>(_ => new SQLiteStorageContext(dbPath));
 
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
@@ -51,5 +55,9 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// VERY temporary for testing
+var storage = app.Services.GetRequiredService<IStorageContext>();
+var user = storage.GetUser(1);
 
 app.Run();

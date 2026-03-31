@@ -4,5 +4,5 @@ namespace Repositories.Category;
 
 public interface ICategoryRepository
 {
-    IEnumerable<CategoryDb> GetCategories();
+    IEnumerable<CategoryDBModel> GetCategories();
 }

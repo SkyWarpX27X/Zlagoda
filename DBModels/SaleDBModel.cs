@@ -1,6 +1,6 @@
 ﻿namespace DBModels;
 
-public class ReceiptDb
+public class SaleDBModel
 {
     
 }
