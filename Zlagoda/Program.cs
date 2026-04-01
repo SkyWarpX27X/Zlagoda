@@ -33,6 +33,9 @@ builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
 
 builder.Services.AddSingleton<CategoriesVM>();
+builder.Services.AddSingleton<CustomersVM>();
+builder.Services.AddSingleton<EmployeesVM>();
+builder.Services.AddSingleton<ProductsVM>();
 
 var app = builder.Build();
 
