@@ -5,6 +5,6 @@ namespace Repositories.Employee;
 public interface IEmployeeRepository
 {
     EmployeeDBModel? GetEmployee(long id);
-    IEnumerable<EmployeeDBModel> GetEmployees();
+    IEnumerable<EmployeeDBModel> GetEmployees(bool sortBySurname = true, bool cashiersOnly = false);
 
 }

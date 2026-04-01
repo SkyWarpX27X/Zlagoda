@@ -24,10 +24,12 @@ public class CategoryRepository : ICategoryRepository
         return reader.Read() ? MapCategory(reader) : null;
     }
 
-    public IEnumerable<CategoryDBModel> GetCategories()
+    public IEnumerable<CategoryDBModel> GetCategories(bool sortByName = true)
     {
         using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Category";
+        var query = "SELECT * FROM Category";
+        if (sortByName) query += "ORDER BY category_name";
+        command.CommandText = query;
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapCategory(reader);
