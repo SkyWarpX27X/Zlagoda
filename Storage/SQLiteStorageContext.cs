@@ -1,42 +1,37 @@
 ﻿using System.Security.Cryptography;
 using DBModels;
+
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Hosting;
+using Repositories.Category;
+using Repositories.Employee;
 
 namespace Storage;
 
 public class SQLiteStorageContext : IStorageContext
 {
-    private readonly string _databaseFilePath;
-    private SqliteConnection? _connection;
+    private readonly SqliteConnection? _connection;
+    public IEmployeeRepository Employees { get; private set; } = null!;
+    public ICategoryRepository Categories { get; private set; } = null!;
 
     public SQLiteStorageContext(string databaseFilePath)
     {
-        _databaseFilePath = databaseFilePath;
-    }
-
-    private void Init()
-    {
         if (_connection is not null) return;
-        bool isFirstLaunch = !File.Exists(_databaseFilePath);
+        bool isFirstLaunch = !File.Exists(databaseFilePath);
+        _connection = new SqliteConnection($"DataSource={databaseFilePath}");
+        _connection.Open();
+        Employees = new EmployeeRepository(_connection);
+        Categories = new CategoryRepository(_connection);
         if (isFirstLaunch) CreateDatabase();
-        else
-        {
-            _connection = new SqliteConnection($"DataSource={_databaseFilePath}");
-            _connection.Open();
-        }
     }
-
+    
     private void CreateDatabase()
     {
-        File.Create(_databaseFilePath).Dispose();
-        _connection = new SqliteConnection($"DataSource={_databaseFilePath}");
-        _connection.Open();
-        using var command = _connection.CreateCommand();
+        using var command = _connection!.CreateCommand();
         // Check in the future: set limitations for date (since DateTime doesn't exist) and maybe add limits for foreign keys?
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Employee (
-                                  id_employee TEXT PRIMARY KEY CHECK(length(id_employee) <= 10),
+                                  id_employee INT PRIMARY KEY,
                                   empl_surname TEXT NOT NULL CHECK(length(empl_surname) <= 50),
                                   empl_name TEXT NOT NULL CHECK(length(empl_name) <= 50),
                                   empl_patronymic TEXT NULL CHECK(length(empl_patronymic) <= 50),
@@ -47,22 +42,11 @@ public class SQLiteStorageContext : IStorageContext
                                   phone_number TEXT NOT NULL CHECK(length(phone_number) <= 13),
                                   city TEXT NOT NULL CHECK(length(city) <= 50),
                                   street TEXT NOT NULL CHECK(length(street) <= 50),
-                                  zip_code TEXT NOT NULL CHECK(length(zip_code) <= 9)
+                                  zip_code TEXT NOT NULL CHECK(length(zip_code) <= 9),
+                                  user_name TEXT NOT NULL CHECK(length(user_name) <= 20) UNIQUE,
+                                  user_password TEXT NOT NULL CHECK(length(user_password) <= 20)                                
                               );
                               """; 
-        command.ExecuteNonQuery();
-        command.CommandText = """
-                              CREATE TABLE IF NOT EXISTS User_Account (
-                                  id_user INT PRIMARY KEY,
-                                  id_employee TEXT NOT NULL,
-                                  user_name TEXT NOT NULL CHECK(length(user_name) <= 20),
-                                  user_password TEXT NOT NULL CHECK(length(user_password) <= 20),
-                                  FOREIGN KEY (id_employee) 
-                                    REFERENCES Employee (id_employee)
-                                    ON UPDATE CASCADE
-                                    ON DELETE NO ACTION
-                              );
-                              """;
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Category (
@@ -155,19 +139,4 @@ public class SQLiteStorageContext : IStorageContext
                               """;
         command.ExecuteNonQuery();
     }
-
-    public UserDBModel? GetUser(int userId)
-    {
-        Init();
-        using var command = _connection!.CreateCommand();
-        command.CommandText = "SELECT * FROM User_Account WHERE id_user = @id";
-        command.Parameters.AddWithValue("@id", userId);
-        using var reader = command.ExecuteReader();
-        if (!reader.Read()) return null;
-        var employeeId = reader.GetString(1);
-        var username = reader.GetString(2);
-        var password = reader.GetString(3);
-        return new UserDBModel(userId, employeeId, username, password);
-    }
-    
 }

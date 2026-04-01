@@ -20,7 +20,7 @@ public class EmployeeService : IEmployeeService
         }
     }
 
-    public EmployeeAuthDto GetAuthData(int id)
+    public EmployeeAuthDto GetAuthData(long id)
     {
         var employee = _employeeRepository.GetEmployee(id);
         return new EmployeeAuthDto(employee.Id, employee.Username, employee.Password, employee.Role);

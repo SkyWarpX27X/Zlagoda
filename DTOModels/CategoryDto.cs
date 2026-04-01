@@ -2,10 +2,10 @@
 
 public class CategoryDto
 {
-    public  int Id { get; set; }
+    public long Id { get; set; }
     public string Name { get; set; }
     
-    public CategoryDto(int id, string name)
+    public CategoryDto(long id, string name)
     {
         Id = id;
         Name = name;

@@ -61,6 +61,5 @@ app.MapRazorComponents<App>()
 
 // VERY temporary for testing
 var storage = app.Services.GetRequiredService<IStorageContext>();
-var user = storage.GetUser(1);
 
 app.Run();

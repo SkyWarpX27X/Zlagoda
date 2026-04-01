@@ -5,7 +5,7 @@ namespace Services.Employee;
 public interface IEmployeeService
 {
     IEnumerable<EmployeeAuthDto> GetAuthDataOfAll();
-    EmployeeAuthDto GetAuthData(int id);
+    EmployeeAuthDto GetAuthData(long id);
     //IEnumerable<EmployeeDto> GetDetailsOfAll();
     //EmployeeDto GetDetails(int id);
 }

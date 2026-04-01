@@ -2,12 +2,14 @@
 
 public class CategoryDBModel
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public string Name { get; set; }
 
-    public CategoryDBModel(int id, string name)
+    public CategoryDBModel(long id, string name)
     {
         Id = id;
         Name = name;
     }
+
+    public CategoryDBModel(string name) : this(0, name) {}
 }
