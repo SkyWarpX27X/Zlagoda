@@ -4,7 +4,9 @@ using DBModels;
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Hosting;
 using Repositories.Category;
+using Repositories.CustomerCard;
 using Repositories.Employee;
+using Repositories.Product;
 
 namespace Storage;
 
@@ -13,6 +15,8 @@ public class SQLiteStorageContext
     private readonly SqliteConnection? _connection;
     public IEmployeeRepository Employees { get; private set; } = null!;
     public ICategoryRepository Categories { get; private set; } = null!;
+    public ICustomerCardRepository CustomerCards { get; private set; } = null!;
+    public IProductRepository Products { get; private set; } = null!;
 
     public SQLiteStorageContext(string databaseFilePath)
     {
@@ -22,6 +26,8 @@ public class SQLiteStorageContext
         _connection.Open();
         Employees = new EmployeeRepository(_connection);
         Categories = new CategoryRepository(_connection);
+        CustomerCards = new CustomerCardRepository(_connection);
+        Products = new ProductRepository(_connection);
         if (isFirstLaunch) CreateDatabase();
     }
     

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Repositories.Category;
+using Repositories.CustomerCard;
 using Repositories.Employee;
+using Repositories.Product;
 using Services.Category;
 using Services.Employee;
 using Storage;
@@ -28,6 +30,8 @@ builder.Services.AddSingleton<SQLiteStorageContext>(_ => new SQLiteStorageContex
 
 builder.Services.AddSingleton<ICategoryRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Categories);
 builder.Services.AddSingleton<IEmployeeRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Employees);
+builder.Services.AddSingleton<ICustomerCardRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().CustomerCards);
+builder.Services.AddSingleton<IProductRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Products);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();

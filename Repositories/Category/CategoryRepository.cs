@@ -10,7 +10,7 @@ public class CategoryRepository : ICategoryRepository
     {
         _connection = connection;
     }
-    private static CategoryDBModel MapCategory(SqliteDataReader reader) => new(
+    private static CategoryDBModel MapCustomerCard(SqliteDataReader reader) => new(
         reader.GetInt64(reader.GetOrdinal("category_number")),
         reader.GetString(reader.GetOrdinal("category_name"))
     );
@@ -21,7 +21,7 @@ public class CategoryRepository : ICategoryRepository
         command.CommandText = "SELECT * FROM Category WHERE category_number = @id";
         command.Parameters.AddWithValue("@id", id);
         using var reader = command.ExecuteReader();
-        return reader.Read() ? MapCategory(reader) : null;
+        return reader.Read() ? MapCustomerCard(reader) : null;
     }
 
     public IEnumerable<CategoryDBModel> GetCategories(bool sortByName = true)
@@ -32,6 +32,6 @@ public class CategoryRepository : ICategoryRepository
         command.CommandText = query;
         using var reader = command.ExecuteReader();
         while (reader.Read())
-            yield return MapCategory(reader);
+            yield return MapCustomerCard(reader);
     }
 }
