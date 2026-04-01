@@ -8,7 +8,7 @@ using Repositories.Employee;
 
 namespace Storage;
 
-public class SQLiteStorageContext : IStorageContext
+public class SQLiteStorageContext
 {
     private readonly SqliteConnection? _connection;
     public IEmployeeRepository Employees { get; private set; } = null!;

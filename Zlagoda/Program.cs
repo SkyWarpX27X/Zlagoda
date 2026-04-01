@@ -24,10 +24,10 @@ builder.Services.AddCascadingAuthenticationState();
 
 
 var dbPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "maindb.sqlite"));
-builder.Services.AddSingleton<IStorageContext>(_ => new SQLiteStorageContext(dbPath));
+builder.Services.AddSingleton<SQLiteStorageContext>(_ => new SQLiteStorageContext(dbPath));
 
-builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
-builder.Services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddSingleton<ICategoryRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Categories);
+builder.Services.AddSingleton<IEmployeeRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Employees);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
@@ -60,6 +60,6 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 // VERY temporary for testing
-var storage = app.Services.GetRequiredService<IStorageContext>();
+var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
 
 app.Run();
