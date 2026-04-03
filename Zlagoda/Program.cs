@@ -40,6 +40,7 @@ builder.Services.AddSingleton<CategoriesVM>();
 builder.Services.AddSingleton<CustomersVM>();
 builder.Services.AddSingleton<EmployeesVM>();
 builder.Services.AddSingleton<ProductsVM>();
+builder.Services.AddSingleton<ReceiptsVM>();
 
 var app = builder.Build();
 
