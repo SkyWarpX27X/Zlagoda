@@ -14,7 +14,7 @@ public class EmployeeRepository : IEmployeeRepository
         reader.GetInt64(reader.GetOrdinal("id_employee")),
         reader.GetString(reader.GetOrdinal("empl_surname")),
         reader.GetString(reader.GetOrdinal("empl_name")),
-        reader.GetString(reader.GetOrdinal("empl_patronymic")),
+        reader.IsDBNull(reader.GetOrdinal("empl_patronymic")) ? null : reader.GetString(reader.GetOrdinal("empl_patronymic")),
         reader.GetString(reader.GetOrdinal("empl_role")),
         reader.GetDecimal(reader.GetOrdinal("salary")),
         reader.GetString(reader.GetOrdinal("date_of_birth")),

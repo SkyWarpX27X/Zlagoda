@@ -12,7 +12,7 @@ public class StoreProductRepository
     }
     private static StoreProductDBModel MapStoreProduct(SqliteDataReader reader) => new(
         reader.GetString(reader.GetOrdinal("UPC")),
-        reader.GetString(reader.GetOrdinal("UPC_prom")),
+        reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
         reader.GetInt64(reader.GetOrdinal("id_product")),
         reader.GetDecimal(reader.GetOrdinal("selling_price")),
         reader.GetInt32(reader.GetOrdinal("products_number")),
