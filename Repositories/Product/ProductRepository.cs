@@ -34,15 +34,17 @@ public class ProductRepository : IProductRepository
         var query = "SELECT * FROM Product";
         if (!string.IsNullOrEmpty(categoryName))
         {
-            query += $" WHERE category_name = {categoryName}";
-            if (!string.IsNullOrEmpty(productName)) query += $" AND product_name = {productName}";
+            query += " WHERE category_name = @categoryName";
+            if (!string.IsNullOrEmpty(productName)) query += " AND product_name = @productName";
         }
-        if (!string.IsNullOrEmpty(productName))
+        if (!string.IsNullOrEmpty(productName) && string.IsNullOrEmpty(categoryName))
         {
-            query += $" WHERE product_name = {productName}";
+            query += " WHERE product_name = @productName";
         }
         if (sortByName) query += " ORDER BY product_name";
         command.CommandText = query;
+        if (!string.IsNullOrEmpty(categoryName)) command.Parameters.AddWithValue("@categoryName", categoryName);
+        if (!string.IsNullOrEmpty(productName)) command.Parameters.AddWithValue("@productName", productName);
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapProduct(reader);

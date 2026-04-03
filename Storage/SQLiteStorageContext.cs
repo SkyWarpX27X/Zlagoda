@@ -12,16 +12,15 @@ namespace Storage;
 
 public class SQLiteStorageContext
 {
-    private readonly SqliteConnection? _connection;
-    public IEmployeeRepository Employees { get; private set; } = null!;
-    public ICategoryRepository Categories { get; private set; } = null!;
-    public ICustomerCardRepository CustomerCards { get; private set; } = null!;
-    public IProductRepository Products { get; private set; } = null!;
+    private readonly SqliteConnection _connection;
+    public IEmployeeRepository Employees { get; private set; }
+    public ICategoryRepository Categories { get; private set; }
+    public ICustomerCardRepository CustomerCards { get; private set; }
+    public IProductRepository Products { get; private set; }
 
     public SQLiteStorageContext(string databaseFilePath)
     {
-        if (_connection is not null) return;
-        bool isFirstLaunch = !File.Exists(databaseFilePath);
+        var isFirstLaunch = !File.Exists(databaseFilePath);
         _connection = new SqliteConnection($"DataSource={databaseFilePath}");
         _connection.Open();
         Employees = new EmployeeRepository(_connection);
@@ -33,7 +32,7 @@ public class SQLiteStorageContext
     
     private void CreateDatabase()
     {
-        using var command = _connection!.CreateCommand();
+        using var command = _connection.CreateCommand();
         // Check in the future: set limitations for date (since DateTime doesn't exist) and maybe add limits for foreign keys?
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Employee (

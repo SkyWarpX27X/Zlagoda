@@ -36,9 +36,10 @@ public class CustomerCardRepository : ICustomerCardRepository
     {
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Customer_Card";
-        if (percent > -1) query += $" WHERE percent == {percent}";
+        if (percent > -1) query += " WHERE percent == @percent";
         if (sortByName) query += " ORDER BY cust_surname";
         command.CommandText = query;
+        command.Parameters.AddWithValue("@percent", percent);
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapCategory(reader);
