@@ -1,3 +1,4 @@
+using DBModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Repositories.Category;
 using Repositories.CustomerCard;
@@ -72,5 +73,8 @@ app.MapRazorComponents<App>()
 
 // VERY temporary for testing
 var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
+var ct = new CategoryDBModel(1, "ssdsds");
+storage.Categories.DeleteCategory(ct);
+
 
 app.Run();

@@ -45,7 +45,7 @@ public class SQLiteStorageContext
         // Check in the future: set limitations for date (since DateTime doesn't exist) and maybe add limits for foreign keys?
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Employee (
-                                  id_employee INT PRIMARY KEY,
+                                  id_employee INTEGER PRIMARY KEY,
                                   empl_surname TEXT NOT NULL CHECK(length(empl_surname) <= 50),
                                   empl_name TEXT NOT NULL CHECK(length(empl_name) <= 50),
                                   empl_patronymic TEXT NULL CHECK(length(empl_patronymic) <= 50),
@@ -64,14 +64,14 @@ public class SQLiteStorageContext
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Category (
-                                  category_number INT PRIMARY KEY,
+                                  category_number INTEGER PRIMARY KEY,
                                   category_name TEXT NOT NULL CHECK(length(category_name) <= 50)
                               );
                               """;
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Product (
-                                id_product INT PRIMARY KEY,
+                                id_product INTEGER PRIMARY KEY,
                                 category_number INT NOT NULL,
                                 product_name TEXT NOT NULL CHECK(length(product_name) <= 50),
                                 characteristics TEXT NOT NULL CHECK(length(characteristics) <= 50),
@@ -85,7 +85,7 @@ public class SQLiteStorageContext
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Store_Product (
-                                  UPC TEXT PRIMARY KEY CHECK(length(UPC) <= 12),
+                                  UPC TEXT PRIMARY KEY NOT NULL CHECK(length(UPC) <= 12),
                                   UPC_prom TEXT NOT NULL,
                                   id_product INT NOT NULL,
                                   selling_price DECIMAL(13,4) NOT NULL,
@@ -104,7 +104,7 @@ public class SQLiteStorageContext
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Customer_Card (
-                                card_number TEXT PRIMARY KEY CHECK(length(card_number) <= 13),
+                                card_number TEXT PRIMARY KEY NOT NULL CHECK(length(card_number) <= 13),
                                 cust_surname TEXT NOT NULL CHECK(length(cust_surname) <= 50),
                                 cust_name TEXT NOT NULL CHECK(length(cust_name) <= 50),
                                 cust_patronymic  TEXT NULL CHECK(length(cust_patronymic) <= 50),
@@ -117,7 +117,7 @@ public class SQLiteStorageContext
                               """;
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Receipt (
-                                receipt_number INT PRIMARY KEY,
+                                receipt_number INTEGER PRIMARY KEY,
                                 id_employee TEXT NOT NULL,
                                 card_number TEXT NOT NULL,
                                 print_date TEXT NOT NULL,

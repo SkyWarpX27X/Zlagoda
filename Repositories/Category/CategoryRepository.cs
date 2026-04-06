@@ -34,4 +34,31 @@ public class CategoryRepository : ICategoryRepository
         while (reader.Read())
             yield return MapCustomerCard(reader);
     }
+
+    public void AddCategory(CategoryDBModel category)
+    {
+        // If needed, I can return the newly generated Id to update the DB model, but for now I shall leave it like this.
+        // Please write to me if that is indeed necessary.
+        using var command = _connection.CreateCommand();
+        command.CommandText = "INSERT INTO Category (category_name) VALUES (@category_name)";
+        command.Parameters.AddWithValue("@category_name", category.Name);
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateCategory(CategoryDBModel category)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "UPDATE Category SET category_name = @category_name WHERE category_number = @category_number";
+        command.Parameters.AddWithValue("@category_name", category.Name);
+        command.Parameters.AddWithValue("@category_number", category.Id);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteCategory(CategoryDBModel category)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Category WHERE category_number = @category_number";
+        command.Parameters.AddWithValue("@category_number", category.Id);
+        command.ExecuteNonQuery();
+    }
 }
