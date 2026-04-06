@@ -7,6 +7,9 @@ using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
 using Repositories.Product;
+using Repositories.Receipt;
+using Repositories.Sale;
+using Repositories.StoreProduct;
 
 namespace Storage;
 
@@ -17,6 +20,9 @@ public class SQLiteStorageContext
     public ICategoryRepository Categories { get; private set; }
     public ICustomerCardRepository CustomerCards { get; private set; }
     public IProductRepository Products { get; private set; }
+    public IStoreProductRepository StoreProducts { get; private set; }
+    public IReceiptRepository Receipts { get; private set; }
+    public ISaleRepository Sales { get; private set; }
 
     public SQLiteStorageContext(string databaseFilePath)
     {
@@ -27,6 +33,9 @@ public class SQLiteStorageContext
         Categories = new CategoryRepository(_connection);
         CustomerCards = new CustomerCardRepository(_connection);
         Products = new ProductRepository(_connection);
+        StoreProducts = new StoreProductRepository(_connection);
+        Receipts = new ReceiptRepository(_connection);
+        Sales = new SaleRepository(_connection);
         if (isFirstLaunch) CreateDatabase();
     }
     
@@ -95,7 +104,7 @@ public class SQLiteStorageContext
         command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Customer_Card (
-                                card_number INT PRIMARY KEY CHECK(length(card_number) <= 13),
+                                card_number TEXT PRIMARY KEY CHECK(length(card_number) <= 13),
                                 cust_surname TEXT NOT NULL CHECK(length(cust_surname) <= 50),
                                 cust_name TEXT NOT NULL CHECK(length(cust_name) <= 50),
                                 cust_patronymic  TEXT NULL CHECK(length(cust_patronymic) <= 50),
@@ -108,7 +117,7 @@ public class SQLiteStorageContext
                               """;
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Receipt (
-                                receipt_number TEXT PRIMARY KEY CHECK(length(receipt_number) <= 10),
+                                receipt_number INT PRIMARY KEY,
                                 id_employee TEXT NOT NULL,
                                 card_number TEXT NOT NULL,
                                 print_date TEXT NOT NULL,

@@ -3,6 +3,9 @@ using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
 using Repositories.Product;
+using Repositories.Receipt;
+using Repositories.Sale;
+using Repositories.StoreProduct;
 using Services.Category;
 using Services.Employee;
 using Storage;
@@ -32,6 +35,9 @@ builder.Services.AddSingleton<ICategoryRepository>(sp => sp.GetRequiredService<S
 builder.Services.AddSingleton<IEmployeeRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Employees);
 builder.Services.AddSingleton<ICustomerCardRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().CustomerCards);
 builder.Services.AddSingleton<IProductRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Products);
+builder.Services.AddSingleton<IStoreProductRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().StoreProducts);
+builder.Services.AddSingleton<IReceiptRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Receipts);
+builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Sales);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();

@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 
 namespace Repositories.StoreProduct;
 
-public class StoreProductRepository
+public class StoreProductRepository : IStoreProductRepository
 {
     private readonly SqliteConnection _connection;
     public StoreProductRepository(SqliteConnection connection)
