@@ -44,4 +44,60 @@ public class CustomerCardRepository : ICustomerCardRepository
         while (reader.Read())
             yield return MapCategory(reader);
     }
+    
+    public void AddCustomerCard(CustomerCardDBModel card)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Customer_Card (card_number, cust_surname, cust_name, cust_patronymic,
+                                                         phone_number, city, street, zip_code, percent) 
+                              VALUES (@card_number, @cust_surname, @cust_name, @cust_patronymic, @phone_number,
+                                      @city, @street, @zip_code, @percent);
+                              """;
+        command.Parameters.AddWithValue("@card_number", card.Number);
+        command.Parameters.AddWithValue("@cust_surname", card.Surname);
+        command.Parameters.AddWithValue("@cust_name", card.Name);
+        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic);
+        command.Parameters.AddWithValue("@phone_number", card.PhoneNumber);
+        command.Parameters.AddWithValue("@city", card.City);
+        command.Parameters.AddWithValue("@street", card.Street);
+        command.Parameters.AddWithValue("@zip_code", card.ZipCode);
+        command.Parameters.AddWithValue("@percent", card.Percent);
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateCustomerCard(CustomerCardDBModel card)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              UPDATE Customer_Card 
+                              SET cust_surname = @cust_surname,
+                                  cust_name = @cust_name,
+                                  cust_patronymic = @cust_patronymic,
+                                  phone_number = @phone_number,
+                                  city = @city,
+                                  street = @street,
+                                  zip_code = @zip_code,
+                                  percent = @percent
+                              WHERE card_number = @card_number;
+                              """;
+        command.Parameters.AddWithValue("@card_number", card.Number);
+        command.Parameters.AddWithValue("@cust_surname", card.Surname);
+        command.Parameters.AddWithValue("@cust_name", card.Name);
+        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic);
+        command.Parameters.AddWithValue("@phone_number", card.PhoneNumber);
+        command.Parameters.AddWithValue("@city", card.City);
+        command.Parameters.AddWithValue("@street", card.Street);
+        command.Parameters.AddWithValue("@zip_code", card.ZipCode);
+        command.Parameters.AddWithValue("@percent", card.Percent);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteCustomerCard(CustomerCardDBModel card)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Customer_Card WHERE card_number = @card_number";
+        command.Parameters.AddWithValue("@card_number", card.Number);
+        command.ExecuteNonQuery();
+    }
 }

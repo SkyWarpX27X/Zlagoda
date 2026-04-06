@@ -24,7 +24,7 @@ public class EmployeeRepository : IEmployeeRepository
         reader.GetString(reader.GetOrdinal("street")),
         reader.GetString(reader.GetOrdinal("zip_code")),
         reader.GetString(reader.GetOrdinal("user_name")),
-        reader.GetString(reader.GetOrdinal("password"))
+        reader.GetString(reader.GetOrdinal("user_password"))
     );
     public EmployeeDBModel? GetEmployee(long id)
     {
@@ -45,6 +45,77 @@ public class EmployeeRepository : IEmployeeRepository
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapEmployee(reader);
+    }
+    
+    public void AddEmployee(EmployeeDBModel employee)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Employee (empl_surname, empl_name, empl_patronymic, empl_role, salary, 
+                                                    date_of_birth, date_of_start, phone_number, city, street, zip_code, 
+                                                    user_name, user_password) 
+                              VALUES (@empl_surname, @empl_name, @empl_patronymic, @empl_role, @salary, 
+                              @date_of_birth, @date_of_start, @phone_number, @city, @street, @zip_code, @user_name, @user_password);
+                              """;
+        command.Parameters.AddWithValue("@empl_surname", employee.Surname);
+        command.Parameters.AddWithValue("@empl_name", employee.Name);
+        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic);
+        command.Parameters.AddWithValue("@empl_role", employee.Role);
+        command.Parameters.AddWithValue("@salary", employee.Salary);
+        command.Parameters.AddWithValue("@date_of_birth", employee.DateOfBirth);
+        command.Parameters.AddWithValue("@date_of_start", employee.DateOfStart);
+        command.Parameters.AddWithValue("@phone_number", employee.PhoneNumber);
+        command.Parameters.AddWithValue("@city", employee.City);
+        command.Parameters.AddWithValue("@street", employee.Street);
+        command.Parameters.AddWithValue("@zip_code", employee.ZipCode);
+        command.Parameters.AddWithValue("@user_name", employee.Name);
+        command.Parameters.AddWithValue("@user_password", employee.Password);
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateEmployee(EmployeeDBModel employee)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              UPDATE Employee
+                              SET empl_surname = @empl_surname,
+                                  empl_name = @empl_name,
+                                  empl_patronymic = @empl_patronymic,
+                                  empl_role = @empl_role,
+                                  salary = @salary,
+                                  date_of_birth = @date_of_birth,
+                                  date_of_start = @date_of_start,
+                                  phone_number = @phone_number,
+                                  city = @city,
+                                  street = @street,
+                                  zip_code = @zip_code,
+                                  user_name = @user_name,
+                                  user_password = @user_password
+                              WHERE id_employee = @id_employee;
+                              """;
+        command.Parameters.AddWithValue("@empl_surname", employee.Surname);
+        command.Parameters.AddWithValue("@empl_name", employee.Name);
+        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic);
+        command.Parameters.AddWithValue("@empl_role", employee.Role);
+        command.Parameters.AddWithValue("@salary", employee.Salary);
+        command.Parameters.AddWithValue("@date_of_birth", employee.DateOfBirth);
+        command.Parameters.AddWithValue("@date_of_start", employee.DateOfStart);
+        command.Parameters.AddWithValue("@phone_number", employee.PhoneNumber);
+        command.Parameters.AddWithValue("@city", employee.City);
+        command.Parameters.AddWithValue("@street", employee.Street);
+        command.Parameters.AddWithValue("@zip_code", employee.ZipCode);
+        command.Parameters.AddWithValue("@user_name", employee.Username);
+        command.Parameters.AddWithValue("@user_password", employee.Password);
+        command.Parameters.AddWithValue("@id_employee", employee.Id);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteEmployee(EmployeeDBModel employee)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Employee WHERE id_employee = @id_employee";
+        command.Parameters.AddWithValue("@id_employee", employee.Id);
+        command.ExecuteNonQuery();
     }
     
 }
