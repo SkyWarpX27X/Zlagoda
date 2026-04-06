@@ -1,41 +1,26 @@
 ﻿namespace DBModels;
 
-public class EmployeeDBModel
+public class EmployeeDBModel(long id, string surname, string name, string? patronymic, string role, decimal salary,
+    string dateOfBirth, string dateOfStart, string phoneNumber, string city, string street, string zipCode, 
+    string username, string password)
 {
-    public long Id { get; set; }
-    public string Surname { get; set; }
-    public string Name { get; set; }
-    public string? Patronymic { get; set; }
-    public string Role { get; set; }
-    public decimal Salary { get; set; }
-    public string DateOfBirth { get; set; }
-    public string DateOfStart { get; set; }
-    public string PhoneNumber { get; set; }
-    public string City { get; set; }
-    public string Street { get; set; }
-    public string ZipCode { get; set; }
-    public string Username { get; set; }
+    public long Id { get; set; } = id;
+    public string Surname { get; set; } = surname;
+    public string Name { get; set; } = name;
+    public string? Patronymic { get; set; } = patronymic;
+    public string Role { get; set; } = role;
+    public decimal Salary { get; set; } = salary;
+    public string DateOfBirth { get; set; } = dateOfBirth;
+    public string DateOfStart { get; set; } = dateOfStart;
+    public string PhoneNumber { get; set; } = phoneNumber;
+    public string City { get; set; } = city;
+    public string Street { get; set; } = street;
+    public string ZipCode { get; set; } = zipCode;
+
+    public string Username { get; set; } = username;
+
     // No hashing yet!
-    public string Password { get; set; }
-    
-    public EmployeeDBModel(long id, string surname, string name, string? patronymic, string role, decimal salary, string dateOfBirth, 
-        string dateOfStart,  string phoneNumber, string city, string street, string zipCode, string username, string password)
-    {
-        Id = id;
-        Surname = surname;
-        Name = name;
-        Patronymic = patronymic;
-        Role = role;
-        Salary = salary;
-        DateOfBirth = dateOfBirth;
-        DateOfStart = dateOfStart;
-        PhoneNumber = phoneNumber;
-        City = city;
-        Street = street;
-        ZipCode = zipCode;
-        Username = username;
-        Password = password;
-    }
+    public string Password { get; set; } = password;
 
     public EmployeeDBModel(string surname, string name, string? patronymic, string role, decimal salary, string dateOfBirth,
         string dateOfStart, string phoneNumber, string city, string street, string zipCode, string username, string password):
