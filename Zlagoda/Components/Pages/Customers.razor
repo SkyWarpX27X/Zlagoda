@@ -1,62 +1,45 @@
 ﻿@page "/customers"
-@using DTOModels
+@rendermode InteractiveServer
+@using Zlagoda.Components.ItemViews
+@using Zlagoda.Components.ItemModifies
 @using Zlagoda.ViewModels
 @inject CustomersVM ViewModel
 
 <h3>Постійні клієнти</h3>
 
 <div class="mb-3">
-    <button class="btn btn-success" @onclick="CreateCustomer">Додати клієнта</button>
+    @if (ViewModel.IsCreating && ViewModel.NewCustomer != null)
+    {
+        <CustomerModify Customer="@ViewModel.NewCustomer" OnSave="@ViewModel.SaveNewCustomer" OnCancel="@ViewModel.CancelCreate" />
+    }
+    else
+    {
+        <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Додати клієнта</button>
+    }
 </div>
 
-@if (ViewModel.Customers == null || !ViewModel.Customers.Any())
+@if (ViewModel.Customers == null)
 {
     <p><em>Завантаження...</em></p>
+}
+else if (!ViewModel.Customers.Any())
+{
+    <p><em>Немає клієнтів</em></p>
 }
 else
 {
     <div class="customer-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
         @foreach (var customer in ViewModel.Customers)
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">@customer.FullName</h5>
-                        <span class="badge bg-info text-dark">Знижка: @customer.Percent%</span>
-                    </div>
-                    <h6 class="card-subtitle mb-2 text-muted">Номер картки: @customer.CardId</h6>
-                    <p class="card-text">
-                        <strong>Телефон:</strong> @customer.Phone<br />
-                        <strong>Адреса:</strong> @customer.Address
-                    </p>
-                    <div class="d-flex justify-content-end gap-2">
-                        <button class="btn btn-primary btn-sm" @onclick="() => EditCustomer(customer.CardId)">Редагувати</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(customer.CardId)">Видалити</button>
-                    </div>
-                </div>
-            </div>
+            <CustomerView Customer="@customer" OnSave="ViewModel.EditCustomer" OnDelete="ViewModel.DeleteCustomer"/>
         }
     </div>
 }
 
 @code {
+    
     protected override void OnInitialized()
     {
         ViewModel.LoadCustomers();
-    }
-
-    private void CreateCustomer()
-    {
-        // TODO: Implement create
-    }
-
-    private void EditCustomer(string cardId)
-    {
-        // TODO: Implement edit
-    }
-
-    private void DeleteCustomer(string cardId)
-    {
-        // TODO: Implement delete
     }
 }

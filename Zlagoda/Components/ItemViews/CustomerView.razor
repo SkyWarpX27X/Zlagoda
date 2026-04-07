@@ -1,0 +1,67 @@
+﻿@using DTOModels
+@using Zlagoda.Components.ItemModifies
+
+@if (_isEditing)
+{
+    <CustomerModify Customer="ToModifyDTO(Customer)" OnSave="SaveEdit" OnCancel="CancelEdit" />
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">@Customer.FullName</h5>
+                <span class="badge bg-info text-dark">Знижка: @Customer.Percent%</span>
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted">Номер картки: @Customer.CardId</h6>
+            <p class="card-text">
+                <strong>Телефон:</strong> @Customer.Phone<br />
+                <strong>Адреса:</strong> @Customer.Address
+            </p>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-primary btn-sm" @onclick="EditCustomer">Редагувати</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(Customer.CardId)">Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public CustomerDTO Customer { get; set; } = null!;
+    [Parameter]
+    public EventCallback<CustomerModifyDTO> OnSave { get; set; }
+    [Parameter]
+    public EventCallback<string> OnDelete { get; set; }
+    
+    private bool _isEditing;
+
+    private CustomerModifyDTO ToModifyDTO(CustomerDTO customer)
+    {
+        //Move to service layer if have time for it
+        var address = customer.Address.Split(", ");
+        var name = customer.FullName.Split();
+        return new CustomerModifyDTO(customer.CardId, name[1], name[0], name.Length == 3 ? name[2] : null, customer.Phone, address[0], address[1], address[2], customer.Percent);
+    }
+
+    private void EditCustomer()
+    {
+        _isEditing = true;
+    }
+
+    private void SaveEdit(CustomerModifyDTO customer)
+    {
+        OnSave.InvokeAsync(customer);
+        _isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+    }
+
+    private void DeleteCustomer(string cardId)
+    {
+        OnDelete.InvokeAsync(cardId);
+    }
+}

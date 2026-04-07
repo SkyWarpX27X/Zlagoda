@@ -1,0 +1,73 @@
+﻿@using DTOModels
+
+<div class="card mb-3 shadow-sm border-primary">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Редагування клієнта</h5>
+        
+        <div class="mb-3">
+            <label class="form-label">Прізвище</label>
+            <input class="form-control" @bind="Customer.LastName" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Ім'я</label>
+            <input class="form-control" @bind="Customer.FirstName" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">По батькові</label>
+            <input class="form-control" @bind="Customer.Patronymic" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Телефон</label>
+            <input class="form-control" @bind="Customer.Phone" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Місто</label>
+            <input class="form-control" @bind="Customer.City" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Вулиця</label>
+            <input class="form-control" @bind="Customer.Street" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Індекс</label>
+            <input class="form-control" @bind="Customer.ZipCode" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Знижка (%)</label>
+            <input type="number" class="form-control" @bind="Customer.Percent" />
+        </div>
+        
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-success btn-sm" @onclick="Save">Зберегти</button>
+            <button class="btn btn-secondary btn-sm" @onclick="Cancel">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CustomerModifyDTO Customer { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<CustomerModifyDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task Save()
+    {
+        await OnSave.InvokeAsync(Customer);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}
