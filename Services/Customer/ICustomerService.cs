@@ -9,5 +9,4 @@ public interface ICustomerService
     void AddCustomer(CustomerModifyDTO customer);
     void UpdateCustomer(CustomerModifyDTO customer);
     void DeleteCustomer(string cardId);
-    CustomerModifyDTO ToModifyDTO(CustomerDTO customer);
 }
