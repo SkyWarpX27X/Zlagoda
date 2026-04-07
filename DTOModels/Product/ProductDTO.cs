@@ -1,6 +1,6 @@
 ﻿namespace DTOModels;
 
-public class ProductDto
+public class ProductDTO
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -8,7 +8,7 @@ public class ProductDto
     public string Characteristics { get; set; }
     public string Manufacturer { get; set; }
 
-    public ProductDto(int id, string name, string category, string characteristics, string manufacturer)
+    public ProductDTO(int id, string name, string category, string characteristics, string manufacturer)
     {
         Id = id;
         Name = name;
@@ -16,4 +16,6 @@ public class ProductDto
         Characteristics = characteristics;
         Manufacturer = manufacturer;
     }
+    
+    public ProductDTO(){}
 }
