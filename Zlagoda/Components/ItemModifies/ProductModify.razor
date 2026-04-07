@@ -1,0 +1,62 @@
+﻿@using DTOModels
+
+<div class="card mb-3 shadow-sm border-primary">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Редагування товару</h5>
+        
+        <div class="mb-3">
+            <label class="form-label">Назва</label>
+            <input class="form-control" @bind="Product.Name" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Категорія</label>
+            <select class="form-select" @bind="Product.Category">
+                <option value="">Оберіть категорію</option>
+                @foreach (var category in Categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Характеристики</label>
+            <input class="form-control" @bind="Product.Characteristics" />
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Виробник</label>
+            <input class="form-control" @bind="Product.Manufacturer" />
+        </div>
+        
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-success btn-sm" @onclick="Save">Зберегти</button>
+            <button class="btn btn-secondary btn-sm" @onclick="Cancel">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<ProductDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Categories { get; set; } = Enumerable.Empty<string>();
+
+    private async Task Save()
+    {
+        await OnSave.InvokeAsync(Product);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

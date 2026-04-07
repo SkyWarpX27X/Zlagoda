@@ -1,0 +1,64 @@
+﻿@using DTOModels
+@using Zlagoda.Components.ItemModifies
+
+@if (_isEditing)
+{
+    <ProductModify Product="Product" Categories="@Categories" OnSave="SaveEdit" OnCancel="@CancelEdit" />
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">@Product.Name</h5>
+                <span class="badge bg-secondary">@Product.Category</span>
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted">Виробник: @Product.Manufacturer</h6>
+            <p class="card-text">
+                <strong>Характеристики:</strong> @Product.Characteristics<br />
+                <strong>ID:</strong> @Product.Id
+            </p>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Id)">Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public ProductDTO Product { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<ProductDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+    
+    [Parameter]
+    public IEnumerable<string> Categories { get; set; } = Enumerable.Empty<string>();
+
+    private bool _isEditing;
+
+    private void EditProduct()
+    {
+        _isEditing = true;
+    }
+
+    private void SaveEdit(ProductDTO product)
+    {
+        OnSave.InvokeAsync(product);
+        _isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+    }
+
+    private void DeleteProduct(int id)
+    {
+        OnDelete.InvokeAsync(id);
+    }
+}
