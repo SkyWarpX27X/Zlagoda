@@ -37,4 +37,28 @@ public class ReceiptRepository : IReceiptRepository
         while (reader.Read())
             yield return MapReceipt(reader);
     }
+
+    public void AddReceipt(ReceiptDBModel receipt)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Receipt (id_employee, card_number, print_date, sum_total, vat) 
+                              VALUES (@id_employee, @card_number, @print_date, @sum_total, @vat)
+                              """;
+        command.Parameters.AddWithValue("@id_employee", receipt.EmployeeId);
+        command.Parameters.AddWithValue("@card_number", receipt.CardNumber);
+        command.Parameters.AddWithValue("@print_date", receipt.PrintDate);
+        command.Parameters.AddWithValue("@sum_total", receipt.TotalSum);
+        command.Parameters.AddWithValue("@vat", receipt.Vat);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteReceipt(ReceiptDBModel receipt)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Receipt WHERE receipt_number = @receipt_number;";
+        command.Parameters.AddWithValue("@receipt_number", receipt.Id);
+        command.ExecuteNonQuery();
+    }
+
 }

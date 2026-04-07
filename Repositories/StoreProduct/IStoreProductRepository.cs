@@ -12,4 +12,7 @@ public interface IStoreProductRepository
 
     IEnumerable<StoreProductDBModel> GetStoreProductsNonPromotional(bool sortByName = true, 
         bool sortByQuantity = false);
+    void AddStoreProduct(StoreProductDBModel storeProduct);
+    void UpdateStoreProduct(StoreProductDBModel storeProduct);
+    void DeleteStoreProduct(StoreProductDBModel storeProduct);
 }

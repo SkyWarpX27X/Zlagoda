@@ -35,4 +35,18 @@ public class SaleRepository : ISaleRepository
         while (reader.Read())
             yield return MapSale(reader);
     }
+
+    public void AddSale(SaleDBModel sale)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Sale (UPC, receipt_number, product_number, selling_price) 
+                              VALUES (@UPC,  @receipt_number, @product_number, @selling_price)
+                              """;
+        command.Parameters.AddWithValue("@UPC", sale.UPC);
+        command.Parameters.AddWithValue("@receipt_number", sale.ReceiptId);
+        command.Parameters.AddWithValue("@product_number", sale.ProductQuantity);
+        command.Parameters.AddWithValue("@selling_price", sale.SellingPrice);
+        command.ExecuteNonQuery();
+    }
 }

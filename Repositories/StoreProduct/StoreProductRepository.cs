@@ -79,4 +79,53 @@ public class StoreProductRepository : IStoreProductRepository
     }
     
     // IDK if I should add Manager query 21 here or not it feels very general help
+    // Yes you should bish SQL for the win :3 (wow colon three looks ugly with this font this was not made for cute catgirls)
+
+    public void AddStoreProduct(StoreProductDBModel storeProduct)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Store_Product (UPC, UPC_prom, id_product, selling_price, products_number, promotional_product) 
+                              VALUES (@UPC,  @UPC_prom, @id_product, @selling_price, @products_number, @promotional_product)
+                              """;
+        command.Parameters.AddWithValue("@UPC", storeProduct.UPC);
+        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm);
+        command.Parameters.AddWithValue("@id_product", storeProduct.ProductId);
+        command.Parameters.AddWithValue("@selling_price", storeProduct.SellingPrice);
+        command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
+        command.Parameters.AddWithValue("@promotional_product", storeProduct.Promotional);
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateStoreProduct(StoreProductDBModel storeProduct)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              UPDATE Store_Product 
+                              SET 
+                                UPC_prom = @UPC_prom,
+                                id_product = @id_product,
+                                selling_price = @selling_price,
+                                products_number = @products_number,
+                                promotional_product = @promotional_product
+                              WHERE
+                                  UPC = @UPC;
+                              """;
+        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm);
+        command.Parameters.AddWithValue("@id_product", storeProduct.ProductId);
+        command.Parameters.AddWithValue("@selling_price", storeProduct.SellingPrice);
+        command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
+        command.Parameters.AddWithValue("@promotional_product", storeProduct.Promotional);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteStoreProduct(StoreProductDBModel storeProduct)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Store_Product WHERE UPC = @UPC;";
+        command.Parameters.AddWithValue("@UPC", storeProduct.UPC);
+        command.ExecuteNonQuery();
+    }
+    
+    
 }
