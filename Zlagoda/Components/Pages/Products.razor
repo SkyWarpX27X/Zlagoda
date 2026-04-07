@@ -1,12 +1,24 @@
 ﻿@page "/products"
+@rendermode InteractiveServer
 @using DTOModels
 @using Zlagoda.ViewModels
+@using Zlagoda.Components.ItemViews
+@using Zlagoda.Components.ItemModifies
 @inject ProductsVM ViewModel
 
 <h3>Товари</h3>
 
 <div class="mb-3 d-flex justify-content-between align-items-center">
-    <button class="btn btn-success" @onclick="CreateProduct">Створити товар</button>
+    @if (ViewModel.IsCreating)
+    {
+        <div class="w-100 me-3">
+            <ProductModify Product="@ViewModel.NewProduct" Categories="@Categories" OnSave="@ViewModel.SaveNewProduct" OnCancel="@ViewModel.CancelCreate" />
+        </div>
+    }
+    else
+    {
+        <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити товар</button>
+    }
     
     <div class="d-flex align-items-center">
         <label for="categoryFilter" class="me-2 fw-bold">Категорія:</label>
@@ -29,23 +41,7 @@ else
     <div class="product-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
         @foreach (var product in FilteredProducts)
         {
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="card-title mb-0">@product.Name</h5>
-                        <span class="badge bg-secondary">@product.Category</span>
-                    </div>
-                    <h6 class="card-subtitle mb-2 text-muted">Виробник: @product.Manufacturer</h6>
-                    <p class="card-text">
-                        <strong>Характеристики:</strong> @product.Characteristics<br />
-                        <strong>ID:</strong> @product.Id
-                    </p>
-                    <div class="d-flex justify-content-end gap-2">
-                        <button class="btn btn-primary btn-sm" @onclick="() => EditProduct(product.Id)">Редагувати</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(product.Id)">Видалити</button>
-                    </div>
-                </div>
-            </div>
+            <ProductView Product="@product" Categories="@Categories" OnSave="ViewModel.EditProduct" OnDelete="ViewModel.DeleteProduct"/>
         }
     </div>
 }
@@ -56,7 +52,7 @@ else
     private IEnumerable<string> Categories => 
         ViewModel.Products?.Select(p => p.Category).Distinct().OrderBy(c => c) ?? Enumerable.Empty<string>();
 
-    private IEnumerable<ProductDto> FilteredProducts => 
+    private IEnumerable<ProductDTO> FilteredProducts => 
         string.IsNullOrEmpty(SelectedCategory) 
             ? ViewModel.Products 
             : ViewModel.Products.Where(p => p.Category == SelectedCategory);
@@ -64,20 +60,5 @@ else
     protected override void OnInitialized()
     {
         ViewModel.LoadProducts();
-    }
-
-    private void CreateProduct()
-    {
-        // TODO: Implement create
-    }
-
-    private void EditProduct(int id)
-    {
-        // TODO: Implement edit
-    }
-
-    private void DeleteProduct(int id)
-    {
-        // TODO: Implement delete
     }
 }
