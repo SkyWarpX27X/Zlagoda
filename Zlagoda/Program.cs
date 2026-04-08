@@ -72,10 +72,15 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-// VERY temporary for testing
+
+
+
+// TESTING EVERYTHING IN HERE
 var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
-var ct = new CategoryDBModel(1, "ssdsds");
-storage.Categories.DeleteCategory(ct);
+var employee = new EmployeeDBModel("Hh", "aha", null, "Cashier", 100.1m, "01-01-2001", "03-04-2026", "+455445", "Kyiv",
+    "Vulytsya", "010110", "user5", "1234");
+
+storage.Employees.AddEmployee(employee);
 
 
 app.Run();

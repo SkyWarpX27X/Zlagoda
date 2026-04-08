@@ -79,7 +79,7 @@ public class EmployeeRepository : IEmployeeRepository
                               """;
         command.Parameters.AddWithValue("@empl_surname", employee.Surname);
         command.Parameters.AddWithValue("@empl_name", employee.Name);
-        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic);
+        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic is null ? DBNull.Value : employee.Patronymic);
         command.Parameters.AddWithValue("@empl_role", employee.Role);
         command.Parameters.AddWithValue("@salary", employee.Salary);
         command.Parameters.AddWithValue("@date_of_birth", employee.DateOfBirth);
@@ -88,7 +88,7 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@city", employee.City);
         command.Parameters.AddWithValue("@street", employee.Street);
         command.Parameters.AddWithValue("@zip_code", employee.ZipCode);
-        command.Parameters.AddWithValue("@user_name", employee.Name);
+        command.Parameters.AddWithValue("@user_name", employee.Username);
         command.Parameters.AddWithValue("@user_password", employee.Password);
         command.ExecuteNonQuery();
     }
@@ -115,7 +115,7 @@ public class EmployeeRepository : IEmployeeRepository
                               """;
         command.Parameters.AddWithValue("@empl_surname", employee.Surname);
         command.Parameters.AddWithValue("@empl_name", employee.Name);
-        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic);
+        command.Parameters.AddWithValue("@empl_patronymic", employee.Patronymic is null ? DBNull.Value : employee.Patronymic);
         command.Parameters.AddWithValue("@empl_role", employee.Role);
         command.Parameters.AddWithValue("@salary", employee.Salary);
         command.Parameters.AddWithValue("@date_of_birth", employee.DateOfBirth);

@@ -67,11 +67,11 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@card_number", card.Number);
         command.Parameters.AddWithValue("@cust_surname", card.Surname);
         command.Parameters.AddWithValue("@cust_name", card.Name);
-        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic);
+        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic is null ? DBNull.Value : card.Patronymic);
         command.Parameters.AddWithValue("@phone_number", card.PhoneNumber);
-        command.Parameters.AddWithValue("@city", card.City);
-        command.Parameters.AddWithValue("@street", card.Street);
-        command.Parameters.AddWithValue("@zip_code", card.ZipCode);
+        command.Parameters.AddWithValue("@city", card.City is null ? DBNull.Value : card.City);
+        command.Parameters.AddWithValue("@street", card.Street is null ? DBNull.Value : card.Street);
+        command.Parameters.AddWithValue("@zip_code", card.ZipCode is  null ? DBNull.Value : card.ZipCode);
         command.Parameters.AddWithValue("@percent", card.Percent);
         command.ExecuteNonQuery();
     }
@@ -94,11 +94,11 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@card_number", card.Number);
         command.Parameters.AddWithValue("@cust_surname", card.Surname);
         command.Parameters.AddWithValue("@cust_name", card.Name);
-        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic);
+        command.Parameters.AddWithValue("@cust_patronymic", card.Patronymic is null ? DBNull.Value : card.Patronymic);
         command.Parameters.AddWithValue("@phone_number", card.PhoneNumber);
-        command.Parameters.AddWithValue("@city", card.City);
-        command.Parameters.AddWithValue("@street", card.Street);
-        command.Parameters.AddWithValue("@zip_code", card.ZipCode);
+        command.Parameters.AddWithValue("@city", card.City is null ? DBNull.Value : card.City);
+        command.Parameters.AddWithValue("@street", card.Street is null ? DBNull.Value : card.Street);
+        command.Parameters.AddWithValue("@zip_code", card.ZipCode is null ? DBNull.Value : card.ZipCode);
         command.Parameters.AddWithValue("@percent", card.Percent);
         command.ExecuteNonQuery();
     }

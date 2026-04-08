@@ -100,7 +100,7 @@ public class ReceiptRepository : IReceiptRepository
                               VALUES (@id_employee, @card_number, @print_date, @sum_total, @vat)
                               """;
         command.Parameters.AddWithValue("@id_employee", receipt.EmployeeId);
-        command.Parameters.AddWithValue("@card_number", receipt.CardNumber);
+        command.Parameters.AddWithValue("@card_number", receipt.CardNumber is null ? DBNull.Value : receipt.CardNumber);
         command.Parameters.AddWithValue("@print_date", receipt.PrintDate);
         command.Parameters.AddWithValue("@sum_total", receipt.TotalSum);
         command.Parameters.AddWithValue("@vat", receipt.Vat);
