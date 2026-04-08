@@ -4,13 +4,13 @@ namespace Repositories.StoreProduct;
 
 public interface IStoreProductRepository
 {
-    StoreProductDBModel? GetStoreProduct(string upc);
-    IEnumerable<StoreProductDBModel> GetStoreProducts(bool sortByName = true, bool sortByQuantity = false);
+    StoreProductInfoDataModel? GetStoreProduct(string upc);
+    IEnumerable<StoreProductInfoDataModel> GetStoreProducts(bool sortByName = true, bool sortByQuantity = false);
 
-    public IEnumerable<StoreProductDBModel> GetStoreProductsPromotional(bool sortByName = true,
+    public IEnumerable<StoreProductInfoDataModel> GetStoreProductsPromotional(bool sortByName = true,
         bool sortByQuantity = false);
 
-    IEnumerable<StoreProductDBModel> GetStoreProductsNonPromotional(bool sortByName = true, 
+    IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, 
         bool sortByQuantity = false);
     void AddStoreProduct(StoreProductDBModel storeProduct);
     void UpdateStoreProduct(StoreProductDBModel storeProduct);

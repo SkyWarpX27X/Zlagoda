@@ -11,7 +11,7 @@ public class CustomerCardRepository : ICustomerCardRepository
     {
         _connection = connection;
     }
-    private static CustomerCardDBModel MapCategory(SqliteDataReader reader) => new(
+    private static CustomerCardDBModel MapCustomer(SqliteDataReader reader) => new(
         reader.GetString(reader.GetOrdinal("card_number")),
         reader.GetString(reader.GetOrdinal("cust_surname")),
         reader.GetString(reader.GetOrdinal("cust_name")),
@@ -23,13 +23,13 @@ public class CustomerCardRepository : ICustomerCardRepository
         reader.GetInt32(reader.GetOrdinal("percent"))
     );
 
-    public CustomerCardDBModel? GetCategory(string number)
+    public CustomerCardDBModel? GetCustomer(string number)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "SELECT * FROM Customer_Card WHERE card_number = @number";
         command.Parameters.AddWithValue("@number", number);
         using var reader = command.ExecuteReader();
-        return reader.Read() ? MapCategory(reader) : null;
+        return reader.Read() ? MapCustomer(reader) : null;
     }
 
     public IEnumerable<CustomerCardDBModel> GetCustomers(bool sortByName = true, int percent = -1)
@@ -42,9 +42,19 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@percent", percent);
         using var reader = command.ExecuteReader();
         while (reader.Read())
-            yield return MapCategory(reader);
+            yield return MapCustomer(reader);
     }
-    
+
+    public IEnumerable<CustomerCardDBModel> GetCustomersBySurname(string surnameQuery)
+    {
+        var namePattern = surnameQuery + "%";
+        using var command = _connection.CreateCommand();
+        command.CommandText = "SELECT * FROM Customer_Card WHERE LOWER(cust_surname) LIKE LOWER(@namePattern)";
+        command.Parameters.AddWithValue("@namePattern", namePattern);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return MapCustomer(reader);
+    }
     public void AddCustomerCard(CustomerCardDBModel card)
     {
         using var command = _connection.CreateCommand();

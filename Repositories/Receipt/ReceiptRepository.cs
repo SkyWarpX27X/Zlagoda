@@ -29,20 +29,74 @@ public class ReceiptRepository : IReceiptRepository
         return reader.Read() ? MapReceipt(reader) : null;
     }
     
-    public IEnumerable<ReceiptDBModel> GetReceipts()
+    public IEnumerable<ReceiptDBModel> GetReceipts((string StartDate, string EndDate)? dates = null)
     {
         using var command = _connection.CreateCommand(); 
-        command.CommandText = "SELECT * FROM Receipt";
+        var query = "SELECT * FROM Receipt";
+        if (dates != null)
+            query += "WHERE print_date BETWEEN @startDate AND @endDate";
+        command.CommandText = query;
+        if (dates != null)
+        {
+            command.Parameters.AddWithValue("@startDate", dates?.StartDate);
+            command.Parameters.AddWithValue("@endDate", dates?.EndDate);
+        }
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapReceipt(reader);
     }
 
+    public IEnumerable<ReceiptDBModel> GetReceiptsByCashier(long employeeId, (string StartDate, string EndDate)? dates = null)
+    {
+        using var command = _connection.CreateCommand();
+        var query = "SELECT * FROM Receipt WHERE id_employee = @employeeId";
+        if (dates != null)
+            query += "AND print_date BETWEEN @startDate AND @endDate";
+        command.CommandText = query;
+        command.Parameters.AddWithValue("@employeeId", employeeId);
+        if (dates != null)
+        {
+            command.Parameters.AddWithValue("@startDate", dates?.StartDate);
+            command.Parameters.AddWithValue("@endDate", dates?.EndDate);
+        }
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return MapReceipt(reader);
+    }
+
+    public decimal GetSumTotal((string StartDate, string EndDate) dates)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT COALESCE(SUM(sum_total), 0)
+                              FROM Receipt 
+                              WHERE print_date BETWEEN @startDate AND @endDate;
+                              """;
+        command.Parameters.AddWithValue("@startDate", dates.StartDate);
+        command.Parameters.AddWithValue("@endDate", dates.EndDate);
+        return Convert.ToDecimal(command.ExecuteScalar());
+    }
+
+    public decimal GetSumByCashier(long employeeId, (string StartDate, string EndDate) dates)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT COALESCE(SUM(sum_total), 0)
+                              FROM Receipt 
+                              WHERE id_employee = @employeeId
+                              AND print_date BETWEEN @startDate AND @endDate;
+                              """;
+        command.Parameters.AddWithValue("@employeeId", employeeId);
+        command.Parameters.AddWithValue("@startDate", dates.StartDate);
+        command.Parameters.AddWithValue("@endDate", dates.EndDate);
+        return Convert.ToDecimal(command.ExecuteScalar());
+    }
+    
     public void AddReceipt(ReceiptDBModel receipt)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """
-                              INSERT INTO Receipt (id_employee, card_number, print_date, sum_total, vat) 
+                              INSERT INTO Receipt (id_employee, card_number, print_date, sum_total, vat)
                               VALUES (@id_employee, @card_number, @print_date, @sum_total, @vat)
                               """;
         command.Parameters.AddWithValue("@id_employee", receipt.EmployeeId);

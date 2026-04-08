@@ -27,27 +27,48 @@ public class ProductRepository : IProductRepository
         return reader.Read() ? MapProduct(reader) : null;
     }
     
-    public IEnumerable<ProductDBModel> GetProducts(bool sortByName = true, string? categoryName = null, 
-        string? productName = null)
+    public IEnumerable<ProductDBModel> GetProducts(bool sortByName = true, string? categoryName = null)
     {
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Product";
-        if (!string.IsNullOrEmpty(categoryName))
-        {
+        if (!string.IsNullOrEmpty(categoryName)) 
             query += " WHERE category_name = @categoryName";
-            if (!string.IsNullOrEmpty(productName)) query += " AND product_name = @productName";
-        }
-        if (!string.IsNullOrEmpty(productName) && string.IsNullOrEmpty(categoryName))
-        {
-            query += " WHERE product_name = @productName";
-        }
-        if (sortByName) query += " ORDER BY product_name";
+        if (sortByName) 
+            query += " ORDER BY product_name";
         command.CommandText = query;
-        if (!string.IsNullOrEmpty(categoryName)) command.Parameters.AddWithValue("@categoryName", categoryName);
-        if (!string.IsNullOrEmpty(productName)) command.Parameters.AddWithValue("@productName", productName);
+        if (!string.IsNullOrEmpty(categoryName)) 
+            command.Parameters.AddWithValue("@categoryName", categoryName);
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapProduct(reader);
+    }
+
+    public IEnumerable<ProductDBModel> GetProductsByName(string productNameQuery)
+    {
+        var namePattern = productNameQuery + "%";
+        using var command = _connection.CreateCommand();
+        command.CommandText = "SELECT * FROM Product WHERE LOWER(product_name) LIKE LOWER(@namePattern)";
+        command.Parameters.AddWithValue("@namePattern", namePattern);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return MapProduct(reader);
+    }
+    
+    public int GetTotalUnits(long id, (string StartDate, string EndDate) dates)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT COALESCE(SUM(product_number), 0)
+                              FROM Sale 
+                              JOIN Receipt ON Sale.receipt_number = Receipt.receipt_number
+                              JOIN Store_Product ON Sale.UPC = Store_Product.UPC
+                              WHERE Store_Product.id_product = @id_product
+                              AND Receipt.print_date BETWEEN @startDate AND @endDate
+                              """;
+        command.Parameters.AddWithValue("@id_product", id);
+        command.Parameters.AddWithValue("@startDate", dates.StartDate);
+        command.Parameters.AddWithValue("@endDate", dates.EndDate);
+        return Convert.ToInt32(command.ExecuteScalar());
     }
 
     public void AddProduct(ProductDBModel product)
@@ -92,4 +113,5 @@ public class ProductRepository : IProductRepository
         command.Parameters.AddWithValue("@id_product", product.Id);
         command.ExecuteNonQuery();
     }
+
 }

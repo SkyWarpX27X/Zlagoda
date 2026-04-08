@@ -46,6 +46,26 @@ public class EmployeeRepository : IEmployeeRepository
         while (reader.Read())
             yield return MapEmployee(reader);
     }
+
+    public IEnumerable<EmployeeContactInfoDataModel> GetEmployeeContactInfo(string surnameQuery)
+    {
+        var namePattern = surnameQuery + "%";
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT phone_number, city, street, zip_code 
+                              FROM Employee 
+                              WHERE LOWER(empl_surname) LIKE LOWER(@namePattern)
+                              """;
+        command.Parameters.AddWithValue("@namePattern", namePattern);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return new EmployeeContactInfoDataModel(
+                reader.GetString(reader.GetOrdinal("empl_surname")),
+                reader.GetString(reader.GetOrdinal("phone_number")),
+                reader.GetString(reader.GetOrdinal("city")),
+                reader.GetString(reader.GetOrdinal("street")),
+                reader.GetString(reader.GetOrdinal("zip_code")));
+    }
     
     public void AddEmployee(EmployeeDBModel employee)
     {

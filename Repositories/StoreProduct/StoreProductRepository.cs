@@ -10,8 +10,9 @@ public class StoreProductRepository : IStoreProductRepository
     {
         _connection = connection;
     }
-    private static StoreProductDBModel MapStoreProduct(SqliteDataReader reader) => new(
+    private static StoreProductInfoDataModel MapStoreProduct(SqliteDataReader reader) => new(
         reader.GetString(reader.GetOrdinal("UPC")),
+            reader.GetString(reader.GetOrdinal("product_name")),
         reader.IsDBNull(reader.GetOrdinal("UPC_prom")) ? null : reader.GetString(reader.GetOrdinal("UPC_prom")),
         reader.GetInt64(reader.GetOrdinal("id_product")),
         reader.GetDecimal(reader.GetOrdinal("selling_price")),
@@ -19,40 +20,36 @@ public class StoreProductRepository : IStoreProductRepository
         reader.GetBoolean(reader.GetOrdinal("promotional_product"))
     );
 
-    public StoreProductDBModel? GetStoreProduct(string upc)
+    public StoreProductInfoDataModel? GetStoreProduct(string upc)
     {
         using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Product WHERE UPC = @upc";
+        command.CommandText = "SELECT * FROM Store_Product S JOIN Product P ON S.id_product = P.id_product WHERE UPC = @upc";
         command.Parameters.AddWithValue("@upc", upc);
         using var reader = command.ExecuteReader();
         return reader.Read() ? MapStoreProduct(reader) : null;
     }
     
-    public IEnumerable<StoreProductDBModel> GetStoreProducts(bool sortByName = true, bool sortByQuantity = false)
+    public IEnumerable<StoreProductInfoDataModel> GetStoreProducts(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
         // Since we join, it technically returns all attributes. Is that necessarily bad? I'm not sure, since I think
         // SELECT basically just does a projection on the final result anyway, and we just ignore that by mapping it to
         // the DB model.
-        var query = "SELECT * FROM Store_Product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
         if (sortByName || sortByQuantity) 
-            query += $"""
-                     JOIN Product ON Store_Product.id_product = Product.id_product
-                     ORDER BY {(sortByName ? "product_name" : "products_number")}
-                     """;
+            query += $"ORDER BY {(sortByName ? "product_name" : "products_number")}";
         command.CommandText = query;
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapStoreProduct(reader);
     }
 
-    public IEnumerable<StoreProductDBModel> GetStoreProductsPromotional(bool sortByName = true, bool sortByQuantity = false)
+    public IEnumerable<StoreProductInfoDataModel> GetStoreProductsPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
         if (sortByName || sortByQuantity) 
             query += $"""
-                      JOIN Product ON Store_Product.id_product = Product.id_product
                       WHERE promotional_product IS TRUE
                       ORDER BY {(sortByName ? "product_name" : "products_number")}
                       """;
@@ -62,13 +59,12 @@ public class StoreProductRepository : IStoreProductRepository
             yield return MapStoreProduct(reader);
     }
     
-    public IEnumerable<StoreProductDBModel> GetStoreProductsNonPromotional(bool sortByName = true, bool sortByQuantity = false)
+    public IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
         if (sortByName || sortByQuantity) 
             query += $"""
-                      JOIN Product ON Store_Product.id_product = Product.id_product
                       WHERE promotional_product IS FALSE
                       ORDER BY {(sortByName ? "product_name" : "products_number")}
                       """;
@@ -77,10 +73,25 @@ public class StoreProductRepository : IStoreProductRepository
         while (reader.Read())
             yield return MapStoreProduct(reader);
     }
-    
-    // IDK if I should add Manager query 21 here or not it feels very general help
-    // Yes you should bish SQL for the win :3 (wow colon three looks ugly with this font this was not made for cute catgirls)
 
+    public StoreProductBriefInfoDataModel? GetStoreProductBriefInfo(string upc)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT selling_price, products_number, product_name, characteristics
+                              FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product
+                              WHERE UPC = @upc;
+                              """;
+        using var reader = command.ExecuteReader();
+        return !reader.Read()
+            ? null
+            : new StoreProductBriefInfoDataModel(upc,
+                reader.GetDecimal(reader.GetOrdinal("selling_price")),
+                reader.GetInt32(reader.GetOrdinal("products_number")),
+                reader.GetString(reader.GetOrdinal("product_name")),
+                reader.GetString(reader.GetOrdinal("characteristics")));
+    }
+    
     public void AddStoreProduct(StoreProductDBModel storeProduct)
     {
         using var command = _connection.CreateCommand();
