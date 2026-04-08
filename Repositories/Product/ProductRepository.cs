@@ -49,4 +49,47 @@ public class ProductRepository : IProductRepository
         while (reader.Read())
             yield return MapProduct(reader);
     }
+
+    public void AddProduct(ProductDBModel product)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              INSERT INTO Product (category_number, product_name, characteristics, manufacturer) 
+                              VALUES (@category_number, @product_name, @characteristics, @manufacturer);
+                              """;
+        command.Parameters.AddWithValue("@category_number", product.CategoryId);
+        command.Parameters.AddWithValue("@product_name", product.Name);
+        command.Parameters.AddWithValue("@characteristics", product.Characteristics);
+        command.Parameters.AddWithValue("@manufacturer", product.Manufacturer);
+        command.ExecuteNonQuery();
+    }
+
+    public void UpdateProduct(ProductDBModel product)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              UPDATE Product 
+                              SET 
+                                category_number = @category_number,
+                                product_name = @product_name,
+                                characteristics = @characteristics,
+                                manufacturer = @manufacturer
+                              WHERE
+                                  id_product = @id_product;
+                              """;
+        command.Parameters.AddWithValue("@category_number", product.CategoryId);
+        command.Parameters.AddWithValue("@product_name", product.Name);
+        command.Parameters.AddWithValue("@characteristics", product.Characteristics);
+        command.Parameters.AddWithValue("@manufacturer", product.Manufacturer);
+        command.Parameters.AddWithValue("@id_product", product.Id);
+        command.ExecuteNonQuery();
+    }
+
+    public void DeleteProduct(ProductDBModel product)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM Product WHERE id_product = @id_product;";
+        command.Parameters.AddWithValue("@id_product", product.Id);
+        command.ExecuteNonQuery();
+    }
 }
