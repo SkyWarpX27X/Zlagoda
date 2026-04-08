@@ -8,4 +8,7 @@ public class ReceiptDBModel(long id, long employeeId, string? cardNumber, string
     public string PrintDate { get; set; } = printDate;
     public decimal TotalSum { get; set; } = totalSum;
     public decimal Vat { get; set; } = vat;
+
+    public ReceiptDBModel(long employeeId, string? cardNumber, string printDate, decimal totalSum, decimal vat) : this(
+        0, employeeId, cardNumber, printDate, totalSum, vat) {}
 }
