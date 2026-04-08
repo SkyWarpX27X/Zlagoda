@@ -1,0 +1,56 @@
+﻿@using DTOModels
+@using Zlagoda.Components.ItemModifies
+
+@if (_isEditing)
+{
+    <CategoryModify Category="Category" OnSave="SaveEdit" OnCancel="@CancelEdit" />
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">@Category.Name</h5>
+                <span class="badge bg-secondary">ID: @Category.Id</span>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-primary btn-sm" @onclick="EditCategory">Редагувати</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => DeleteCategory(Category.Id)">Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public CategoryDto Category { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<CategoryDto> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<long> OnDelete { get; set; }
+    
+    private bool _isEditing;
+
+    private void EditCategory()
+    {
+        _isEditing = true;
+    }
+
+    private void SaveEdit(CategoryDto category)
+    {
+        OnSave.InvokeAsync(category);
+        _isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+    }
+
+    private void DeleteCategory(long id)
+    {
+        OnDelete.InvokeAsync(id);
+    }
+}
