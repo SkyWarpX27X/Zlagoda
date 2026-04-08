@@ -28,7 +28,7 @@ public class CategoryRepository : ICategoryRepository
     {
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Category";
-        if (sortByName) query += "ORDER BY category_name";
+        if (sortByName) query += " ORDER BY category_name";
         command.CommandText = query;
         using var reader = command.ExecuteReader();
         while (reader.Read())

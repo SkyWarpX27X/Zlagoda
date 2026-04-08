@@ -52,7 +52,7 @@ public class EmployeeRepository : IEmployeeRepository
         var namePattern = surnameQuery + "%";
         using var command = _connection.CreateCommand();
         command.CommandText = """
-                              SELECT phone_number, city, street, zip_code 
+                              SELECT empl_surname, phone_number, city, street, zip_code 
                               FROM Employee 
                               WHERE LOWER(empl_surname) LIKE LOWER(@namePattern)
                               """;

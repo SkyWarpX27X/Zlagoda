@@ -15,7 +15,7 @@ public class CustomerCardRepository : ICustomerCardRepository
         reader.GetString(reader.GetOrdinal("card_number")),
         reader.GetString(reader.GetOrdinal("cust_surname")),
         reader.GetString(reader.GetOrdinal("cust_name")),
-        reader.GetString(reader.GetOrdinal("cust_patronymic")),
+        reader.IsDBNull(reader.GetOrdinal("cust_patronymic")) ? null : reader.GetString(reader.GetOrdinal("cust_patronymic")),
         reader.GetString(reader.GetOrdinal("phone_number")),
         reader.IsDBNull(reader.GetOrdinal("city")) ? null : reader.GetString(reader.GetOrdinal("city")),
         reader.IsDBNull(reader.GetOrdinal("street")) ? null : reader.GetString(reader.GetOrdinal("street")),

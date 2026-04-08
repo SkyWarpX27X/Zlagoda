@@ -1,3 +1,4 @@
+using System.Text;
 using DBModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Repositories.Category;
@@ -77,11 +78,17 @@ app.MapRazorComponents<App>()
 
 // TESTING EVERYTHING IN HERE
 var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
-var employee = new EmployeeDBModel("sd", "s", "sd", "Cashier", 100.3m, "01-01-2001", "02-02-2024", "+433434", "gfd",
-    "sd", "df", "haha", "1212");
+var employee = new EmployeeDBModel(2,"Мартиненко", "Анна", "Вікторівна", "Manager", 3000m,
+    "09-07-2004", "15-11-2022", "+380774328165", "Вінниця", "вул. Монастирська, 12", "21000", "ann_martynenko", "^HPQK8Xhe#@4wJJPD");
 var receipt = new ReceiptDBModel(1,1, null, "08-04-2026", 210.6m, 20);
 var sale = new SaleDBModel("192123823", 1, 10, 50m);
-storage.Receipts.DeleteReceipt(receipt);
+storage.Employees.UpdateEmployee(employee);
+IEnumerable<ProductDBModel> products = storage.Products.GetProducts();
+Console.OutputEncoding = Encoding.UTF8;
+foreach (var cust in products)
+{
+    Console.WriteLine(cust.Name);
+} 
 
 
 app.Run();
