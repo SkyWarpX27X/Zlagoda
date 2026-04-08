@@ -1,6 +1,83 @@
-﻿@page "/productsStore"
+﻿@page "/productsInStore"
+@rendermode InteractiveServer
+@using DTOModels
+@using Zlagoda.ViewModels
+@using Zlagoda.Components.ItemViews
+@using Zlagoda.Components.ItemModifies
+@inject ProductsInStoreVM ViewModel
+
 <h3>Товари в магазині</h3>
 
+<div class="mb-3">
+    @if (ViewModel.IsCreating && ViewModel.NewProduct != null)
+    {
+        <div class="w-100 mb-3">
+            <ProductInStoreModify Product="@ViewModel.NewProduct" IsNew="true" AvailableProducts="ViewModel.AvailableProducts" OnSave="@ViewModel.SaveNewProduct" OnCancel="@ViewModel.CancelCreate" />
+        </div>
+    }
+    else
+    {
+        <button class="btn btn-success mb-3" @onclick="ViewModel.ShowCreateNew">Додати товар в магазин</button>
+    }
+
+    <div class="card bg-light p-3">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label for="searchUpc" class="form-label fw-bold">Пошук за UPC:</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchUpc" class="form-control" placeholder="Введіть UPC..." @bind="ViewModel.SearchUpc" @bind:event="oninput" />
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="promFilter" class="form-label fw-bold">Фільтр акцій:</label>
+                <select id="promFilter" class="form-select" @bind="ViewModel.PromFilter">
+                    <option value="All">Всі товари</option>
+                    <option value="PromOnly">Тільки акційні</option>
+                    <option value="NonPromOnly">Тільки неакційні</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4">
+                <label for="sortBy" class="form-label fw-bold">Сортування:</label>
+                <select id="sortBy" class="form-select" @bind="ViewModel.SortBy">
+                    <option value="Name">За назвою</option>
+                    <option value="Quantity">За кількістю</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ViewModel.ProductsInStore == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!ViewModel.ProductsInStore.Any())
+{
+    <p><em>Немає товарів у магазині</em></p>
+}
+else
+{
+    <div class="product-in-store-list" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+        @foreach (var product in ViewModel.FilteredAndSortedProducts)
+        {
+            <ProductInStoreView 
+                Product="@product"
+                AvailableProducts="ViewModel.AvailableProducts"
+                OnSave="ViewModel.EditProduct" 
+                OnDelete="ViewModel.DeleteProduct"
+                OnMakeProm="ViewModel.MakeProm"
+                OnCancelProm="ViewModel.CancelProm" />
+        }
+    </div>
+}
+
 @code {
-    
+
+    protected override void OnInitialized()
+    {
+        ViewModel.LoadProducts();
+    }
 }

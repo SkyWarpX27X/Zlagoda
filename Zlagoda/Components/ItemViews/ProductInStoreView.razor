@@ -1,0 +1,116 @@
+﻿@using DTOModels
+@using Zlagoda.Components.ItemModifies
+
+@if (_isEditing)
+{
+    <ProductInStoreModify Product="ToModifyDTO(Product)" CurrentProductName="@Product.Name" AvailableProducts="AvailableProducts" OnSave="SaveEdit" OnCancel="@CancelEdit" />
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">
+                    @Product.Name
+                    @if (Product.IsProm)
+                    {
+                        <span class="badge bg-danger ms-2">Акція</span>
+                    }
+                </h5>
+                <span class="badge bg-secondary">Кількість: @Product.Quantity</span>
+            </div>
+            
+            <h6 class="card-subtitle mb-2 text-muted">UPC: @Product.Upc</h6>
+            
+            <div class="card-text mb-3">
+                <div class="d-flex align-items-center">
+                    <strong class="me-2">Ціна:</strong>
+                    @if (Product.IsProm && Product.OldPrice.HasValue)
+                    {
+                        <span class="text-decoration-line-through text-muted me-2">@Product.OldPrice.Value.ToString("C")</span>
+                        <span class="text-danger fw-bold fs-5">@Product.Price.ToString("C")</span>
+                    }
+                    else
+                    {
+                        <span class="fw-bold fs-5">@Product.Price.ToString("C")</span>
+                    }
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2">
+                @if (Product.IsProm)
+                {
+                    <button class="btn btn-warning btn-sm text-dark" @onclick="() => CancelProm(Product.Upc)">Скасувати акцію</button>
+                }
+                else
+                {
+                    <button class="btn btn-success btn-sm" @onclick="() => MakeProm(Product.Upc)">Зробити акційним</button>
+                }
+                <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Upc)">Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public StoreProductDTO Product { get; set; } = null!;
+    
+    [Parameter]
+    public IEnumerable<ProductDTO> AvailableProducts { get; set; } = Enumerable.Empty<ProductDTO>();
+
+    [Parameter]
+    public EventCallback<StoreProductModifyDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnDelete { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> OnMakeProm { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCancelProm { get; set; }
+
+    private bool _isEditing;
+
+    private StoreProductModifyDTO ToModifyDTO(StoreProductDTO product)
+    {
+        // Ideally handled by a service, but for now we look up the product ID
+        // Assuming we pass it along or find it. For now, defaulting ProductId to 0
+        // until we hook up actual data mapping. We need ProductId from somewhere.
+        // Let's assume you'll map it correctly based on Upc later.
+        return new StoreProductModifyDTO(product.Upc, product.OldPrice ?? product.Price, product.Quantity);
+    }
+
+    private void EditProduct()
+    {
+        _isEditing = true;
+    }
+
+    private void SaveEdit(StoreProductModifyDTO product)
+    {
+        OnSave.InvokeAsync(product);
+        _isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+    }
+
+    private void DeleteProduct(string upc)
+    {
+        OnDelete.InvokeAsync(upc);
+    }
+    
+    private void MakeProm(string upc)
+    {
+        OnMakeProm.InvokeAsync(upc);
+    }
+
+    private void CancelProm(string upc)
+    {
+        OnCancelProm.InvokeAsync(upc);
+    }
+}
