@@ -51,7 +51,7 @@ public class ProductsVM
         LoadProducts();
     }
 
-    public void DeleteProduct(int id)
+    public void DeleteProduct(long id)
     {
         //_productService.DeleteProduct(id);
         LoadProducts();

@@ -34,7 +34,7 @@ else
     public EventCallback<ProductDTO> OnSave { get; set; }
 
     [Parameter]
-    public EventCallback<int> OnDelete { get; set; }
+    public EventCallback<long> OnDelete { get; set; }
     
     [Parameter]
     public IEnumerable<string> Categories { get; set; } = Enumerable.Empty<string>();
@@ -57,7 +57,7 @@ else
         _isEditing = false;
     }
 
-    private void DeleteProduct(int id)
+    private void DeleteProduct(long id)
     {
         OnDelete.InvokeAsync(id);
     }
