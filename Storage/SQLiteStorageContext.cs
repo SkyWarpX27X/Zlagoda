@@ -86,7 +86,7 @@ public class SQLiteStorageContext
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Store_Product (
                                   UPC TEXT PRIMARY KEY NOT NULL CHECK(length(UPC) <= 12),
-                                  UPC_prom TEXT NOT NULL,
+                                  UPC_prom TEXT NULL,
                                   id_product INT NOT NULL,
                                   selling_price DECIMAL(13,4) NOT NULL,
                                   products_number INT NOT NULL,
@@ -115,11 +115,12 @@ public class SQLiteStorageContext
                                 percent INT NOT NULL
                               );
                               """;
+        command.ExecuteNonQuery();
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Receipt (
                                 receipt_number INTEGER PRIMARY KEY,
                                 id_employee TEXT NOT NULL,
-                                card_number TEXT NOT NULL,
+                                card_number TEXT NULL,
                                 print_date TEXT NOT NULL,
                                 sum_total DECIMAL(13,4) NOT NULL,
                                 vat DECIMAL(13,4) NOT NULL,

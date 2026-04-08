@@ -127,6 +127,7 @@ public class StoreProductRepository : IStoreProductRepository
         command.Parameters.AddWithValue("@selling_price", storeProduct.SellingPrice);
         command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
         command.Parameters.AddWithValue("@promotional_product", storeProduct.Promotional);
+        command.Parameters.AddWithValue("@UPC", storeProduct.UPC);
         command.ExecuteNonQuery();
     }
 

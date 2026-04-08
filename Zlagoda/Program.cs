@@ -77,10 +77,11 @@ app.MapRazorComponents<App>()
 
 // TESTING EVERYTHING IN HERE
 var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
-var employee = new EmployeeDBModel("Hh", "aha", null, "Cashier", 100.1m, "01-01-2001", "03-04-2026", "+455445", "Kyiv",
-    "Vulytsya", "010110", "user5", "1234");
-
-storage.Employees.AddEmployee(employee);
+var employee = new EmployeeDBModel("sd", "s", "sd", "Cashier", 100.3m, "01-01-2001", "02-02-2024", "+433434", "gfd",
+    "sd", "df", "haha", "1212");
+var receipt = new ReceiptDBModel(1,1, null, "08-04-2026", 210.6m, 20);
+var sale = new SaleDBModel("192123823", 1, 10, 50m);
+storage.Receipts.DeleteReceipt(receipt);
 
 
 app.Run();

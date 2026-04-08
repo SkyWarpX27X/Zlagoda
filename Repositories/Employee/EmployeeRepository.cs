@@ -90,7 +90,14 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@zip_code", employee.ZipCode);
         command.Parameters.AddWithValue("@user_name", employee.Username);
         command.Parameters.AddWithValue("@user_password", employee.Password);
-        command.ExecuteNonQuery();
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException ex) when (ex.SqliteExtendedErrorCode == 2067)
+        {
+            throw new InvalidOperationException($"An employee with username \"{employee.Username}\" already exists.");
+        }
     }
 
     public void UpdateEmployee(EmployeeDBModel employee)
@@ -127,7 +134,14 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@user_name", employee.Username);
         command.Parameters.AddWithValue("@user_password", employee.Password);
         command.Parameters.AddWithValue("@id_employee", employee.Id);
-        command.ExecuteNonQuery();
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException ex) when (ex.SqliteExtendedErrorCode == 2067)
+        {
+            throw new InvalidOperationException($"An employee with username \"{employee.Username}\" already exists.");
+        }
     }
 
     public void DeleteEmployee(EmployeeDBModel employee)

@@ -73,7 +73,14 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@street", card.Street is null ? DBNull.Value : card.Street);
         command.Parameters.AddWithValue("@zip_code", card.ZipCode is  null ? DBNull.Value : card.ZipCode);
         command.Parameters.AddWithValue("@percent", card.Percent);
-        command.ExecuteNonQuery();
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException ex) when (ex.SqliteExtendedErrorCode == 1555)
+        {
+            throw new InvalidOperationException($"A card with number {card.Number} already exists.");
+        }
     }
 
     public void UpdateCustomerCard(CustomerCardDBModel card)
@@ -100,7 +107,14 @@ public class CustomerCardRepository : ICustomerCardRepository
         command.Parameters.AddWithValue("@street", card.Street is null ? DBNull.Value : card.Street);
         command.Parameters.AddWithValue("@zip_code", card.ZipCode is null ? DBNull.Value : card.ZipCode);
         command.Parameters.AddWithValue("@percent", card.Percent);
-        command.ExecuteNonQuery();
+        try
+        {
+            command.ExecuteNonQuery();
+        }
+        catch (SqliteException ex) when (ex.SqliteExtendedErrorCode == 1555)
+        {
+            throw new InvalidOperationException($"A card with number {card.Number} already exists.");
+        }
     }
 
     public void DeleteCustomerCard(CustomerCardDBModel card)
