@@ -2,7 +2,7 @@
 
 public class ReceiptDTO
 {
-    public string Id { get; set; }
+    public long Id { get; set; }
     public string EmployeeName { get; set; }
     public string? CustomerName { get; set; }
     public DateTime PrintDate { get; set; }
@@ -10,7 +10,7 @@ public class ReceiptDTO
     public decimal Tax { get; set; }
     public IEnumerable<SaleDTO> Sales { get; set; }
 
-    public ReceiptDTO(string id, string employeeName, string? customerName, DateTime printDate, decimal totalSum, decimal tax, IEnumerable<SaleDTO> sales)
+    public ReceiptDTO(long id, string employeeName, string? customerName, DateTime printDate, decimal totalSum, decimal tax, IEnumerable<SaleDTO> sales)
     {
         Id = id;
         EmployeeName = employeeName;

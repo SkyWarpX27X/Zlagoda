@@ -49,7 +49,7 @@
     public ReceiptDTO Receipt { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<string> OnDelete { get; set; }
+    public EventCallback<long> OnDelete { get; set; }
 
     private void DeleteReceipt()
     {

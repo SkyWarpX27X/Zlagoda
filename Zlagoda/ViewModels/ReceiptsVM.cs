@@ -98,7 +98,7 @@ public class ReceiptsVM
         NewReceipt = null;
     }
 
-    public void DeleteReceipt(string id)
+    public void DeleteReceipt(long id)
     {
         // TODO: delete receipt via service
         LoadReceipts();

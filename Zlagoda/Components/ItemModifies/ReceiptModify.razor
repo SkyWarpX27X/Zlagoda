@@ -116,7 +116,7 @@
     {
         if (!string.IsNullOrWhiteSpace(NewSaleUpc) && _newSaleQuantity > 0)
         {
-            Receipt.Sales.Add(new SaleDTO("", SelectedProductName, SelectedProductPrice, _newSaleQuantity));
+            Receipt.Sales.Add(new SaleDTO(null, SelectedProductName, SelectedProductPrice, _newSaleQuantity));
             NewSaleUpc = "";
             _newSaleQuantity = 1;
         }
