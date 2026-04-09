@@ -1,6 +1,6 @@
 ﻿namespace DTOModels;
 
-public class EmployeeDto
+public class EmployeeDTO
 {
     public string Id { get; set; }
     public string FullName { get; set; }
@@ -11,7 +11,7 @@ public class EmployeeDto
     public string Phone { get; set; }
     public string Address { get; set; }
 
-    public EmployeeDto(string id, string fullName, string role, decimal salary, DateOnly hireDate, DateOnly birthDate, string phone, string address)
+    public EmployeeDTO(string id, string fullName, string role, decimal salary, DateOnly hireDate, DateOnly birthDate, string phone, string address)
     {
         Id = id;
         FullName = fullName;
