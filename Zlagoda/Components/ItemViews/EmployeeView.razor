@@ -1,0 +1,95 @@
+﻿@using DTOModels
+@using Zlagoda.Components.ItemModifies
+
+@if (_isEditing)
+{
+    <EmployeeModify Employee="ToModifyDTO(Employee)" OnSave="SaveEdit" OnCancel="@CancelEdit" />
+}
+else
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title mb-0">@Employee.FullName</h5>
+                <span class="badge bg-primary">@Employee.Role</span>
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted">ID: @Employee.Id</h6>
+            <p class="card-text">
+                <strong>Телефон:</strong> @Employee.Phone<br />
+                <strong>Адреса:</strong> @Employee.Address<br />
+                <strong>Зарплата:</strong> @Employee.Salary ₴<br />
+                <strong>Дата народження:</strong> @Employee.BirthDate.ToString("d")<br />
+                <strong>Дата прийому на роботу:</strong> @Employee.HireDate.ToString("d")
+            </p>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-primary btn-sm" @onclick="EditEmployee">Редагувати</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => DeleteEmployee(Employee.Id)">Видалити</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EmployeeDTO Employee { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<EmployeeModifyDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnDelete { get; set; }
+    
+    private bool _isEditing;
+
+    private EmployeeModifyDTO ToModifyDTO(EmployeeDTO employee)
+    {
+        // Split name (assuming standard "LastName FirstName Patronymic" format)
+        var nameParts = employee.FullName.Split(' ');
+        var lastName = nameParts.Length > 0 ? nameParts[0] : "";
+        var firstName = nameParts.Length > 1 ? nameParts[1] : "";
+        var patronymic = nameParts.Length > 2 ? nameParts[2] : null;
+
+        // Split address (assuming format "City, Street, ZipCode")
+        var addressParts = employee.Address.Split(", ");
+        var city = addressParts.Length > 0 ? addressParts[0] : "";
+        var street = addressParts.Length > 1 ? addressParts[1] : "";
+        var zipCode = addressParts.Length > 2 ? addressParts[2] : "";
+        return new EmployeeModifyDTO(
+            employee.Id, 
+            lastName, 
+            firstName, 
+            patronymic, 
+            "",
+            "",
+            employee.Role, 
+            employee.Salary, 
+            employee.HireDate, 
+            employee.BirthDate, 
+            employee.Phone, 
+            city, 
+            street, 
+            zipCode
+        );
+    }
+
+    private void EditEmployee()
+    {
+        _isEditing = true;
+    }
+
+    private void SaveEdit(EmployeeModifyDTO employee)
+    {
+        OnSave.InvokeAsync(employee);
+        _isEditing = false;
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+    }
+
+    private void DeleteEmployee(string id)
+    {
+        OnDelete.InvokeAsync(id);
+    }
+}

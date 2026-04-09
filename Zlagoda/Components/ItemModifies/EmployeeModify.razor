@@ -1,0 +1,110 @@
+﻿@using DTOModels
+
+<div class="card mb-3 shadow-sm border-primary">
+    <div class="card-body">
+        <h5 class="card-title mb-3">@(IsNew ? "Додавання працівника" : "Редагування працівника")</h5>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Прізвище</label>
+                <input class="form-control" @bind="Employee.LastName" />
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Ім'я</label>
+                <input class="form-control" @bind="Employee.FirstName" />
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">По батькові</label>
+                <input class="form-control" @bind="Employee.Patronymic" />
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Телефон</label>
+                <input class="form-control" @bind="Employee.Phone" />
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Місто</label>
+                <input class="form-control" @bind="Employee.City" />
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Вулиця</label>
+                <input class="form-control" @bind="Employee.Street" />
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Індекс</label>
+                <input class="form-control" @bind="Employee.ZipCode" />
+            </div>
+
+            @if (IsNew)
+            {
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Логін</label>
+                    <input class="form-control" @bind="Employee.UserName" />
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" class="form-control" @bind="Employee.Password" />
+                </div>
+            }
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Посада</label>
+                <select class="form-select" @bind="Employee.Role">
+                    <option value="">Оберіть посаду</option>
+                    <option value="Касир">Касир</option>
+                    <option value="Менеджер">Менеджер</option>
+                </select>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Зарплата</label>
+                <input type="number" step="0.01" class="form-control" @bind="Employee.Salary" />
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Дата народження</label>
+                <input type="date" class="form-control" @bind="Employee.BirthDate" />
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Дата прийому на роботу</label>
+                <input type="date" class="form-control" @bind="Employee.HireDate" />
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-success btn-sm" @onclick="Save">Зберегти</button>
+            <button class="btn btn-secondary btn-sm" @onclick="Cancel">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EmployeeModifyDTO Employee { get; set; } = null!;
+
+    [Parameter]
+    public bool IsNew { get; set; }
+
+    [Parameter]
+    public EventCallback<EmployeeModifyDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private async Task Save()
+    {
+        await OnSave.InvokeAsync(Employee);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

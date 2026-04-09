@@ -12,17 +12,17 @@ public class EmployeeService : IEmployeeService
         _employeeRepository = employeeRepository;
     }
     
-    public IEnumerable<EmployeeAuthDto> GetAuthDataOfAll()
+    public IEnumerable<EmployeeAuthDTO> GetAuthDataOfAll()
     {
         foreach (var employee in _employeeRepository.GetEmployees())
         {
-            yield return new EmployeeAuthDto(employee.Id, employee.Username, employee.Password, employee.Role);
+            yield return new EmployeeAuthDTO(employee.Id, employee.Username, employee.Password, employee.Role);
         }
     }
 
-    public EmployeeAuthDto GetAuthData(long id)
+    public EmployeeAuthDTO GetAuthData(long id)
     {
         var employee = _employeeRepository.GetEmployee(id);
-        return new EmployeeAuthDto(employee.Id, employee.Username, employee.Password, employee.Role);
+        return new EmployeeAuthDTO(employee.Id, employee.Username, employee.Password, employee.Role);
     }
 }
