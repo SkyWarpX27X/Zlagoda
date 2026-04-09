@@ -57,6 +57,9 @@ public class ReceiptsVM
             return query.OrderByDescending(r => r.PrintDate);
         }
     }
+    
+    //TODO: get from service
+    public decimal TotalSum => 42;
 
     public void LoadReceipts()
     {

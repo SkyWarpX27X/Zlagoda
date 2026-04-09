@@ -46,16 +46,25 @@
                 </div>
             </div>
         </div>
+        
+        <div class="alert alert-success d-flex justify-content-between align-items-center py-2 mb-3">
+            <span class="fs-6 mb-0">Загальна сума по чекам:</span>
+            <span class="fs-5 fw-bold mb-0">@ViewModel.TotalSum.ToString("C2")</span>
+        </div>
     }
 </div>
 
-@if (ViewModel.Receipts == null || !ViewModel.Receipts.Any())
+@if (ViewModel.Receipts == null)
 {
     <p><em>Завантаження...</em></p>
 }
+else if (!ViewModel.Receipts.Any())
+{
+    <p><em>Немає чеків</em></p>
+}
 else
 {
-    <div class="receipt-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+    <div class="receipt-list" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
         @foreach (var receipt in ViewModel.FilteredReceipts)
         {
             <ReceiptView Receipt="receipt" OnDelete="ViewModel.DeleteReceipt"/>
@@ -63,7 +72,7 @@ else
         
         @if (!ViewModel.FilteredReceipts.Any())
         {
-            <div class="alert alert-info">Не знайдено чеків за вказаними фільтрами.</div>
+            <div class="alert alert-info mt-2">Не знайдено чеків за вказаними фільтрами.</div>
         }
     </div>
 }
