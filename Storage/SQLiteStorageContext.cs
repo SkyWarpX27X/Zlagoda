@@ -58,7 +58,7 @@ public class SQLiteStorageContext
                                   street TEXT NOT NULL CHECK(length(street) <= 50),
                                   zip_code TEXT NOT NULL CHECK(length(zip_code) <= 9),
                                   user_name TEXT NOT NULL CHECK(length(user_name) <= 20) UNIQUE,
-                                  user_password TEXT NOT NULL CHECK(length(user_password) <= 20)                                
+                                  user_password TEXT NOT NULL                               
                               );
                               """; 
         command.ExecuteNonQuery();

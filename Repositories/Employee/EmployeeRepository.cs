@@ -35,11 +35,20 @@ public class EmployeeRepository : IEmployeeRepository
         return reader.Read() ? MapEmployee(reader) : null;
     }
 
+    public EmployeeDBModel? GetEmployee(string username)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = "SELECT * FROM Employee WHERE user_name = @username";
+        command.Parameters.AddWithValue("@username", username);
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? MapEmployee(reader) : null;
+    }
+
     public IEnumerable<EmployeeDBModel> GetEmployees(bool sortBySurname = true, bool cashiersOnly = false)
     {
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Employee";
-        if (cashiersOnly) query += " WHERE empl_role = 'Cashier'";
+        if (cashiersOnly) query += " WHERE empl_role = 'Касир'";
         if (sortBySurname) query += " ORDER BY empl_surname";
         command.CommandText = query;
         using var reader = command.ExecuteReader();
