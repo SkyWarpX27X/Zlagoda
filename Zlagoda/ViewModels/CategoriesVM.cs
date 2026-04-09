@@ -10,15 +10,15 @@ public class CategoriesVM
 {
     //TODO replace with real service
     //private readonly ICategoryService _categoryService;
-    public IEnumerable<CategoryDto> Categories { get; set; }
+    public IEnumerable<CategoryDTO> Categories { get; set; }
     
     public bool IsCreating { get; private set; }
-    public CategoryDto? NewCategory { get; private set; }
+    public CategoryDTO? NewCategory { get; private set; }
     
     public CategoriesVM()
     {
         //_categoryService = categoryService;
-        Categories = new List<CategoryDto>();
+        Categories = new List<CategoryDTO>();
     }
 
     public void LoadCategories()
@@ -29,11 +29,11 @@ public class CategoriesVM
 
     public void ShowCreateNew()
     {
-        NewCategory = new CategoryDto(0, "");
+        NewCategory = new CategoryDTO(0, "");
         IsCreating = true;
     }
 
-    public void SaveNewCategory(CategoryDto category)
+    public void SaveNewCategory(CategoryDTO category)
     {
         IsCreating = false;
         NewCategory = null;
@@ -47,7 +47,7 @@ public class CategoriesVM
         NewCategory = null;
     }
 
-    public void EditCategory(CategoryDto category)
+    public void EditCategory(CategoryDTO category)
     {
         //_categoryService.UpdateCategory(category);
         LoadCategories();

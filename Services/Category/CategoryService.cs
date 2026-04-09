@@ -12,8 +12,8 @@ public class CategoryService : ICategoryService
         _categoryRepository = categoryRepository;
     }
     
-    public IEnumerable<CategoryDto> GetCategories()
+    public IEnumerable<CategoryDTO> GetCategories()
     {
-        return _categoryRepository.GetCategories().Select(category => new CategoryDto(category.Id, category.Name)).ToList();
+        return _categoryRepository.GetCategories().Select(category => new CategoryDTO(category.Id, category.Name)).ToList();
     }
 }

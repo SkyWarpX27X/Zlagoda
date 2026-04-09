@@ -23,10 +23,10 @@ else
 
 @code {
     [Parameter]
-    public CategoryDto Category { get; set; } = null!;
+    public CategoryDTO Category { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<CategoryDto> OnSave { get; set; }
+    public EventCallback<CategoryDTO> OnSave { get; set; }
 
     [Parameter]
     public EventCallback<long> OnDelete { get; set; }
@@ -38,7 +38,7 @@ else
         _isEditing = true;
     }
 
-    private void SaveEdit(CategoryDto category)
+    private void SaveEdit(CategoryDTO category)
     {
         OnSave.InvokeAsync(category);
         _isEditing = false;

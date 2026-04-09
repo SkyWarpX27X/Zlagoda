@@ -4,18 +4,18 @@ namespace Zlagoda.Test;
 
 static class FakeCategories
 {
-    static IEnumerable<CategoryDto> _categories;
+    static IEnumerable<CategoryDTO> _categories;
 
     static FakeCategories()
     {
-        _categories = new List<CategoryDto>()
+        _categories = new List<CategoryDTO>()
         {
-            new CategoryDto(1, "Картон"),
-            new CategoryDto(2, "Товари подвійного призначення")
+            new CategoryDTO(1, "Картон"),
+            new CategoryDTO(2, "Товари подвійного призначення")
         };
     }
 
-    public static IEnumerable<CategoryDto> GetCategories()
+    public static IEnumerable<CategoryDTO> GetCategories()
     {
         return _categories;
     }

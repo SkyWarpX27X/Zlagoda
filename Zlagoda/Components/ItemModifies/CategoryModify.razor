@@ -18,10 +18,10 @@
 
 @code {
     [Parameter]
-    public CategoryDto Category { get; set; } = null!;
+    public CategoryDTO Category { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<CategoryDto> OnSave { get; set; }
+    public EventCallback<CategoryDTO> OnSave { get; set; }
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
