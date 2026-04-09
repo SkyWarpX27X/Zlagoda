@@ -50,7 +50,7 @@ public class EmployeesVM
         LoadEmployees();
     }
 
-    public void DeleteEmployee(string id)
+    public void DeleteEmployee(long id)
     {
         // TODO: delete employee via service
         LoadEmployees();

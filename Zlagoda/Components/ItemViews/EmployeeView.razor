@@ -37,7 +37,7 @@ else
     public EventCallback<EmployeeModifyDTO> OnSave { get; set; }
 
     [Parameter]
-    public EventCallback<string> OnDelete { get; set; }
+    public EventCallback<long> OnDelete { get; set; }
     
     private bool _isEditing;
 
@@ -88,7 +88,7 @@ else
         _isEditing = false;
     }
 
-    private void DeleteEmployee(string id)
+    private void DeleteEmployee(long id)
     {
         OnDelete.InvokeAsync(id);
     }

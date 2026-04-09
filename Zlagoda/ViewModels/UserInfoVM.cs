@@ -11,7 +11,7 @@ public class UserInfoVM
         // TODO: Implement getting current employee
         // Mock data for now
         CurrentEmployee = new EmployeeDTO(
-            "12345678",
+            12345678,
             "Бердимухамедов Гурбангули Мялікгулийович",
             "Менеджер",
             15000m,

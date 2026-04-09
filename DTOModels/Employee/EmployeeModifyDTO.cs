@@ -2,7 +2,7 @@
 
 public class EmployeeModifyDTO
 {
-    public string? Id { get; set; }
+    public long? Id { get; set; }
     public string LastName { get; set; }
     public string FirstName { get; set; }
     public string? Patronymic { get; set; }
@@ -17,7 +17,7 @@ public class EmployeeModifyDTO
     public string Street { get; set; }
     public string ZipCode { get; set; }
 
-    public EmployeeModifyDTO(string? id, string lastName, string firstName, string? patronymic, string userName, string password, string role, decimal salary, DateOnly hireDate, DateOnly birthDate, string phone, string city, string street, string zipCode)
+    public EmployeeModifyDTO(long? id, string lastName, string firstName, string? patronymic, string userName, string password, string role, decimal salary, DateOnly hireDate, DateOnly birthDate, string phone, string city, string street, string zipCode)
     {
         Id = id;
         LastName = lastName;
