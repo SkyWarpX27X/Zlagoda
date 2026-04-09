@@ -124,9 +124,7 @@ public class EmployeeRepository : IEmployeeRepository
                                   phone_number = @phone_number,
                                   city = @city,
                                   street = @street,
-                                  zip_code = @zip_code,
-                                  user_name = @user_name,
-                                  user_password = @user_password
+                                  zip_code = @zip_code
                               WHERE id_employee = @id_employee;
                               """;
         command.Parameters.AddWithValue("@empl_surname", employee.Surname);
