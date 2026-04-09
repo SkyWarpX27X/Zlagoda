@@ -1,6 +1,6 @@
 ﻿namespace DTOModels;
 
-public class SaleDto
+public class SaleDTO
 {
     public string ReceiptId { get; set; }
     public string ProductName { get; set; }
@@ -8,7 +8,7 @@ public class SaleDto
     public int Quantity { get; set; }
     public decimal Sum => Price * Quantity;
 
-    public SaleDto(string receiptId, string productName, decimal price, int quantity)
+    public SaleDTO(string receiptId, string productName, decimal price, int quantity)
     {
         ReceiptId = receiptId;
         ProductName = productName;
