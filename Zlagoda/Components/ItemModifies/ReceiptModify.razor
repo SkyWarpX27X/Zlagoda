@@ -1,0 +1,139 @@
+﻿@using DTOModels
+
+<div class="card mb-3 shadow-sm border-primary">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Створення чеку</h5>
+        
+        <div class="mb-3">
+            <label class="form-label">Клієнт (необов'язково)</label>
+            <select class="form-select" @bind="Receipt.CustomerCardId">
+                <option value="">Без картки клієнта</option>
+                @foreach (var c in Customers)
+                {
+                    <option value="@c.CardId">@c.FullName (@c.Phone)</option>
+                }
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Дата друку</label>
+            <input type="datetime-local" class="form-control" @bind="Receipt.PrintDate" />
+        </div>
+        
+        <h6 class="mt-4 mb-2">Товари</h6>
+        @if (Receipt.Sales.Any())
+        {
+            <ul class="list-group mb-3">
+                @foreach (var sale in Receipt.Sales)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@sale.ProductName</strong><br />
+                            <small class="text-muted">@sale.Price.ToString("C") x @sale.Quantity = @sale.Sum.ToString("C")</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveSale(sale)">
+                            <i class="bi bi-trash"></i> Видалити
+                        </button>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="text-muted small">Немає доданих товарів.</p>
+        }
+
+        <div class="card bg-light mb-3">
+            <div class="card-body p-2">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label small">Товар в магазині</label>
+                        <select class="form-select form-select-sm" @bind="NewSaleUpc">
+                            <option value="">Оберіть товар...</option>
+                            @foreach (var p in StoreProducts)
+                            {
+                                <option value="@p.Upc">@p.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Ціна</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" value="@SelectedProductPrice" disabled />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">К-сть</label>
+                        <input type="number" class="form-control form-control-sm" @bind="_newSaleQuantity" />
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-sm btn-primary w-100" @onclick="AddSale" disabled="@(string.IsNullOrEmpty(NewSaleUpc) || _newSaleQuantity <= 0)">Додати</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button class="btn btn-success btn-sm" @onclick="Save">Зберегти чек</button>
+            <button class="btn btn-secondary btn-sm" @onclick="Cancel">Скасувати</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ReceiptCreateDTO Receipt { get; set; } = null!;
+
+    [Parameter]
+    public IEnumerable<CustomerDTO> Customers { get; set; } = Enumerable.Empty<CustomerDTO>();
+
+    [Parameter]
+    public IEnumerable<StoreProductDTO> StoreProducts { get; set; } = Enumerable.Empty<StoreProductDTO>();
+
+    [Parameter]
+    public EventCallback<ReceiptCreateDTO> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private string _newSaleUpc = "";
+    public string NewSaleUpc
+    {
+        get => _newSaleUpc;
+        set
+        {
+            _newSaleUpc = value;
+        }
+    }
+
+    private decimal SelectedProductPrice => 
+        StoreProducts.FirstOrDefault(p => p.Upc == _newSaleUpc)?.Price ?? 0;
+        
+    private string SelectedProductName => 
+        StoreProducts.FirstOrDefault(p => p.Upc == _newSaleUpc)?.Name ?? "";
+
+    private int _newSaleQuantity = 1;
+
+    private void AddSale()
+    {
+        if (!string.IsNullOrWhiteSpace(NewSaleUpc) && _newSaleQuantity > 0)
+        {
+            Receipt.Sales.Add(new SaleDTO("", SelectedProductName, SelectedProductPrice, _newSaleQuantity));
+            NewSaleUpc = "";
+            _newSaleQuantity = 1;
+        }
+    }
+
+    private void RemoveSale(SaleDTO sale)
+    {
+        Receipt.Sales.Remove(sale);
+    }
+
+    private async Task Save()
+    {
+        await OnSave.InvokeAsync(Receipt);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();
+    }
+}

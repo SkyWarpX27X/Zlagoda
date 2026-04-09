@@ -1,39 +1,52 @@
 ﻿@page "/receipts"
 @rendermode InteractiveServer
 @using Zlagoda.ViewModels
+@using Zlagoda.Components.ItemViews
+@using Zlagoda.Components.ItemModifies
 @inject ReceiptsVM ViewModel
 
 <h3>Чеки</h3>
 
-<div class="mb-3 d-flex justify-content-between align-items-end flex-wrap gap-3">
-    <button class="btn btn-success" @onclick="ViewModel.CreateReceipt">Створити чек</button>
-    
-    <div class="d-flex align-items-end gap-3 flex-wrap">
-        <div>
-            <label for="employeeFilter" class="form-label fw-bold mb-1">Касир:</label>
-            <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged">
-                <option value="">Всі касири</option>
-                @foreach (var emp in ViewModel.Employees)
-                {
-                    <option value="@emp">@emp</option>
-                }
-            </select>
+<div class="mb-3">
+    @if (ViewModel.IsCreating && ViewModel.NewReceipt != null)
+    {
+        <div class="w-100 mb-4">
+            <ReceiptModify Receipt="@ViewModel.NewReceipt" Customers="@ViewModel.Customers" StoreProducts="@ViewModel.StoreProducts" OnSave="@ViewModel.SaveNewReceipt" OnCancel="@ViewModel.CancelCreate" />
         </div>
-        
-        <div>
-            <label for="fromDate" class="form-label fw-bold mb-1">З дати:</label>
-            <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged" />
+    }
+    else
+    {
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+            <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити чек</button>
+            
+            <div class="d-flex align-items-end gap-3 flex-wrap">
+                <div>
+                    <label for="employeeFilter" class="form-label fw-bold mb-1">Касир:</label>
+                    <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged">
+                        <option value="">Всі касири</option>
+                        @foreach (var emp in ViewModel.Employees)
+                        {
+                            <option value="@emp">@emp</option>
+                        }
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="fromDate" class="form-label fw-bold mb-1">З дати:</label>
+                    <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged" />
+                </div>
+                
+                <div>
+                    <label for="toDate" class="form-label fw-bold mb-1">По дату:</label>
+                    <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged" />
+                </div>
+                
+                <div>
+                    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Очистити фільтри</button>
+                </div>
+            </div>
         </div>
-        
-        <div>
-            <label for="toDate" class="form-label fw-bold mb-1">По дату:</label>
-            <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged" />
-        </div>
-        
-        <div>
-            <button class="btn btn-outline-secondary" @onclick="ClearFilters">Очистити фільтри</button>
-        </div>
-    </div>
+    }
 </div>
 
 @if (ViewModel.Receipts == null || !ViewModel.Receipts.Any())
@@ -45,61 +58,7 @@ else
     <div class="receipt-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
         @foreach (var receipt in ViewModel.FilteredReceipts)
         {
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Чек #@receipt.Id</h5>
-                    <span class="text-muted">@receipt.PrintDate.ToString("g")</span>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-6">
-                            <strong>Касир:</strong> @receipt.EmployeeName<br />
-                            <strong>Клієнт:</strong> @(string.IsNullOrEmpty(receipt.CustomerName) ? "Невідомо (не має картки)" : receipt.CustomerName)
-                        </div>
-                        <div class="col-sm-6 text-sm-end">
-                            <h5 class="text-success mb-1">Всього: @receipt.TotalSum.ToString("C2")</h5>
-                            <small class="text-muted">ПДВ: @receipt.Tax.ToString("C2")</small>
-                        </div>
-                    </div>
-                    
-                    <h6 class="mt-3 border-bottom pb-2">Товари в чеку:</h6>
-                    
-                    @if (receipt.Sales == null || !receipt.Sales.Any())
-                    {
-                        <p class="text-muted fst-italic">Немає товарів</p>
-                    }
-                    else
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>Товар</th>
-                                        <th class="text-end">Ціна</th>
-                                        <th class="text-center">К-сть</th>
-                                        <th class="text-end">Сума</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var sale in receipt.Sales)
-                                    {
-                                        <tr>
-                                            <td>@sale.ProductName</td>
-                                            <td class="text-end">@sale.Price.ToString("C2")</td>
-                                            <td class="text-center">@sale.Quantity</td>
-                                            <td class="text-end fw-bold">@sale.Sum.ToString("C2")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    
-                    <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-danger btn-sm" @onclick="() => ViewModel.DeleteReceipt(receipt.Id)">Видалити чек</button>
-                    </div>
-                </div>
-            </div>
+            <ReceiptView Receipt="receipt" OnDelete="ViewModel.DeleteReceipt"/>
         }
         
         @if (!ViewModel.FilteredReceipts.Any())
