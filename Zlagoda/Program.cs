@@ -44,6 +44,7 @@ builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLit
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
 
+builder.Services.AddSingleton<UserInfoVM>();
 builder.Services.AddSingleton<CategoriesVM>();
 builder.Services.AddSingleton<ProductsInStoreVM>();
 builder.Services.AddSingleton<CustomersVM>();
