@@ -10,5 +10,5 @@ public interface IReceiptRepository
     decimal GetSumTotal((string StartDate, string EndDate) dates);
     decimal GetSumByCashier(long employeeId, (string StartDate, string EndDate) dates);
     void AddReceipt(ReceiptDBModel receipt);
-    void DeleteReceipt(ReceiptDBModel receipt);
+    void DeleteReceipt(long id);
 }

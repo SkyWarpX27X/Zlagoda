@@ -131,11 +131,11 @@ public class StoreProductRepository : IStoreProductRepository
         command.ExecuteNonQuery();
     }
 
-    public void DeleteStoreProduct(StoreProductDBModel storeProduct)
+    public void DeleteStoreProduct(string upc)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Store_Product WHERE UPC = @UPC;";
-        command.Parameters.AddWithValue("@UPC", storeProduct.UPC);
+        command.Parameters.AddWithValue("@UPC", upc);
         command.ExecuteNonQuery();
     }
     
