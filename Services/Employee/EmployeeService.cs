@@ -176,7 +176,7 @@ public class EmployeeService : IEmployeeService
         byte[] result = new byte[HashSize + salt.Length];
         Span<byte> resultHash = result.AsSpan().Slice(0, HashSize);
         Span<byte> resultSalt = result.AsSpan().Slice(HashSize, salt.Length);
-        Rfc2898DeriveBytes.Pbkdf2(password, salt, resultHash, iterations, HashAlgorithmName.SHA3_256);
+        Rfc2898DeriveBytes.Pbkdf2(password, salt, resultHash, iterations, HashAlgorithmName.SHA256);
         salt.CopyTo(resultSalt);
         return result;
     }
