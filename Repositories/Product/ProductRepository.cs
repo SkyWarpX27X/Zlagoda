@@ -106,11 +106,11 @@ public class ProductRepository : IProductRepository
         command.ExecuteNonQuery();
     }
 
-    public void DeleteProduct(ProductDBModel product)
+    public void DeleteProduct(long id)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Product WHERE id_product = @id_product;";
-        command.Parameters.AddWithValue("@id_product", product.Id);
+        command.Parameters.AddWithValue("@id_product", id);
         command.ExecuteNonQuery();
     }
 

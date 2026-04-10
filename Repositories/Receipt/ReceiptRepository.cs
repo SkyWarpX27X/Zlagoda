@@ -107,11 +107,11 @@ public class ReceiptRepository : IReceiptRepository
         command.ExecuteNonQuery();
     }
 
-    public void DeleteReceipt(ReceiptDBModel receipt)
+    public void DeleteReceipt(long id)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Receipt WHERE receipt_number = @receipt_number;";
-        command.Parameters.AddWithValue("@receipt_number", receipt.Id);
+        command.Parameters.AddWithValue("@receipt_number", id);
         command.ExecuteNonQuery();
     }
 

@@ -54,11 +54,11 @@ public class CategoryRepository : ICategoryRepository
         command.ExecuteNonQuery();
     }
 
-    public void DeleteCategory(CategoryDBModel category)
+    public void DeleteCategory(long id)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Category WHERE category_number = @category_number";
-        command.Parameters.AddWithValue("@category_number", category.Id);
+        command.Parameters.AddWithValue("@category_number", id);
         command.ExecuteNonQuery();
     }
 }
