@@ -112,9 +112,7 @@ public class EmployeeService : IEmployeeService
 
     public void DeleteEmployee(long id)
     {
-        var employee = _employeeRepository.GetEmployee(id);
-        if (employee is null) return;
-        _employeeRepository.DeleteEmployee(employee);
+        _employeeRepository.DeleteEmployee(id);
     }
 
     public IEnumerable<EmployeeDTO> GetEmployees()
@@ -152,7 +150,7 @@ public class EmployeeService : IEmployeeService
     public EmployeeDTO? GetEmployee(long id)
     {
         var employee = _employeeRepository.GetEmployee(id);
-        if (employee is null) return null;
+        if (employee is null) throw new InvalidDataException($"Employee {id} doesn't exist'");
         return new(
             employee.Id, 
             $"{employee.Surname} {employee.Name} {employee.Patronymic}",
@@ -167,7 +165,7 @@ public class EmployeeService : IEmployeeService
     public EmployeeDTO? GetEmployee(string lastName)
     {
         var employee = _employeeRepository.GetEmployees().FirstOrDefault(x => x.Surname == lastName);
-        if (employee is null) return null;
+        if (employee is null) throw new InvalidDataException($"Employee {lastName} doesn't exist'");
         return new(
             employee.Id, 
             $"{employee.Surname} {employee.Name} {employee.Patronymic}",

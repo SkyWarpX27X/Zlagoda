@@ -88,8 +88,6 @@ public class CustomerService : ICustomerService
 
     public void DeleteCustomer(string cardId)
     {
-        var customer = _customerCardRepository.GetCustomer(cardId);
-        if (customer is null) return;
-        _customerCardRepository.DeleteCustomerCard(customer);
+        _customerCardRepository.DeleteCustomerCard(cardId);
     }
 }

@@ -78,8 +78,6 @@ public class ProductService : IProductService
 
     public void DeleteProduct(long id)
     {
-        var product = _productRepository.GetProduct(id);
-        if (product is null) return;
-        _productRepository.DeleteProduct(product);
+        _productRepository.DeleteProduct(id);
     }
 }

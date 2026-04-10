@@ -41,8 +41,6 @@ public class CategoryService : ICategoryService
 
     public void DeleteCategory(long id)
     {
-        var category = _categoryRepository.GetCategory(id);
-        if (category is null) return;
-        _categoryRepository.DeleteCategory(category);
+        _categoryRepository.DeleteCategory(id);
     }
 }
