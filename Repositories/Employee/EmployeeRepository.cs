@@ -56,24 +56,22 @@ public class EmployeeRepository : IEmployeeRepository
             yield return MapEmployee(reader);
     }
 
-    public IEnumerable<EmployeeContactInfoDataModel> GetEmployeeContactInfo(string surnameQuery)
+    public IEnumerable<EmployeeDBModel> GetEmployeeBySearch(string surnameQuery, bool cashiersOnly = false)
     {
         var namePattern = surnameQuery + "%";
         using var command = _connection.CreateCommand();
-        command.CommandText = """
-                              SELECT empl_surname, phone_number, city, street, zip_code 
-                              FROM Employee 
-                              WHERE LOWER(empl_surname) LIKE LOWER(@namePattern)
-                              """;
+        var query = """
+                    SELECT *
+                    FROM Employee 
+                    WHERE LOWER(empl_surname) LIKE LOWER(@namePattern)
+                    """;
+        if (cashiersOnly)
+            query += " AND empl_role = 'Касир'";
+        command.CommandText =  query;
         command.Parameters.AddWithValue("@namePattern", namePattern);
         using var reader = command.ExecuteReader();
         while (reader.Read())
-            yield return new EmployeeContactInfoDataModel(
-                reader.GetString(reader.GetOrdinal("empl_surname")),
-                reader.GetString(reader.GetOrdinal("phone_number")),
-                reader.GetString(reader.GetOrdinal("city")),
-                reader.GetString(reader.GetOrdinal("street")),
-                reader.GetString(reader.GetOrdinal("zip_code")));
+            yield return MapEmployee(reader);
     }
     
     public void AddEmployee(EmployeeDBModel employee)
