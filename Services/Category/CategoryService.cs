@@ -14,6 +14,35 @@ public class CategoryService : ICategoryService
     
     public IEnumerable<CategoryDTO> GetCategories()
     {
-        return _categoryRepository.GetCategories().Select(category => new CategoryDTO(category.Id, category.Name)).ToList();
+        foreach (var category in _categoryRepository.GetCategories())
+        {
+            yield return new(category.Id, category.Name);
+        }
+    }
+
+    public CategoryDTO? GetCategory(long id)
+    {
+        var category = _categoryRepository.GetCategory(id);
+        if (category is null) return null;
+        return new(category.Id, category.Name);
+    }
+
+    public void AddCategory(CategoryDTO category)
+    {
+        if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
+        _categoryRepository.AddCategory(new(category.Id, category.Name));
+    }
+
+    public void UpdateCategory(CategoryDTO category)
+    {
+        if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
+        _categoryRepository.UpdateCategory(new(category.Id, category.Name));
+    }
+
+    public void DeleteCategory(long id)
+    {
+        var category = _categoryRepository.GetCategory(id);
+        if (category is null) return;
+        _categoryRepository.DeleteCategory(category);
     }
 }
