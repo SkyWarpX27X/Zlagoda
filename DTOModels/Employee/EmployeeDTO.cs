@@ -11,7 +11,7 @@ public class EmployeeDTO
     public string Phone { get; set; }
     public string Address { get; set; }
 
-    public EmployeeDTO(long id, string fullName, string role, decimal salary, DateOnly hireDate, DateOnly birthDate, string phone, string address)
+    public EmployeeDTO(long id, string fullName, string role, decimal salary, DateOnly birthDate, DateOnly hireDate, string phone, string address)
     {
         Id = id;
         FullName = fullName;
