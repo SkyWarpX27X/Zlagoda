@@ -5,15 +5,17 @@ public class StoreProductDTO
     public string Upc { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }
+    public string Description { get; set; }
     public int Quantity { get; set; }
     public bool IsProm { get; set; }
     public decimal? OldPrice { get; set; }
     
-    public StoreProductDTO(string upc, string name, decimal price, int quantity, bool isProm, decimal? oldPrice)
+    public StoreProductDTO(string upc, string name, decimal price, string description, int quantity, bool isProm, decimal? oldPrice)
     {
         Upc = upc;
         Name = name;
         Price = price;
+        Description = description;
         Quantity = quantity;
         IsProm = isProm;
         OldPrice = oldPrice;
