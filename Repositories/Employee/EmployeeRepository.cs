@@ -147,11 +147,11 @@ public class EmployeeRepository : IEmployeeRepository
         }
     }
 
-    public void DeleteEmployee(EmployeeDBModel employee)
+    public void DeleteEmployee(long id)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Employee WHERE id_employee = @id_employee";
-        command.Parameters.AddWithValue("@id_employee", employee.Id);
+        command.Parameters.AddWithValue("@id_employee", id);
         command.ExecuteNonQuery();
     }
     

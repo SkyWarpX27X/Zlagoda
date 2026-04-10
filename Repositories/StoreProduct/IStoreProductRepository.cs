@@ -14,5 +14,5 @@ public interface IStoreProductRepository
         bool sortByQuantity = false);
     void AddStoreProduct(StoreProductDBModel storeProduct);
     void UpdateStoreProduct(StoreProductDBModel storeProduct);
-    void DeleteStoreProduct(StoreProductDBModel storeProduct);
+    void DeleteStoreProduct(string upc);
 }

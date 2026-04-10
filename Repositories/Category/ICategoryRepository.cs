@@ -8,5 +8,5 @@ public interface ICategoryRepository
     IEnumerable<CategoryDBModel> GetCategories(bool sortByName = true);
     void AddCategory(CategoryDBModel category);
     void UpdateCategory(CategoryDBModel category);
-    void DeleteCategory(CategoryDBModel category);
+    void DeleteCategory(long id);
 }

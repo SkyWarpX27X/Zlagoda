@@ -11,5 +11,5 @@ public interface IProductRepository
     int GetTotalUnits(long id, (string StartDate, string EndDate) dates);
     void AddProduct(ProductDBModel product);
     void UpdateProduct(ProductDBModel product);
-    void DeleteProduct(ProductDBModel product);
+    void DeleteProduct(long id);
 }
