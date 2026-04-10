@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using Zlagoda.ViewModels
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
 @inject UserInfoVM ViewModel
 @inject NavigationManager NavigationManager
@@ -20,6 +21,16 @@ else
 {
     <div class="row justify-content-center mt-4">
         <div class="col-md-8 col-lg-6">
+            
+            
+            <AuthorizeView>
+                <Authorized>
+                    <p>@context.User.IsInRole("Менеджер")</p>
+                </Authorized>
+            </AuthorizeView>
+            
+            
+            
             <div class="card shadow-sm border-primary position-relative">
                 <div class="card-header bg-primary text-white text-center py-3">
                     <h4 class="mb-0">Особистий кабінет</h4>
@@ -33,7 +44,7 @@ else
                         <span class="badge bg-secondary fs-6">@ViewModel.CurrentEmployee.Role</span>
                     </div>
 
-                    <hr />
+                    <hr/>
 
                     <div class="row">
                         <div class="col-sm-5 text-muted fw-bold">ID Працівника:</div>
