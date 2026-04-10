@@ -8,7 +8,7 @@ public interface IEmployeeRepository
     EmployeeDBModel? GetEmployee(string username);
     IEnumerable<EmployeeDBModel> GetEmployees(bool sortBySurname = true, bool cashiersOnly = false);
     // Accepts non-full surname string literals!
-    IEnumerable<EmployeeContactInfoDataModel> GetEmployeeContactInfo(string surnameQuery);
+    IEnumerable<EmployeeDBModel> GetEmployeeBySearch(string surnameQuery, bool cashiersOnly = false);
     void AddEmployee(EmployeeDBModel employee);
     void UpdateEmployee(EmployeeDBModel employee);
     void DeleteEmployee(EmployeeDBModel employee);
