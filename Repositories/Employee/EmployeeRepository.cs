@@ -138,7 +138,7 @@ public class EmployeeRepository : IEmployeeRepository
         command.Parameters.AddWithValue("@city", employee.City);
         command.Parameters.AddWithValue("@street", employee.Street);
         command.Parameters.AddWithValue("@zip_code", employee.ZipCode);
-        command.Parameters.AddWithValue("@user_name", employee.Username);
+        command.Parameters.AddWithValue("@id_employee", employee.Id);
         try
         {
             command.ExecuteNonQuery();
