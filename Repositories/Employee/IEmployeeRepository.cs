@@ -11,5 +11,5 @@ public interface IEmployeeRepository
     IEnumerable<EmployeeDBModel> GetEmployeeBySearch(string surnameQuery, bool cashiersOnly = false);
     void AddEmployee(EmployeeDBModel employee);
     void UpdateEmployee(EmployeeDBModel employee);
-    void DeleteEmployee(EmployeeDBModel employee);
+    void DeleteEmployee(long id);
 }

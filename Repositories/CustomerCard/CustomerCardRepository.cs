@@ -117,11 +117,11 @@ public class CustomerCardRepository : ICustomerCardRepository
         }
     }
 
-    public void DeleteCustomerCard(CustomerCardDBModel card)
+    public void DeleteCustomerCard(string number)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM Customer_Card WHERE card_number = @card_number";
-        command.Parameters.AddWithValue("@card_number", card.Number);
+        command.Parameters.AddWithValue("@card_number", number);
         command.ExecuteNonQuery();
     }
 }
