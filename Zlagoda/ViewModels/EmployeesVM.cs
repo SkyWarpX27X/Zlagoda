@@ -1,4 +1,5 @@
 ﻿using DTOModels;
+using Services.Employee;
 using Zlagoda.Test;
 
 namespace Zlagoda.ViewModels;
@@ -6,22 +7,22 @@ namespace Zlagoda.ViewModels;
 public class EmployeesVM
 {
     //TODO switch to real employee service
-    //private readonly IEmployeeService _employeeService;
+    private readonly IEmployeeService _employeeService;
 
     public IEnumerable<EmployeeDTO> Employees { get; private set; }
     
     public bool IsCreating { get; private set; }
     public EmployeeModifyDTO? NewEmployee { get; private set; }
 
-    public EmployeesVM()
+    public EmployeesVM(IEmployeeService employeeService)
     {
-        //_employeeService = employeeService;
+        _employeeService = employeeService;
         Employees = new List<EmployeeDTO>();
     }
 
     public void LoadEmployees()
     {
-        Employees = FakeEmployees.GetEmployees();
+        Employees = _employeeService.GetEmployees();
     }
     
     public void ShowCreateNew()
@@ -34,7 +35,7 @@ public class EmployeesVM
     {
         IsCreating = false;
         NewEmployee = null;
-        // TODO: save employee via service
+        _employeeService.AddEmployee(employee);
         LoadEmployees();
     }
 
@@ -46,13 +47,13 @@ public class EmployeesVM
 
     public void EditEmployee(EmployeeModifyDTO employee)
     {
-        // TODO: edit employee via service
+        _employeeService.UpdateEmployee(employee);
         LoadEmployees();
     }
 
     public void DeleteEmployee(long id)
     {
-        // TODO: delete employee via service
+        _employeeService.DeleteEmployee(id);
         LoadEmployees();
     }
 }
