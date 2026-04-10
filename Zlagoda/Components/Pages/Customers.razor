@@ -14,7 +14,15 @@
     }
     else
     {
-        <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Додати клієнта</button>
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+            <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Додати клієнта</button>
+            <div class="d-flex align-items-end gap-3 flex-wrap">
+                <div>
+                    <label for="percentFilter" class="form-label fw-bold mb-1">Фільтрувати за відсотком:</label>
+                    <input type="number" id="percentFilter" class="form-control" @bind="ViewModel.SearchPercent" @bind:after="StateHasChanged" placeholder="Введіть відсоток..." />
+                </div>
+            </div>
+        </div>
     }
 </div>
 
@@ -22,14 +30,14 @@
 {
     <p><em>Завантаження...</em></p>
 }
-else if (!ViewModel.Customers.Any())
+else if (!ViewModel.FilteredCustomers.Any())
 {
-    <p><em>Немає клієнтів</em></p>
+    <p><em>Немає клієнтів за вказаними фільтрами</em></p>
 }
 else
 {
     <div class="customer-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
-        @foreach (var customer in ViewModel.Customers)
+        @foreach (var customer in ViewModel.FilteredCustomers)
         {
             <CustomerView Customer="@customer" OnSave="ViewModel.EditCustomer" OnDelete="ViewModel.DeleteCustomer"/>
         }
