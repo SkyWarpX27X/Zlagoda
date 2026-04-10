@@ -58,27 +58,23 @@
         // TODO: Add hashing with salt
         if (!string.IsNullOrWhiteSpace(ViewModel.Username) && !string.IsNullOrWhiteSpace(ViewModel.Password))
         {
-            var data = EmployeeService.GetAuthDataOfAll().FirstOrDefault(x => x.Username == ViewModel.Username);
-            if (data != null)
+            if (EmployeeService.AuthenticateEmployee(ViewModel.Username, ViewModel.Password, out var id))
             {
-                if (EmployeeService.GetAuthData(data.Id).Password == ViewModel.Password)
+                var claims = new List<Claim>
                 {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, ViewModel.Username),
-                        new Claim(ClaimTypes.Role, data.Role)
-                    };
+                    new Claim(ClaimTypes.Name, ViewModel.Username),
+                    new Claim(ClaimTypes.Role, EmployeeService.GetEmployee(id).Role)
+                };
 
-                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var principal = new ClaimsPrincipal(identity);
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
 
-                    if (HttpContext != null)
-                    {
-                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    }
-
-                    NavigationManager.NavigateTo("/");
+                if (HttpContext != null)
+                {
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
                 }
+
+                NavigationManager.NavigateTo("/");
             }
             else
             {
