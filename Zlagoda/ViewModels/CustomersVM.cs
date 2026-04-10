@@ -11,6 +11,13 @@ public class CustomersVM
     public IEnumerable<CustomerDTO> Customers;
     public bool IsCreating;
     public CustomerModifyDTO? NewCustomer;
+    public int? SearchPercent { get; set; }
+    
+    //TODO replace with service method
+    public IEnumerable<CustomerDTO> FilteredCustomers =>
+        SearchPercent.HasValue
+            ? Customers.Where(c => c.Percent == SearchPercent.Value)
+            : Customers;
     
     public CustomersVM()
     {
