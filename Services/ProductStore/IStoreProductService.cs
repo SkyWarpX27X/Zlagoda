@@ -4,7 +4,7 @@ namespace Services.ProductStore;
 
 public interface IStoreProductService
 {
-    public IEnumerator<StoreProductDTO> GetStoreProducts(bool sortByQuantity = false);
+    public IEnumerable<StoreProductDTO> GetStoreProducts(bool sortByQuantity = false);
     public StoreProductDTO? GetStoreProduct(string upc);
     void AddStoreProduct(StoreProductModifyDTO storeProduct);
     void UpdateStoreProduct(StoreProductModifyDTO storeProduct);

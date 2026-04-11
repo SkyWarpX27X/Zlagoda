@@ -16,7 +16,7 @@ public class StoreProductService : IStoreProductService
         _productRepository = productRepository;
     }
 
-    public IEnumerator<StoreProductDTO> GetStoreProducts(bool sortByQuantity)
+    public IEnumerable<StoreProductDTO> GetStoreProducts(bool sortByQuantity)
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByQuantity: sortByQuantity))
         {
