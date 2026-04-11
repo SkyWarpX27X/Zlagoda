@@ -65,7 +65,7 @@ public class SQLiteStorageContext
         command.CommandText = """
                               CREATE TABLE IF NOT EXISTS Category (
                                   category_number INTEGER PRIMARY KEY,
-                                  category_name TEXT NOT NULL CHECK(length(category_name) <= 50)
+                                  category_name TEXT NOT NULL CHECK(length(category_name) <= 50) UNIQUE
                               );
                               """;
         command.ExecuteNonQuery();
