@@ -1,4 +1,5 @@
 ﻿@using DTOModels
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.Components.ItemModifies
 
 @if (_isEditing)
@@ -18,10 +19,22 @@ else
                 <strong>Характеристики:</strong> @Product.Characteristics<br />
                 <strong>ID:</strong> @Product.Id
             </p>
-            <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
-                <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Id)">Видалити</button>
-            </div>
+            
+            @if (SoldAmount.HasValue)
+            {
+                <div class="alert alert-info py-2 px-3 mb-3 d-inline-block">
+                    <strong>Продано за період:</strong> @SoldAmount.Value шт.
+                </div>
+            }
+            
+            <AuthorizeView Roles="Менеджер">
+                <Authorized>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Id)">Видалити</button>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
         </div>
     </div>
 }
@@ -38,6 +51,9 @@ else
     
     [Parameter]
     public IEnumerable<string> Categories { get; set; } = Enumerable.Empty<string>();
+    
+    [Parameter]
+    public int? SoldAmount { get; set; }
 
     private bool _isEditing;
 
