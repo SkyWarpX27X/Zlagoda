@@ -9,7 +9,7 @@ public class StoreProductModifyDTO
     public int Quantity { get; set; }
     public bool Promotional { get; set; }
     
-    public StoreProductModifyDTO(string upc, long productId, decimal price, int quantity, string? upcProm = null, bool promotional = true)
+    public StoreProductModifyDTO(string upc, decimal price, int quantity, string? upcProm = null, bool promotional = false)
     {
         Upc = upc;
         Price = price;
