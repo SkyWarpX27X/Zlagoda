@@ -9,14 +9,8 @@ public interface IEmployeeService
     bool AuthenticateEmployee(string username, string password, out long id);
     void DeleteEmployee(long id);
     
-    IEnumerable<EmployeeDTO> GetEmployees();
-    IEnumerable<EmployeeDTO> GetCashiers();
+    IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly);
     
     EmployeeDTO? GetEmployee(long id);
-    EmployeeDTO? GetEmployee(string lastName);
-    
-    IEnumerable<EmployeeAuthDTO> GetAuthDataOfAll();
-    EmployeeAuthDTO GetAuthData(long id);
-    //IEnumerable<EmployeeDto> GetDetailsOfAll();
-    //EmployeeDto GetDetails(int id);
+    IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false);
 }
