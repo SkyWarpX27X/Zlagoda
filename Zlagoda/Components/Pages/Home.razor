@@ -6,6 +6,7 @@
 @attribute [Authorize]
 @inject UserInfoVM ViewModel
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Головна</PageTitle>
 
@@ -19,67 +20,62 @@
 }
 else
 {
-    <div class="row justify-content-center mt-4">
-        <div class="col-md-8 col-lg-6">
-            
-            
-            <AuthorizeView>
-                <Authorized>
-                    <p>@context.User.IsInRole("Менеджер")</p>
-                </Authorized>
-            </AuthorizeView>
-            
-            
-            
-            <div class="card shadow-sm border-primary position-relative">
-                <div class="card-header bg-primary text-white text-center py-3">
-                    <h4 class="mb-0">Особистий кабінет</h4>
-                </div>
-                <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 bg-white" @onclick="LogOut" title="Вийти">
-                    <i class="bi bi-box-arrow-right"></i> Вийти
-                </button>
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <h2 class="card-title mb-1">@ViewModel.CurrentEmployee.FullName</h2>
-                        <span class="badge bg-secondary fs-6">@ViewModel.CurrentEmployee.Role</span>
-                    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card shadow-sm border-primary position-relative">
+                        <div class="card-header bg-primary text-white text-center py-3">
+                            <h4 class="mb-0">Особистий кабінет</h4>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2 bg-white" @onclick="LogOut" title="Вийти">
+                            <i class="bi bi-box-arrow-right"></i> Вийти
+                        </button>
+                        <div class="card-body p-4">
+                            <div class="text-center mb-4">
+                                <h2 class="card-title mb-1">@ViewModel.CurrentEmployee.FullName</h2>
+                                <span class="badge bg-secondary fs-6">@ViewModel.CurrentEmployee.Role</span>
+                            </div>
 
-                    <hr/>
+                            <hr/>
 
-                    <div class="row">
-                        <div class="col-sm-5 text-muted fw-bold">ID Працівника:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Id</div>
+                            <div class="row">
+                                <div class="col-sm-5 text-muted fw-bold">ID Працівника:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Id</div>
 
-                        <div class="col-sm-5 text-muted fw-bold">Телефон:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Phone</div>
+                                <div class="col-sm-5 text-muted fw-bold">Телефон:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Phone</div>
 
-                        <div class="col-sm-5 text-muted fw-bold">Адреса:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Address</div>
+                                <div class="col-sm-5 text-muted fw-bold">Адреса:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Address</div>
 
-                        <div class="col-sm-5 text-muted fw-bold">Дата народження:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.BirthDate.ToString("dd.MM.yyyy")</div>
+                                <div class="col-sm-5 text-muted fw-bold">Дата народження:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.BirthDate.ToString("dd.MM.yyyy")</div>
 
-                        <div class="col-sm-5 text-muted fw-bold">Дата прийому:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.HireDate.ToString("dd.MM.yyyy")</div>
+                                <div class="col-sm-5 text-muted fw-bold">Дата прийому:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.HireDate.ToString("dd.MM.yyyy")</div>
 
-                        <div class="col-sm-5 text-muted fw-bold">Зарплата:</div>
-                        <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Salary.ToString("C2")</div>
+                                <div class="col-sm-5 text-muted fw-bold">Зарплата:</div>
+                                <div class="col-sm-7 mb-3">@ViewModel.CurrentEmployee.Salary.ToString("C2")</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </Authorized>
+    </AuthorizeView>
 }
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        ViewModel.LoadUserInfo();
+        var username = (await AuthStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        await ViewModel.LoadUserInfo(username);
     }
 
     private async Task LogOut()
     {
         //TODO connect to auth service and logout here
-        NavigationManager.NavigateTo("/login", forceLoad: true);
+        NavigationManager.NavigateTo("/logout", forceLoad: true);
     }
 }
