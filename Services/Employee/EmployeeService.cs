@@ -20,22 +20,7 @@ public class EmployeeService : IEmployeeService
 
     public void AddEmployee(EmployeeModifyDTO employee)
     {
-        if (string.IsNullOrEmpty(employee.LastName)) throw new InvalidDataException("Last name is required");
-        if (string.IsNullOrEmpty(employee.FirstName)) throw new InvalidDataException("First name is required");
-        if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
-        if (string.IsNullOrEmpty(employee.Role)) throw new InvalidDataException("Role is required");
-        if (employee.Salary < 0) throw new InvalidDataException("Salary is required");
-        if (string.IsNullOrEmpty(employee.Phone)) throw new InvalidDataException("Phone number is required");
-        if (!Regex.IsMatch(employee.Phone, @"\+\d{1,12}"))
-            throw new InvalidDataException("Invalid phone number");
-        int age = DateTime.Now.Year - employee.BirthDate.Year;
-        if (employee.BirthDate.AddYears(age).ToDateTime(new(0, 0)) > DateTime.Now) --age;
-        if (age < 18) throw new InvalidDataException("Worker can't be younger than 18 years old");
-        if (string.IsNullOrEmpty(employee.City)) throw new InvalidDataException("City is required");
-        if (string.IsNullOrEmpty(employee.Street)) throw new InvalidDataException("Street is required");
-        if (string.IsNullOrEmpty(employee.ZipCode)) throw new InvalidDataException("Zip code is required");
-        if (!Regex.IsMatch(employee.ZipCode, @"\d{5}"))
-            throw new InvalidDataException("Invalid zip code");
+        ValidateEmployee(employee);
         
         Span<byte> salt = stackalloc byte[SaltSize];
         RandomNumberGenerator.Fill(salt);
@@ -60,22 +45,7 @@ public class EmployeeService : IEmployeeService
     public void UpdateEmployee(EmployeeModifyDTO employee)
     {
         if (employee.Id is null) throw new InvalidDataException("Id is required");
-        if (string.IsNullOrEmpty(employee.LastName)) throw new InvalidDataException("Last name is required");
-        if (string.IsNullOrEmpty(employee.FirstName)) throw new InvalidDataException("First name is required");
-        if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
-        if (string.IsNullOrEmpty(employee.Role)) throw new InvalidDataException("Role is required");
-        if (employee.Salary < 0) throw new InvalidDataException("Salary cannot be negative");
-        if (string.IsNullOrEmpty(employee.Phone)) throw new InvalidDataException("Phone number is required");
-        if (!Regex.IsMatch(employee.Phone, @"\+\d{1,12}"))
-            throw new InvalidDataException("Invalid phone number");
-        int age = DateTime.Now.Year - employee.BirthDate.Year;
-        if (employee.BirthDate.AddYears(age).ToDateTime(new(0, 0)) > DateTime.Now) --age;
-        if (age < 18) throw new InvalidDataException("Worker can't be younger than 18 years old");
-        if (string.IsNullOrEmpty(employee.City)) throw new InvalidDataException("City is required");
-        if (string.IsNullOrEmpty(employee.Street)) throw new InvalidDataException("Street is required");
-        if (string.IsNullOrEmpty(employee.ZipCode)) throw new InvalidDataException("Zip code is required");
-        if (!Regex.IsMatch(employee.ZipCode, @"\d{5}"))
-            throw new InvalidDataException("Invalid zip code");
+        ValidateEmployee(employee);
 
         _employeeRepository.UpdateEmployee(new EmployeeDBModel(
             employee.Id ?? -1,
@@ -119,15 +89,7 @@ public class EmployeeService : IEmployeeService
     {
         foreach (var employee in _employeeRepository.GetEmployees(cashiersOnly: cashiersOnly))
         {
-            yield return new EmployeeDTO(
-                employee.Id,
-                $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-                employee.Role,
-                employee.Salary,
-                DateOnly.Parse(employee.DateOfBirth),
-                DateOnly.Parse(employee.DateOfStart),
-                employee.PhoneNumber,
-                $"{employee.City}, {employee.Street}, {employee.ZipCode}");
+            yield return EmployeeDbToDto(employee);
         }
     }
 
@@ -135,30 +97,14 @@ public class EmployeeService : IEmployeeService
     {
         var employee = _employeeRepository.GetEmployee(id);
         if (employee is null) throw new InvalidDataException($"Employee {id} doesn't exist'");
-        return new(
-            employee.Id, 
-            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-            employee.Role,
-            employee.Salary,
-            DateOnly.Parse(employee.DateOfBirth),
-            DateOnly.Parse(employee.DateOfStart),
-            employee.PhoneNumber,
-            $"{employee.City}, {employee.Street}, {employee.ZipCode}" );
+        return EmployeeDbToDto(employee);
     }
 
-    public EmployeeDTO? GetEmployee(string username)
+    public EmployeeDTO GetEmployee(string username)
     {
         var employee = _employeeRepository.GetEmployee(username);
         if (employee is null) throw new InvalidDataException($"Employee {username} doesn't exist");
-        return new(
-            employee.Id,
-            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-            employee.Role,
-            employee.Salary,
-            DateOnly.Parse(employee.DateOfBirth),
-            DateOnly.Parse(employee.DateOfStart),
-            employee.PhoneNumber,
-            $"{employee.City}, {employee.Street}, {employee.ZipCode}");
+        return EmployeeDbToDto(employee);
     }
 
     public IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false)
@@ -187,5 +133,38 @@ public class EmployeeService : IEmployeeService
         Rfc2898DeriveBytes.Pbkdf2(password, salt, resultHash, iterations, HashAlgorithmName.SHA256);
         salt.CopyTo(resultSalt);
         return result;
+    }
+
+    private EmployeeDTO EmployeeDbToDto(EmployeeDBModel employee)
+    {
+        return new(
+            employee.Id,
+            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
+            employee.Role,
+            employee.Salary,
+            DateOnly.Parse(employee.DateOfBirth),
+            DateOnly.Parse(employee.DateOfStart),
+            employee.PhoneNumber,
+            $"{employee.City}, {employee.Street}, {employee.ZipCode}");
+    }
+
+    private void ValidateEmployee(EmployeeModifyDTO employee)
+    {
+        if (string.IsNullOrEmpty(employee.LastName)) throw new InvalidDataException("Last name is required");
+        if (string.IsNullOrEmpty(employee.FirstName)) throw new InvalidDataException("First name is required");
+        if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
+        if (string.IsNullOrEmpty(employee.Role)) throw new InvalidDataException("Role is required");
+        if (employee.Salary < 0) throw new InvalidDataException("Salary is required");
+        if (string.IsNullOrEmpty(employee.Phone)) throw new InvalidDataException("Phone number is required");
+        if (!Regex.IsMatch(employee.Phone, @"\+\d{1,12}"))
+            throw new InvalidDataException("Invalid phone number");
+        int age = DateTime.Now.Year - employee.BirthDate.Year;
+        if (employee.BirthDate.AddYears(age).ToDateTime(new(0, 0)) > DateTime.Now) --age;
+        if (age < 18) throw new InvalidDataException("Worker can't be younger than 18 years old");
+        if (string.IsNullOrEmpty(employee.City)) throw new InvalidDataException("City is required");
+        if (string.IsNullOrEmpty(employee.Street)) throw new InvalidDataException("Street is required");
+        if (string.IsNullOrEmpty(employee.ZipCode)) throw new InvalidDataException("Zip code is required");
+        if (!Regex.IsMatch(employee.ZipCode, @"\d{5}"))
+            throw new InvalidDataException("Invalid zip code");
     }
 }
