@@ -92,19 +92,20 @@ public class ReceiptRepository : IReceiptRepository
         return Convert.ToDecimal(command.ExecuteScalar());
     }
     
-    public void AddReceipt(ReceiptDBModel receipt)
+    public long AddReceipt(ReceiptDBModel receipt)
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """
                               INSERT INTO Receipt (id_employee, card_number, print_date, sum_total, vat)
-                              VALUES (@id_employee, @card_number, @print_date, @sum_total, @vat)
+                              VALUES (@id_employee, @card_number, @print_date, @sum_total, @vat);
+                              SELECT last_insert_rowid();
                               """;
         command.Parameters.AddWithValue("@id_employee", receipt.EmployeeId);
         command.Parameters.AddWithValue("@card_number", receipt.CardNumber is null ? DBNull.Value : receipt.CardNumber);
         command.Parameters.AddWithValue("@print_date", receipt.PrintDate);
         command.Parameters.AddWithValue("@sum_total", receipt.TotalSum);
         command.Parameters.AddWithValue("@vat", receipt.Vat);
-        command.ExecuteNonQuery();
+        return Convert.ToInt64(command.ExecuteScalar());
     }
 
     public void DeleteReceipt(long id)
