@@ -146,6 +146,21 @@ public class EmployeeService : IEmployeeService
             $"{employee.City}, {employee.Street}, {employee.ZipCode}" );
     }
 
+    public EmployeeDTO? GetEmployee(string username)
+    {
+        var employee = _employeeRepository.GetEmployee(username);
+        if (employee is null) throw new InvalidDataException($"Employee {username} doesn't exist");
+        return new(
+            employee.Id,
+            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
+            employee.Role,
+            employee.Salary,
+            DateOnly.Parse(employee.DateOfBirth),
+            DateOnly.Parse(employee.DateOfStart),
+            employee.PhoneNumber,
+            $"{employee.City}, {employee.Street}, {employee.ZipCode}");
+    }
+
     public IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false)
     {
         foreach (var employee in _employeeRepository.GetEmployeeBySearch(query, cashiersOnly))
