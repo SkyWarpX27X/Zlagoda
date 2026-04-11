@@ -37,7 +37,7 @@ public class StoreProductRepository : IStoreProductRepository
         // the DB model.
         var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
         if (sortByName || sortByQuantity) 
-            query += $"ORDER BY {(sortByName ? "product_name" : "products_number")}";
+            query += $" ORDER BY {(sortByName ? "product_name" : "products_number")}";
         command.CommandText = query;
         using var reader = command.ExecuteReader();
         while (reader.Read())
