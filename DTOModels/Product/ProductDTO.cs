@@ -8,7 +8,7 @@ public class ProductDTO
     public string Characteristics { get; set; }
     public string Manufacturer { get; set; }
 
-    public ProductDTO(long id, string name, string category, string characteristics, string manufacturer)
+    public ProductDTO(long id, string name, string category, string manufacturer, string characteristics)
     {
         Id = id;
         Name = name;
