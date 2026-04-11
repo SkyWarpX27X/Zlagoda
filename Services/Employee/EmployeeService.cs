@@ -115,25 +115,9 @@ public class EmployeeService : IEmployeeService
         _employeeRepository.DeleteEmployee(id);
     }
 
-    public IEnumerable<EmployeeDTO> GetEmployees()
+    public IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly)
     {
-        foreach (var employee in _employeeRepository.GetEmployees())
-        {
-            yield return new EmployeeDTO(
-                employee.Id,
-                $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-                employee.Role,
-                employee.Salary,
-                DateOnly.Parse(employee.DateOfBirth),
-                DateOnly.Parse(employee.DateOfStart),
-                employee.PhoneNumber,
-                $"{employee.City}, {employee.Street}, {employee.ZipCode}");
-        }
-    }
-
-    public IEnumerable<EmployeeDTO> GetCashiers()
-    {
-        foreach (var employee in _employeeRepository.GetEmployees(cashiersOnly: true))
+        foreach (var employee in _employeeRepository.GetEmployees(cashiersOnly: cashiersOnly))
         {
             yield return new EmployeeDTO(
                 employee.Id,
@@ -162,33 +146,20 @@ public class EmployeeService : IEmployeeService
             $"{employee.City}, {employee.Street}, {employee.ZipCode}" );
     }
 
-    public EmployeeDTO? GetEmployee(string lastName)
+    public IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false)
     {
-        var employee = _employeeRepository.GetEmployees().FirstOrDefault(x => x.Surname == lastName);
-        if (employee is null) throw new InvalidDataException($"Employee {lastName} doesn't exist'");
-        return new(
-            employee.Id, 
-            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-            employee.Role,
-            employee.Salary,
-            DateOnly.Parse(employee.DateOfBirth),
-            DateOnly.Parse(employee.DateOfStart),
-            employee.PhoneNumber,
-            $"{employee.City}, {employee.Street}, {employee.ZipCode}" );
-    }
-
-    public IEnumerable<EmployeeAuthDTO> GetAuthDataOfAll()
-    {
-        foreach (var employee in _employeeRepository.GetEmployees())
+        foreach (var employee in _employeeRepository.GetEmployeeBySearch(query, cashiersOnly))
         {
-            yield return new EmployeeAuthDTO(employee.Id, employee.Username, employee.Password, employee.Role);
+            yield return new EmployeeDTO(
+                employee.Id,
+                $"{employee.Surname} {employee.Name} {employee.Patronymic}",
+                employee.Role,
+                employee.Salary,
+                DateOnly.Parse(employee.DateOfBirth),
+                DateOnly.Parse(employee.DateOfStart),
+                employee.PhoneNumber,
+                $"{employee.City}, {employee.Street}, {employee.ZipCode}");
         }
-    }
-
-    public EmployeeAuthDTO GetAuthData(long id)
-    {
-        var employee = _employeeRepository.GetEmployee(id);
-        return new EmployeeAuthDTO(employee.Id, employee.Username, employee.Password, employee.Role);
     }
 
     private static byte[] HashPassword(string password, ReadOnlySpan<byte> salt)
