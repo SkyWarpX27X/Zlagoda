@@ -1,34 +1,31 @@
 ﻿using DTOModels;
-using Zlagoda.Test;
+using Services.Customer;
 
 namespace Zlagoda.ViewModels;
 
 public class CustomersVM
 {
-    //TODO switch to real customer service
-    //private readonly ICustomerService _customerService;
+    private readonly ICustomerService _customerService;
     
     public IEnumerable<CustomerDTO> Customers;
     public bool IsCreating;
     public CustomerModifyDTO? NewCustomer;
     public int? SearchPercent { get; set; }
     
-    //TODO replace with service method
     public IEnumerable<CustomerDTO> FilteredCustomers =>
         SearchPercent.HasValue
-            ? Customers.Where(c => c.Percent == SearchPercent.Value)
-            : Customers;
+            ? _customerService.GetCustomers(SearchPercent.Value)
+            : _customerService.GetCustomers();
     
-    public CustomersVM()
+    public CustomersVM(ICustomerService customerService)
     {
-        //_customerService = customerService;
+        _customerService = customerService;
         Customers = new List<CustomerDTO>();
     }
 
     public void LoadCustomers()
     {
-        //Customers = _customerService.GetCustomers();
-        Customers = FakeCustomers.GetCustomers();
+        Customers = _customerService.GetCustomers();
     }
     
     public void ShowCreateNew()
@@ -45,23 +42,20 @@ public class CustomersVM
     
     public void SaveNewCustomer(CustomerModifyDTO customer)
     {
-        var foo = 1;
-        //_customerService.AddCustomer(customer);
+        _customerService.AddCustomer(customer);
         IsCreating = false;
         LoadCustomers();
     }
 
     public void EditCustomer(CustomerModifyDTO customer)
     {
-        var foo = 1;
-        //_customerService.UpdateCustomer(customer);
+        _customerService.UpdateCustomer(customer);
         LoadCustomers();
     }
 
     public void DeleteCustomer(string cardId)
     {
-        var foo = 1;
-        //_customerService.DeleteCustomer(customer);
+        _customerService.DeleteCustomer(cardId);
         LoadCustomers();
     }
 }
