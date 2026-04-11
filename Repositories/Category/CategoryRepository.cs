@@ -24,14 +24,13 @@ public class CategoryRepository : ICategoryRepository
         return reader.Read() ? MapCategory(reader) : null;
     }
 
-    public IEnumerable<CategoryDBModel> GetCategoriesByName(string categoryName)
+    public CategoryDBModel? GetCategory(string categoryName)
     {
         using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT * FROM Category where category_name = @category_name";
+        command.CommandText = "SELECT category_number FROM Category where category_name = @category_name";
         command.Parameters.AddWithValue("@category_name", categoryName);
         using var reader = command.ExecuteReader();
-        while (reader.Read())
-            yield return MapCategory(reader);
+        return reader.Read() ? MapCategory(reader) : null;
     }
 
     public IEnumerable<CategoryDBModel> GetCategories(bool sortByName = true)
