@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using DBModels;
 using DTOModels;
 using Repositories.Product;
 using Repositories.StoreProduct;
@@ -20,65 +21,20 @@ public class StoreProductService : IStoreProductService
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByQuantity: sortByQuantity))
         {
-            var product = _productRepository.GetProduct(storeProduct.ProductId);
-            if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
-            var oldPrice = storeProduct.SellingPrice;
-            if (!storeProduct.Promotional)
-            {
-                if (string.IsNullOrEmpty(storeProduct.UPCProm)) throw new InvalidDataException($"Promotional UPC is required");
-                var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
-                if (promotional is null) throw new InvalidDataException($"Promotional {storeProduct.UPCProm} does not exist");
-                oldPrice = promotional.SellingPrice;
-            }
-            yield return new(
-                storeProduct.UPC,
-                storeProduct.Name,
-                storeProduct.SellingPrice,
-                product.Characteristics,
-                storeProduct.Quantity,
-                storeProduct.Promotional,
-                oldPrice);
+            yield return StoreProductDbToDto(storeProduct);
         }
     }
 
-    public StoreProductDTO? GetStoreProduct(string upc)
+    public StoreProductDTO GetStoreProduct(string upc)
     {
         var storeProduct = _storeProductRepository.GetStoreProduct(upc);
-        if (storeProduct is null) throw new InvalidDataException($"Store product {upc} doesn't exist");
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
-        var oldPrice = storeProduct.SellingPrice;
-        if (!storeProduct.Promotional)
-        {
-            if (string.IsNullOrEmpty(storeProduct.UPCProm)) throw new InvalidDataException($"Promotional UPC is required");
-            var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
-            if (promotional is null) throw new InvalidDataException($"Promotional {storeProduct.UPCProm} does not exist");
-            oldPrice = promotional.SellingPrice;
-        }
-        return new(
-            storeProduct.UPC,
-            storeProduct.Name,
-            storeProduct.SellingPrice,
-            product.Characteristics,
-            storeProduct.Quantity,
-            storeProduct.Promotional,
-            oldPrice);
+        if (storeProduct is null) throw new InvalidDataException($"Product {upc} does not exist");
+        return StoreProductDbToDto(storeProduct);
     }
 
     public void AddStoreProduct(StoreProductModifyDTO storeProduct)
     {
-        if (string.IsNullOrEmpty(storeProduct.Upc))
-            throw new InvalidDataException("UPC is required");
-        if (!Regex.IsMatch(storeProduct.Upc, @"\d{12}"))
-            throw new InvalidDataException("Invalid UPC");
-        if (storeProduct.Quantity < 0)
-            throw new InvalidDataException("Quantity cannot be negative");
-        if (storeProduct.Price < 0)
-            throw new InvalidDataException("Price cannot be negative");
-        if (!string.IsNullOrEmpty(storeProduct.UpcProm) && !Regex.IsMatch(storeProduct.UpcProm, @"\d{12}"))
-            throw new InvalidDataException("Invalid promotion UPC");
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
+        ValidateStoreProduct(storeProduct);
         
         _storeProductRepository.AddStoreProduct(new(
             storeProduct.Upc,
@@ -91,18 +47,7 @@ public class StoreProductService : IStoreProductService
 
     public void UpdateStoreProduct(StoreProductModifyDTO storeProduct)
     {
-        if (string.IsNullOrEmpty(storeProduct.Upc))
-            throw new InvalidDataException("UPC is required");
-        if (!Regex.IsMatch(storeProduct.Upc, @"\d{12}"))
-            throw new InvalidDataException("Invalid UPC");
-        if (storeProduct.Quantity < 0)
-            throw new InvalidDataException("Quantity cannot be negative");
-        if (storeProduct.Price < 0)
-            throw new InvalidDataException("Price cannot be negative");
-        if (!string.IsNullOrEmpty(storeProduct.UpcProm) && !Regex.IsMatch(storeProduct.UpcProm, @"\d{12}"))
-            throw new InvalidDataException("Invalid promotion UPC");
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
+        ValidateStoreProduct(storeProduct);
         
         _storeProductRepository.UpdateStoreProduct(new(
             storeProduct.Upc,
@@ -116,5 +61,42 @@ public class StoreProductService : IStoreProductService
     public void DeleteStoreProduct(string upc)
     {
         _storeProductRepository.DeleteStoreProduct(upc);
+    }
+
+    private StoreProductDTO StoreProductDbToDto(StoreProductInfoDataModel storeProduct)
+    {
+        var product = _productRepository.GetProduct(storeProduct.ProductId);
+        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
+        var oldPrice = storeProduct.SellingPrice;
+        if (!string.IsNullOrEmpty(storeProduct.UPCProm))
+        {
+            var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
+            if (promotional is null) throw new InvalidDataException($"Promotional {storeProduct.UPCProm} does not exist");
+            oldPrice = promotional.SellingPrice;
+        }
+        return new(
+            storeProduct.UPC,
+            product.Name,
+            storeProduct.SellingPrice,
+            product.Characteristics,
+            storeProduct.Quantity,
+            storeProduct.Promotional,
+            oldPrice);
+    }
+
+    private void ValidateStoreProduct(StoreProductModifyDTO storeProduct)
+    {
+        if (string.IsNullOrEmpty(storeProduct.Upc))
+            throw new InvalidDataException("UPC is required");
+        if (!Regex.IsMatch(storeProduct.Upc, @"\d{12}"))
+            throw new InvalidDataException("Invalid UPC");
+        if (storeProduct.Quantity < 0)
+            throw new InvalidDataException("Quantity cannot be negative");
+        if (storeProduct.Price < 0)
+            throw new InvalidDataException("Price cannot be negative");
+        if (!string.IsNullOrEmpty(storeProduct.UpcProm) && !Regex.IsMatch(storeProduct.UpcProm, @"\d{12}"))
+            throw new InvalidDataException("Invalid promotion UPC");
+        var product = _productRepository.GetProduct(storeProduct.ProductId);
+        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
     }
 }
