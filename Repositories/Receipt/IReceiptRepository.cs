@@ -9,6 +9,6 @@ public interface IReceiptRepository
     IEnumerable<ReceiptDBModel> GetReceiptsByCashier(long employeeId, (string StartDate, string EndDate)? dates = null);
     decimal GetSumTotal((string StartDate, string EndDate) dates);
     decimal GetSumByCashier(long employeeId, (string StartDate, string EndDate) dates);
-    void AddReceipt(ReceiptDBModel receipt);
+    long AddReceipt(ReceiptDBModel receipt);
     void DeleteReceipt(long id);
 }
