@@ -1,59 +1,86 @@
 ﻿using DTOModels;
+using Services.Category;
 using Services.Product;
-using Zlagoda.Test;
 
 namespace Zlagoda.ViewModels;
 
 public class ProductsVM
 {
-    //TODO switch to real product service
-    //private readonly IProductService _productService;
-
-    public IEnumerable<ProductDTO> Products { get; private set; }
+    private readonly IProductService _productService;
+    private readonly ICategoryService _categoryService;
+    public string SelectedCategory { get; set; } = "";
+    public IEnumerable<ProductDTO> Products => _productService.GetProducts(string.IsNullOrWhiteSpace(SelectedCategory) ? null : SelectedCategory);
+    public IEnumerable<string> Categories => _categoryService.GetCategories().Select(c => c.Name);
     public bool IsCreating { get; private set; }
     public ProductDTO? NewProduct { get; private set; }
+    public string? ErrorMessage { get; private set; }
     
-    public ProductsVM()
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+    
+    public ProductsVM(IProductService productService, ICategoryService categoryService)
     {
-        //_productService = productService;
-        Products = new List<ProductDTO>();
+        _productService = productService;
+        _categoryService = categoryService;
     }
-
-    public void LoadProducts()
+    
+    public int? GetSoldAmount(long productId)
     {
-        //Products = _productService.GetProducts();
-        Products = FakeProducts.GetProducts();
+        if (!FromDate.HasValue || !ToDate.HasValue) return null;
+        
+        // TODO: call real service method to get sold amount
+        // return _productService.GetSoldAmount(productId, FromDate.Value, ToDate.Value);
+        return 0;
     }
-
+    
     public void ShowCreateNew()
     {
         NewProduct = new ProductDTO();
         IsCreating = true;
+        ErrorMessage = null;
     }
 
     public void CancelCreate()
     {
         IsCreating = false;
         NewProduct = null;
+        ErrorMessage = null;
+    }
+
+    public void ClearError()
+    {
+        ErrorMessage = null;
     }
     
     public void SaveNewProduct(ProductDTO product)
     {
-        //_productService.AddProduct(product);
-        IsCreating = false;
-        NewProduct = null;
-        LoadProducts();
+        try
+        {
+            _productService.AddProduct(product);
+            IsCreating = false;
+            NewProduct = null;
+            ErrorMessage = null;
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
     }
 
     public void EditProduct(ProductDTO product)
     {
-        //_productService.UpdateProduct(product);
-        LoadProducts();
+        try
+        {
+            _productService.UpdateProduct(product);
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
     }
 
     public void DeleteProduct(long id)
     {
-        //_productService.DeleteProduct(id);
-        LoadProducts();
+        _productService.DeleteProduct(id);
     }
 }

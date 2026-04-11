@@ -1,6 +1,6 @@
 ﻿@page "/products"
 @rendermode InteractiveServer
-@using DTOModels
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.ViewModels
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
@@ -8,57 +8,68 @@
 
 <h3>Товари</h3>
 
-<div class="mb-3 d-flex justify-content-between align-items-center">
-    @if (ViewModel.IsCreating)
-    {
-        <div class="w-100 me-3">
-            <ProductModify Product="@ViewModel.NewProduct" Categories="@Categories" OnSave="@ViewModel.SaveNewProduct" OnCancel="@ViewModel.CancelCreate" />
-        </div>
-    }
-    else
-    {
-        <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити товар</button>
-    }
-    
-    <div class="d-flex align-items-center">
-        <label for="categoryFilter" class="me-2 fw-bold">Категорія:</label>
-        <select id="categoryFilter" class="form-select" style="width: auto;" @bind="SelectedCategory" @bind:after="StateHasChanged">
-            <option value="">Всі категорії</option>
-            @foreach (var category in Categories)
+@if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewModel.ErrorMessage
+        <button type="button" class="btn-close" aria-label="Close" @onclick="ViewModel.ClearError"></button>
+    </div>
+}
+
+<div class="mb-3 d-flex justify-content-between align-items-end flex-wrap gap-3">
+    <AuthorizeView Roles="Менеджер">
+        <Authorized>
+            @if (ViewModel.IsCreating)
             {
-                <option value="@category">@category</option>
+                <div class="w-100 me-3">
+                    <ProductModify Product="@ViewModel.NewProduct" Categories="@ViewModel.Categories" OnSave="@ViewModel.SaveNewProduct" OnCancel="@ViewModel.CancelCreate"/>
+                </div>
             }
-        </select>
+            else
+            {
+                <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити товар</button>
+            }
+        </Authorized>
+    </AuthorizeView>
+    
+    <div class="d-flex align-items-end gap-3 flex-wrap">
+        <div>
+            <label for="categoryFilter" class="form-label fw-bold mb-1">Категорія:</label>
+            <select id="categoryFilter" class="form-select" style="width: auto;" @bind="ViewModel.SelectedCategory" @bind:after="StateHasChanged">
+                <option value="">Всі категорії</option>
+                @foreach (var category in ViewModel.Categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label for="fromDate" class="form-label fw-bold mb-1">З дати (продажі):</label>
+            <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged"/>
+        </div>
+
+        <div>
+            <label for="toDate" class="form-label fw-bold mb-1">По дату (продажі):</label>
+            <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged"/>
+        </div>
     </div>
 </div>
 
-@if (ViewModel.Products == null || !ViewModel.Products.Any())
+@if (ViewModel.Products == null)
 {
     <p><em>Завантаження...</em></p>
 }
 else
 {
     <div class="product-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
-        @foreach (var product in FilteredProducts)
+        @foreach (var product in ViewModel.Products)
         {
-            <ProductView Product="@product" Categories="@Categories" OnSave="ViewModel.EditProduct" OnDelete="ViewModel.DeleteProduct"/>
+            <ProductView Product="@product" Categories="@ViewModel.Categories" SoldAmount="ViewModel.GetSoldAmount(product.Id)" OnSave="ViewModel.EditProduct" OnDelete="ViewModel.DeleteProduct"/>
         }
     </div>
 }
 
 @code {
-    private string SelectedCategory { get; set; } = "";
 
-    private IEnumerable<string> Categories => 
-        ViewModel.Products?.Select(p => p.Category).Distinct().OrderBy(c => c) ?? Enumerable.Empty<string>();
-
-    private IEnumerable<ProductDTO> FilteredProducts => 
-        string.IsNullOrEmpty(SelectedCategory) 
-            ? ViewModel.Products 
-            : ViewModel.Products.Where(p => p.Category == SelectedCategory);
-
-    protected override void OnInitialized()
-    {
-        ViewModel.LoadProducts();
-    }
 }
