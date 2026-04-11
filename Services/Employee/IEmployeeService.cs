@@ -12,5 +12,6 @@ public interface IEmployeeService
     IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly);
     
     EmployeeDTO? GetEmployee(long id);
+    EmployeeDTO? GetEmployee(string username);
     IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false);
 }
