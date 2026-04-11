@@ -1,24 +1,20 @@
 ﻿using DTOModels;
+using Services.Employee;
 
 namespace Zlagoda.ViewModels;
 
 public class UserInfoVM
 {
+    private readonly IEmployeeService _employeeService;
     public EmployeeDTO? CurrentEmployee { get; private set; }
 
-    public void LoadUserInfo()
+    public UserInfoVM(IEmployeeService employeeService)
     {
-        // TODO: Implement getting current employee
-        // Mock data for now
-        CurrentEmployee = new EmployeeDTO(
-            12345678,
-            "Бердимухамедов Гурбангули Мялікгулийович",
-            "Менеджер",
-            15000m,
-            DateOnly.FromDateTime(DateTime.Now.AddYears(-2)),
-            DateOnly.FromDateTime(DateTime.Now.AddYears(-30)),
-            "+380501234567",
-            "Сараєво, бульвар Героїв Злагоди 4б, 01001"
-        );
+        _employeeService = employeeService;
+    }
+
+    public async Task LoadUserInfo(string username)
+    {
+        CurrentEmployee = _employeeService.GetEmployee(username);
     }
 }
