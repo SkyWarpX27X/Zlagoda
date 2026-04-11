@@ -70,6 +70,7 @@ public class ProductService : IProductService
         if (string.IsNullOrEmpty(product.Characteristics)) throw new InvalidDataException("Characteristics are required");
         if (string.IsNullOrEmpty(product.Manufacturer)) throw new InvalidDataException("Manufacturer is required");
         _productRepository.UpdateProduct(new(
+            product.Id,
             category.Id,
             product.Name,
             product.Characteristics,
