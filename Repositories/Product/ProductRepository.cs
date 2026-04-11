@@ -32,7 +32,8 @@ public class ProductRepository : IProductRepository
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Product";
         if (!string.IsNullOrEmpty(categoryName)) 
-            query += " WHERE category_name = @categoryName";
+            query += " JOIN Category on Product.category_number = Category.category_number" +
+                     " WHERE category_name = @categoryName";
         if (sortByName) 
             query += " ORDER BY product_name";
         command.CommandText = query;

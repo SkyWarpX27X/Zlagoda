@@ -27,10 +27,15 @@ public class SaleRepository : ISaleRepository
         return reader.Read() ? MapSale(reader) : null;
     }
     
-    public IEnumerable<SaleDBModel> GetSales()
+    public IEnumerable<SaleDBModel> GetSales(long? receiptId = null)
     {
         using var command = _connection.CreateCommand(); 
-        command.CommandText = "SELECT * FROM Sale";
+        var query = "SELECT * FROM Sale";
+        if (receiptId != null)
+            query += " WHERE receipt_number = @receipt_number;";
+        command.CommandText = query;
+        if (receiptId != null)
+            command.Parameters.AddWithValue("@receipt_number", receiptId);
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return MapSale(reader);
