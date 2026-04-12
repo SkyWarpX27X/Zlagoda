@@ -21,8 +21,8 @@ public class ReceiptsVM
     public string? ErrorMessage { get; private set; }
     
     public long SelectedEmployee { get; set; }
-    public DateOnly? FromDate { get; set; }
-    public DateOnly? ToDate { get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
     public long? SearchReceiptId { get; set; }
     
     public bool IsCreating { get; private set; }

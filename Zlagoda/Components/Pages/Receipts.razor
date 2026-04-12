@@ -64,13 +64,13 @@
                 </AuthorizeView>
 
                 <div>
-                    <label for="fromDate" class="form-label fw-bold mb-1">З дати:</label>
-                    <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged"/>
+                    <label for="fromDate" class="form-label fw-bold mb-1">З дати/часу:</label>
+                    <input type="datetime-local" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged"/>
                 </div>
 
                 <div>
-                    <label for="toDate" class="form-label fw-bold mb-1">По дату:</label>
-                    <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged"/>
+                    <label for="toDate" class="form-label fw-bold mb-1">По дату/час:</label>
+                    <input type="datetime-local" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged"/>
                 </div>
 
                 <div>
