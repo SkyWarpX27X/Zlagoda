@@ -1,11 +1,15 @@
 ﻿using DTOModels;
-using Zlagoda.Test;
+using Services.Product;
+using Services.ProductStore;
 
 namespace Zlagoda.ViewModels;
 
 public class ProductsInStoreVM
 {
+    private readonly IStoreProductService _storeProductService;
+    private readonly IProductService _productService;
     public IEnumerable<StoreProductDTO> ProductsInStore { get; private set; }
+    public string? ErrorMessage { get; private set; }
     
     //TODO replace with service
     public IEnumerable<StoreProductDTO> FilteredAndSortedProducts
@@ -48,32 +52,40 @@ public class ProductsInStoreVM
     public string PromFilter { get; set; } = "All";
     public string SortBy { get; set; } = "Name";
     
-    public ProductsInStoreVM()
+    public ProductsInStoreVM(IStoreProductService storeProductService, IProductService productService)
     {
+        _storeProductService = storeProductService;
+        _productService = productService;
         ProductsInStore = new List<StoreProductDTO>();
         AvailableProducts = new List<ProductDTO>();
     }
 
     public void LoadProducts()
     {
-        // TODO: Load from service
-        ProductsInStore = FakeStoreProducts.GetProducts();
-        
-        // TODO: Load from Product service
-        AvailableProducts = FakeProducts.GetProducts();
+        ProductsInStore = _storeProductService.GetStoreProducts();
+        AvailableProducts = _productService.GetProducts();
     }
 
     public void ShowCreateNew()
     {
         NewProduct = new StoreProductModifyDTO("", 0, 0);
         IsCreating = true;
+        ErrorMessage = null;
     }
 
     public void SaveNewProduct(StoreProductModifyDTO product)
     {
-        IsCreating = false;
-        NewProduct = null;
-        // TODO: save product via service
+        try
+        {
+            _storeProductService.AddStoreProduct(product);
+            IsCreating = false;
+            NewProduct = null;
+            ErrorMessage = null;
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
         LoadProducts();
     }
 
@@ -81,27 +93,33 @@ public class ProductsInStoreVM
     {
         IsCreating = false;
         NewProduct = null;
+        ErrorMessage = null;
+    }
+
+    public void ClearError()
+    {
+        ErrorMessage = null;
     }
 
     public void EditProduct(StoreProductModifyDTO product)
     {
-        // TODO: edit product via service
+        _storeProductService.UpdateStoreProduct(product);
         LoadProducts();
     }
 
     public void DeleteProduct(string upc)
     {
-        // TODO: delete product via service
+        _storeProductService.DeleteStoreProduct(upc);
         LoadProducts();
     }
     
-    public void MakeProm(string upc)
+    public void MakeProm((string originalUpc, string promUpc) data)
     {
-        // TODO: call make prom service method
+        // TODO: call make prom service method using data.originalUpc and data.promUpc
         LoadProducts();
     }
 
-    public void CancelProm(string upc)
+    public void CancelProm(string promUpc)
     {
         // TODO: call cancel prom service method
         LoadProducts();
