@@ -1,6 +1,5 @@
 ﻿using DTOModels;
 using Services.Employee;
-using Zlagoda.Test;
 
 namespace Zlagoda.ViewModels;
 
@@ -88,6 +87,5 @@ public class EmployeesVM
     public void DeleteEmployee(long id)
     {
         _employeeService.DeleteEmployee(id);
-        LoadEmployees();
     }
 }

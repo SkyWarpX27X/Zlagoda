@@ -6,7 +6,12 @@
 @using Zlagoda.ViewModels
 @inject CustomersVM ViewModel
 
-<h3>Постійні клієнти</h3>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Постійні клієнти</h3>
+    <button class="btn btn-outline-primary" @onclick="PrintReport">
+        <i class="bi bi-printer me-1"></i> Друк звіту
+    </button>
+</div>
 
 @if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
 {
@@ -66,5 +71,8 @@ else
 }
 
 @code {
-    
+    private async Task PrintReport()
+    {
+        // TODO: Implement printing logic
+    }
 }
