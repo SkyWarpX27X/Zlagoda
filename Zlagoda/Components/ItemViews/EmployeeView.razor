@@ -43,22 +43,13 @@ else
 
     private EmployeeModifyDTO ToModifyDTO(EmployeeDTO employee)
     {
-        // Split name (assuming standard "LastName FirstName Patronymic" format)
-        var nameParts = employee.FullName.Split(' ');
-        var lastName = nameParts.Length > 0 ? nameParts[0] : "";
-        var firstName = nameParts.Length > 1 ? nameParts[1] : "";
-        var patronymic = nameParts.Length > 2 ? nameParts[2] : null;
-
-        // Split address (assuming format "City, Street, ZipCode")
-        var addressParts = employee.Address.Split(", ");
-        var city = addressParts.Length > 0 ? addressParts[0] : "";
-        var street = addressParts.Length > 1 ? addressParts[1] : "";
-        var zipCode = addressParts.Length > 2 ? addressParts[2] : "";
+        var name = employee.FullName.Split(' ');
+        var address = employee.Address.Split(", ");
         return new EmployeeModifyDTO(
             employee.Id, 
-            lastName, 
-            firstName, 
-            patronymic, 
+            name[0], 
+            name[1], 
+            name.Length > 2 ? name[2] : null, 
             "",
             "",
             employee.Role, 
@@ -66,9 +57,9 @@ else
             employee.HireDate, 
             employee.BirthDate, 
             employee.Phone, 
-            city, 
-            street, 
-            zipCode
+            address[0], 
+            string.Join(", ", address, 1, address.Length - 2), 
+            address[^1]
         );
     }
 
