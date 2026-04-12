@@ -33,11 +33,15 @@
             </AuthorizeView>
 
             <div class="d-flex align-items-end gap-3 flex-wrap">
-                <div>
-                    <label for="searchId" class="form-label fw-bold mb-1">Пошук за ID:</label>
-                    <input type="number" id="searchId" class="form-control" @bind="ViewModel.SearchReceiptId" @bind:after="StateHasChanged" placeholder="Введіть ID..."/>
-                </div>
-
+                <AuthorizeView Roles="Касир">
+                    <Authorized>
+                        <div>
+                            <label for="searchId" class="form-label fw-bold mb-1">Пошук за ID:</label>
+                            <input type="number" id="searchId" class="form-control" @bind="ViewModel.SearchReceiptId" @bind:after="StateHasChanged" placeholder="Введіть ID..."/>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+                
                 <AuthorizeView Roles="Менеджер, Касир">
                     <Authorized>
                         <div>
