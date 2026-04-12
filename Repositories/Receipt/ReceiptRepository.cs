@@ -34,7 +34,7 @@ public class ReceiptRepository : IReceiptRepository
         using var command = _connection.CreateCommand(); 
         var query = "SELECT * FROM Receipt";
         if (dates != null)
-            query += "WHERE print_date BETWEEN @startDate AND @endDate";
+            query += " WHERE print_date BETWEEN @startDate AND @endDate";
         command.CommandText = query;
         if (dates != null)
         {
@@ -51,7 +51,7 @@ public class ReceiptRepository : IReceiptRepository
         using var command = _connection.CreateCommand();
         var query = "SELECT * FROM Receipt WHERE id_employee = @employeeId";
         if (dates != null)
-            query += "AND print_date BETWEEN @startDate AND @endDate";
+            query += " AND print_date BETWEEN @startDate AND @endDate";
         command.CommandText = query;
         command.Parameters.AddWithValue("@employeeId", employeeId);
         if (dates != null)
@@ -69,7 +69,7 @@ public class ReceiptRepository : IReceiptRepository
         using var command = _connection.CreateCommand();
         var query = "SELECT COALESCE(SUM(sum_total), 0) FROM Receipt";
         if (dates != null)
-            query += "WHERE print_date BETWEEN @startDate AND @endDate;";
+            query += " WHERE print_date BETWEEN @startDate AND @endDate;";
         command.CommandText = query;
         if (dates != null)
         {
@@ -88,7 +88,7 @@ public class ReceiptRepository : IReceiptRepository
                     WHERE id_employee = @employeeId
                     """;
         if (dates != null)
-            query += "AND print_date BETWEEN @startDate AND @endDate;";
+            query += " AND print_date BETWEEN @startDate AND @endDate;";
         command.CommandText = query;
         command.Parameters.AddWithValue("@employeeId", employeeId);
         if (dates != null)
