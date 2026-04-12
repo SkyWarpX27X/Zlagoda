@@ -1,4 +1,5 @@
 ﻿@using DTOModels
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.Components.ItemModifies
 
 @if (_isEditing)
@@ -41,19 +42,35 @@ else
                     }
                 </div>
             </div>
-            
-            <div class="d-flex justify-content-end gap-2">
-                @if (Product.IsProm)
-                {
-                    <button class="btn btn-warning btn-sm text-dark" @onclick="() => CancelProm(Product.Upc)">Скасувати акцію</button>
-                }
-                else
-                {
-                    <button class="btn btn-success btn-sm" @onclick="() => MakeProm(Product.Upc)">Зробити акційним</button>
-                }
-                <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
-                <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Upc)">Видалити</button>
-            </div>
+            <AuthorizeView Roles="Менеджер">
+                <Authorized>
+                    <div class="d-flex justify-content-end gap-2">
+                        @if (Product.IsProm)
+                        {
+                            <button class="btn btn-warning btn-sm text-dark" @onclick="() => CancelProm(Product.Upc)">Скасувати акцію</button>
+                        }
+                        else
+                        {
+                            @if (_isMakingProm)
+                            {
+                                <input type="text" class="form-control form-control-sm" style="max-width: 150px;" placeholder="Акційний UPC" @bind="_promUpc" />
+                                <button class="btn btn-success btn-sm" @onclick="ConfirmMakeProm">Зберегти</button>
+                                <button class="btn btn-secondary btn-sm" @onclick="CancelMakeProm">Скасувати</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success btn-sm" @onclick="StartMakeProm">Зробити акційним</button>
+                            }
+                        }
+                
+                        @if (!_isMakingProm)
+                        {
+                            <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Upc)">Видалити</button>
+                        }
+                    </div>
+                </Authorized>
+            </AuthorizeView>
         </div>
     </div>
 }
@@ -72,12 +89,14 @@ else
     public EventCallback<string> OnDelete { get; set; }
     
     [Parameter]
-    public EventCallback<string> OnMakeProm { get; set; }
+    public EventCallback<(string originalUpc, string promUpc)> OnMakeProm { get; set; }
 
     [Parameter]
     public EventCallback<string> OnCancelProm { get; set; }
 
     private bool _isEditing;
+    private bool _isMakingProm;
+    private string _promUpc = "";
 
     private StoreProductModifyDTO ToModifyDTO(StoreProductDTO product)
     {
@@ -109,9 +128,25 @@ else
         OnDelete.InvokeAsync(upc);
     }
     
-    private void MakeProm(string upc)
+    private void StartMakeProm()
     {
-        OnMakeProm.InvokeAsync(upc);
+        _isMakingProm = true;
+        _promUpc = "";
+    }
+
+    private void CancelMakeProm()
+    {
+        _isMakingProm = false;
+        _promUpc = "";
+    }
+
+    private void ConfirmMakeProm()
+    {
+        if (!string.IsNullOrWhiteSpace(_promUpc))
+        {
+            OnMakeProm.InvokeAsync((Product.Upc, _promUpc));
+            _isMakingProm = false;
+        }
     }
 
     private void CancelProm(string upc)
