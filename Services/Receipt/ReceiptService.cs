@@ -64,6 +64,18 @@ public class ReceiptService : IReceiptService
         return ReceiptDbToDtoModel(receipt);
     }
 
+    public decimal GetReceiptsTotalSum((DateOnly start, DateOnly end) dates)
+    {
+        (string, string) argumentDates = new(dates.start.ToShortDateString(), dates.end.ToShortDateString());
+        return _receiptRepository.GetSumTotal(argumentDates);
+    }
+
+    public decimal GetReceiptsTotalSumByCashier(long cashierId, (DateOnly start, DateOnly end) dates)
+    {
+        (string, string) argumentDates = new(dates.start.ToShortDateString(), dates.end.ToShortDateString());
+        return _receiptRepository.GetSumByCashier(cashierId, argumentDates);
+    }
+
     public void AddReceipt(ReceiptCreateDTO receipt)
     {
         ValidateReceipt(receipt);
@@ -72,16 +84,24 @@ public class ReceiptService : IReceiptService
         {
             ValidateSale(sale);
             total += sale.Price * sale.Quantity;
-            var storeProduct = _storeProductRepository.GetStoreProduct(sale.ProductUPC);
         }
         
-        _receiptRepository.AddReceipt(new(
+        long id = _receiptRepository.AddReceipt(new(
             receipt.EmployeeId,
             receipt.CustomerCardId,
-            receipt.PrintDate.ToShortDateString(),
+            $"{receipt.PrintDate.ToShortDateString()} {receipt.PrintDate.ToShortTimeString()}",
             total,
             total * 0.2m
             ));
+        foreach (var sale in receipt.Sales)
+        {
+            _saleRepository.AddSale(new(
+                sale.ProductUPC,
+                id,
+                sale.Quantity,
+                sale.Price
+                ));
+        }
     }
 
     public void DeleteReceipt(long id)
@@ -134,7 +154,7 @@ public class ReceiptService : IReceiptService
             throw new InvalidDataException("UPC is required");
         if (_storeProductRepository.GetStoreProduct(sale.ProductUPC) is null)
             throw new InvalidDataException($"Product {sale.ProductUPC} doesn't exist");
-        if (sale.Price < 0) throw new InvalidDataException($"Price can't be negative");
-        if (sale.Quantity < 0) throw new InvalidDataException($"Quantity can't be negative");
+        if (sale.Price < 0) throw new InvalidDataException("Price can't be negative");
+        if (sale.Quantity < 0) throw new InvalidDataException("Quantity can't be negative");
     }
 }
