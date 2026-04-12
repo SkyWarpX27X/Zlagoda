@@ -1,4 +1,5 @@
 ﻿@using DTOModels
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.Components.ItemModifies
 
 @if (_isEditing)
@@ -20,7 +21,11 @@ else
             </p>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-primary btn-sm" @onclick="EditCustomer">Редагувати</button>
-                <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(Customer.CardId)">Видалити</button>
+                <AuthorizeView Roles="Менеджер">
+                    <Authorized>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(Customer.CardId)">Видалити</button>
+                    </Authorized>
+                </AuthorizeView>
             </div>
         </div>
     </div>

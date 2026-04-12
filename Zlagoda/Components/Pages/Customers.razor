@@ -1,5 +1,6 @@
 ﻿@page "/customers"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
 @using Zlagoda.ViewModels
@@ -25,10 +26,22 @@
         <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
             <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Додати клієнта</button>
             <div class="d-flex align-items-end gap-3 flex-wrap">
-                <div>
-                    <label for="percentFilter" class="form-label fw-bold mb-1">Фільтрувати за відсотком:</label>
-                    <input type="number" id="percentFilter" class="form-control" @bind="ViewModel.SearchPercent" @bind:after="StateHasChanged" placeholder="Введіть відсоток..." />
-                </div>
+                <AuthorizeView Roles="Касир">
+                    <Authorized>
+                        <div>
+                            <label for="surnameFilter" class="form-label fw-bold mb-1">Пошук за прізвищем:</label>
+                            <input type="text" id="surnameFilter" class="form-control" @bind="ViewModel.SearchSurname" @bind:after="StateHasChanged" placeholder="Введіть прізвище..."/>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Менеджер">
+                    <Authorized>
+                        <div>
+                            <label for="percentFilter" class="form-label fw-bold mb-1">Фільтрувати за відсотком:</label>
+                            <input type="number" id="percentFilter" class="form-control" @bind="ViewModel.SearchPercent" @bind:after="StateHasChanged" placeholder="Введіть відсоток..."/>
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
             </div>
         </div>
     }

@@ -7,13 +7,24 @@ public class CustomersVM
 {
     private readonly ICustomerService _customerService;
     
-    public IEnumerable<CustomerDTO> Customers =>
-        SearchPercent.HasValue
-            ? _customerService.GetCustomers(SearchPercent.Value)
-            : _customerService.GetCustomers();
+    public IEnumerable<CustomerDTO> Customers
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(SearchSurname))
+            {
+                //return _customerService.GetCustomer(SearchSurname);
+            }
+            return SearchPercent.HasValue
+                ? _customerService.GetCustomers(SearchPercent.Value)
+                : _customerService.GetCustomers();
+        }
+    }
+    
     public bool IsCreating;
     public CustomerModifyDTO? NewCustomer;
     public int? SearchPercent { get; set; }
+    public string SearchSurname { get; set; } = "";
     public string? ErrorMessage { get; private set; }
     
     public CustomersVM(ICustomerService customerService)
