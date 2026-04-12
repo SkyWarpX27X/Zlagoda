@@ -34,22 +34,22 @@ public class ReceiptService : IReceiptService
         _storeProductRepository = storeProductRepository;
     }
     
-    public IEnumerable<ReceiptDTO> GetReceipts((DateOnly start, DateOnly end)? dates = null)
+    public IEnumerable<ReceiptDTO> GetReceipts((DateTime start, DateTime end)? dates = null)
     {
         (string start, string end)? argumentDates = null;
         if (dates is not null)
-            argumentDates = new(dates.Value.start.ToShortDateString(), dates.Value.end.ToShortDateString());
+            argumentDates = DateRangeToStrings(dates.Value.start, dates.Value.end);
         foreach (var receipt in _receiptRepository.GetReceipts(argumentDates))
         {
             yield return ReceiptDbToDtoModel(receipt);
         }
     }
 
-    public IEnumerable<ReceiptDTO> GetReceiptsByCashier(long cashierId, (DateOnly start, DateOnly end)? dates = null)
+    public IEnumerable<ReceiptDTO> GetReceiptsByCashier(long cashierId, (DateTime start, DateTime end)? dates = null)
     {
         (string start, string end)? argumentDates = null;
         if (dates is not null)
-            argumentDates = new(dates.Value.start.ToShortDateString(), dates.Value.end.ToShortDateString());
+            argumentDates = DateRangeToStrings(dates.Value.start, dates.Value.end);
         foreach (var receipt in _receiptRepository.GetReceiptsByCashier(cashierId, argumentDates))
         {
             yield return ReceiptDbToDtoModel(receipt);
@@ -64,15 +64,19 @@ public class ReceiptService : IReceiptService
         return ReceiptDbToDtoModel(receipt);
     }
 
-    public decimal GetReceiptsTotalSum((DateOnly start, DateOnly end) dates)
+    public decimal GetReceiptsTotalSum((DateTime start, DateTime end)? dates)
     {
-        (string, string) argumentDates = new(dates.start.ToShortDateString(), dates.end.ToShortDateString());
+        (string start, string end)? argumentDates = null;
+        if (dates is not null)
+            argumentDates = DateRangeToStrings(dates.Value.start, dates.Value.end);
         return _receiptRepository.GetSumTotal(argumentDates);
     }
 
-    public decimal GetReceiptsTotalSumByCashier(long cashierId, (DateOnly start, DateOnly end) dates)
+    public decimal GetReceiptsTotalSumByCashier(long cashierId, (DateTime start, DateTime end)? dates)
     {
-        (string, string) argumentDates = new(dates.start.ToShortDateString(), dates.end.ToShortDateString());
+        (string start, string end)? argumentDates = null;
+        if (dates is not null)
+            argumentDates = DateRangeToStrings(dates.Value.start, dates.Value.end);
         return _receiptRepository.GetSumByCashier(cashierId, argumentDates);
     }
 
@@ -156,5 +160,12 @@ public class ReceiptService : IReceiptService
             throw new InvalidDataException($"Product {sale.ProductUPC} doesn't exist");
         if (sale.Price < 0) throw new InvalidDataException("Price can't be negative");
         if (sale.Quantity < 0) throw new InvalidDataException("Quantity can't be negative");
+    }
+
+    private (string, string) DateRangeToStrings(DateTime start, DateTime end)
+    {
+        var a = $"{start.ToShortDateString()} {start.ToShortTimeString()}";
+        var b = $"{end.ToShortDateString()} {end.ToShortTimeString()}";
+        return (a, b);
     }
 }
