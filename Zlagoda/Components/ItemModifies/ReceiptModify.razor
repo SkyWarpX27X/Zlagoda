@@ -1,4 +1,10 @@
 ﻿@using DTOModels
+@using Microsoft.AspNetCore.Components.Authorization
+@using Services.Employee
+@using Services.ProductStore
+@inject IStoreProductService StoreProductService
+@inject IEmployeeService EmployeeService
+@inject AuthenticationStateProvider AuthStateProvider
 
 <div class="card mb-3 shadow-sm border-primary">
     <div class="card-body">
@@ -28,8 +34,8 @@
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>@sale.ProductName</strong><br />
-                            <small class="text-muted">@sale.Price.ToString("C") x @sale.Quantity = @sale.Sum.ToString("C")</small>
+                            <strong>@StoreProductService.GetStoreProduct(sale.ProductUPC).Name</strong><br />
+                            <small class="text-muted">@sale.Price.ToString("C") x @sale.Quantity = @((sale.Price * sale.Quantity).ToString("C"))</small>
                         </div>
                         <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveSale(sale)">
                             <i class="bi bi-trash"></i> Видалити
@@ -58,7 +64,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label small">Ціна</label>
-                        <input type="number" step="0.01" class="form-control form-control-sm" value="@SelectedProductPrice" disabled />
+                        <input type="number" step="0.01" class="form-control form-control-sm" value="@NewSalePrice" disabled />
                     </div>
                     <div class="col-md-2">
                         <label class="form-label small">К-сть</label>
@@ -94,35 +100,43 @@
     [Parameter]
     public EventCallback OnCancel { get; set; }
 
-    private string _newSaleUpc = "";
-    public string NewSaleUpc
+    protected override async Task OnInitializedAsync()
     {
-        get => _newSaleUpc;
-        set
+        var username = (await AuthStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+        Receipt.EmployeeId = EmployeeService.GetEmployee(username).Id;
+    }
+
+    private string NewSaleUpc { get; set; } = "";
+
+    private decimal NewSalePrice
+    {
+        get
         {
-            _newSaleUpc = value;
+            try
+            {
+                return StoreProductService.GetStoreProduct(NewSaleUpc).Price;
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
         }
     }
 
-    private decimal SelectedProductPrice => 
-        StoreProducts.FirstOrDefault(p => p.Upc == _newSaleUpc)?.Price ?? 0;
-        
-    private string SelectedProductName => 
-        StoreProducts.FirstOrDefault(p => p.Upc == _newSaleUpc)?.Name ?? "";
-
     private int _newSaleQuantity = 1;
-
+    
+    
     private void AddSale()
     {
         if (!string.IsNullOrWhiteSpace(NewSaleUpc) && _newSaleQuantity > 0)
         {
-            Receipt.Sales.Add(new SaleDTO(null, SelectedProductName, SelectedProductPrice, _newSaleQuantity));
+            Receipt.Sales.Add(new SaleCreateDTO(NewSaleUpc, NewSalePrice, _newSaleQuantity));
             NewSaleUpc = "";
             _newSaleQuantity = 1;
         }
     }
 
-    private void RemoveSale(SaleDTO sale)
+    private void RemoveSale(SaleCreateDTO sale)
     {
         Receipt.Sales.Remove(sale);
     }
