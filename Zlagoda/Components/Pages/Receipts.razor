@@ -1,11 +1,20 @@
 ﻿@page "/receipts"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.ViewModels
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
 @inject ReceiptsVM ViewModel
 
 <h3>Чеки</h3>
+
+@if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewModel.ErrorMessage
+        <button type="button" class="btn-close" aria-label="Close" @onclick="ViewModel.ClearError"></button>
+    </div>
+}
 
 <div class="mb-3">
     @if (ViewModel.IsCreating && ViewModel.NewReceipt != null)
@@ -17,30 +26,49 @@
     else
     {
         <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
-            <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити чек</button>
-            
+            <AuthorizeView Roles="Касир">
+                <Authorized>
+                    <button class="btn btn-success" @onclick="ViewModel.ShowCreateNew">Створити чек</button>
+                </Authorized>
+            </AuthorizeView>
+
             <div class="d-flex align-items-end gap-3 flex-wrap">
-                <div>
-                    <label for="employeeFilter" class="form-label fw-bold mb-1">Касир:</label>
-                    <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged">
-                        <option value="">Всі касири</option>
-                        @foreach (var emp in ViewModel.Employees)
-                        {
-                            <option value="@emp">@emp</option>
-                        }
-                    </select>
-                </div>
-                
+                <AuthorizeView Roles="Менеджер, Касир">
+                    <Authorized>
+                        <div>
+                            <label for="employeeFilter" class="form-label fw-bold mb-1">Касир:</label>
+                            @if (context.User.IsInRole("Касир"))
+                            {
+                                <span hidden>@(ViewModel.SelectedEmployee = ViewModel.GetEmployee(context.User.Identity.Name).Id)</span>
+                                <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged" disabled>
+                                    <option value="@ViewModel.SelectedEmployee">@ViewModel.GetEmployee(context.User.Identity.Name).FullName</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <span hidden>@(ViewModel.SelectedEmployee = -1)</span>
+                                <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged">
+                                    <option value=-1>Всі касири</option>
+                                    @foreach (var emp in ViewModel.Employees)
+                                    {
+                                        <option value="@emp.Id">@emp.FullName</option>
+                                    }
+                                </select>
+                            }
+                        </div>
+                    </Authorized>
+                </AuthorizeView>
+
                 <div>
                     <label for="fromDate" class="form-label fw-bold mb-1">З дати:</label>
-                    <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged" />
+                    <input type="date" id="fromDate" class="form-control" @bind="ViewModel.FromDate" @bind:after="StateHasChanged"/>
                 </div>
-                
+
                 <div>
                     <label for="toDate" class="form-label fw-bold mb-1">По дату:</label>
-                    <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged" />
+                    <input type="date" id="toDate" class="form-control" @bind="ViewModel.ToDate" @bind:after="StateHasChanged"/>
                 </div>
-                
+
                 <div>
                     <button class="btn btn-outline-secondary" @onclick="ClearFilters">Очистити фільтри</button>
                 </div>
@@ -58,19 +86,15 @@
 {
     <p><em>Завантаження...</em></p>
 }
-else if (!ViewModel.Receipts.Any())
-{
-    <p><em>Немає чеків</em></p>
-}
 else
 {
     <div class="receipt-list" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
-        @foreach (var receipt in ViewModel.FilteredReceipts)
+        @foreach (var receipt in ViewModel.Receipts)
         {
             <ReceiptView Receipt="receipt" OnDelete="ViewModel.DeleteReceipt"/>
         }
         
-        @if (!ViewModel.FilteredReceipts.Any())
+        @if (!ViewModel.Receipts.Any())
         {
             <div class="alert alert-info mt-2">Не знайдено чеків за вказаними фільтрами.</div>
         }
@@ -80,12 +104,13 @@ else
 @code {
     protected override void OnInitialized()
     {
-        ViewModel.LoadReceipts();
+        ViewModel.LoadData();
     }
-    
+
     private void ClearFilters()
     {
         ViewModel.ClearFilters();
         StateHasChanged();
     }
+
 }
