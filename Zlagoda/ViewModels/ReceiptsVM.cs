@@ -1,106 +1,117 @@
 ﻿using DTOModels;
-using Zlagoda.Test;
+using Services.Employee;
+using Services.Customer;
+using Services.ProductStore;
+using Services.Receipt;
 
 namespace Zlagoda.ViewModels;
 
 public class ReceiptsVM
 {
-    //TODO switch to real receipt service
-    //private readonly IReceiptService _receiptService;
+    private readonly IReceiptService _receiptService;
+    private readonly IEmployeeService _employeeService;
+    private readonly IStoreProductService _storeProductService;
+    private readonly ICustomerService _customerService;
 
-    public IEnumerable<ReceiptDTO> Receipts { get; private set; }
+    public IEnumerable<ReceiptDTO> Receipts => FilterReceipts();
     
     public IEnumerable<CustomerDTO> Customers { get; private set; }
     public IEnumerable<StoreProductDTO> StoreProducts { get; private set; }
-
-    public string SelectedEmployee { get; set; } = "";
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public IEnumerable<EmployeeDTO> Employees { get; private set; }
+    public string? ErrorMessage { get; private set; }
+    
+    public long SelectedEmployee { get; set; }
+    public DateOnly? FromDate { get; set; }
+    public DateOnly? ToDate { get; set; }
     
     public bool IsCreating { get; private set; }
     public ReceiptCreateDTO? NewReceipt { get; private set; }
 
-    public ReceiptsVM()
+    public ReceiptsVM(IEmployeeService employeeService, IReceiptService receiptService, IStoreProductService storeProductService, ICustomerService customerService)
     {
-        //_receiptService = receiptService;
-        Receipts = new List<ReceiptDTO>();
-        Customers = new List<CustomerDTO>();
-        StoreProducts = new List<StoreProductDTO>();
+        _receiptService = receiptService;
+        _employeeService = employeeService;
+        _storeProductService = storeProductService;
+        _customerService = customerService;
     }
-
-    public IEnumerable<string> Employees => 
-        Receipts?.Select(r => r.EmployeeName).Distinct().OrderBy(e => e) ?? Enumerable.Empty<string>();
-
-    
-    //TODO: Move filter to service layer after connecting it
-    public IEnumerable<ReceiptDTO> FilteredReceipts
+    public IEnumerable<ReceiptDTO> FilterReceipts()
     {
-        get
-        { 
-            var query = Receipts.AsQueryable();
-
-            if (!string.IsNullOrEmpty(SelectedEmployee))
+        //TODO uncomment when null value for dates will be ready
+        if (SelectedEmployee != -1)
+        {
+            if (FromDate != null && ToDate != null)
             {
-                query = query.Where(r => r.EmployeeName == SelectedEmployee);
+                TotalSum = _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee, (FromDate.Value, ToDate.Value));
+                return _receiptService.GetReceiptsByCashier(SelectedEmployee, (FromDate.Value, ToDate.Value));
             }
-
-            if (FromDate.HasValue)
-            {
-                query = query.Where(r => r.PrintDate.Date >= FromDate.Value.Date);
-            }
-
-            if (ToDate.HasValue)
-            {
-                query = query.Where(r => r.PrintDate.Date <= ToDate.Value.Date);
-            }
-
-            return query.OrderByDescending(r => r.PrintDate);
+            //TotalSum = _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee);
+            return _receiptService.GetReceiptsByCashier(SelectedEmployee);
         }
+        if (FromDate != null && ToDate != null)
+        {
+            TotalSum = _receiptService.GetReceiptsTotalSum((FromDate.Value, ToDate.Value));
+            return _receiptService.GetReceipts((FromDate.Value, ToDate.Value));
+        }
+        //TotalSum = _receiptService.GetReceiptsTotalSum();
+        return _receiptService.GetReceipts();
+    }
+
+    public EmployeeDTO GetEmployee(string username)
+    {
+        return  _employeeService.GetEmployee(username);
     }
     
-    //TODO: get from service
-    public decimal TotalSum => 42;
-
-    public void LoadReceipts()
+    public decimal TotalSum { get; private set; }
+    
+    public void LoadData()
     {
-        // Receipts = _receiptService.GetReceipts();
-        Receipts = FakeReceipts.GetReceipts();
-        
-        // TODO: Load from real services
-        Customers = FakeCustomers.GetCustomers();
-        StoreProducts = FakeStoreProducts.GetProducts();
+        Customers = _customerService.GetCustomers();
+        StoreProducts = _storeProductService.GetStoreProducts();
+        Employees = _employeeService.GetEmployees(true);
     }
 
     public void ClearFilters()
     {
-        SelectedEmployee = "";
         FromDate = null;
         ToDate = null;
     }
 
     public void ShowCreateNew()
     {
-        NewReceipt = new ReceiptCreateDTO( "", DateTime.Now, new List<SaleDTO>());
+        NewReceipt = new ReceiptCreateDTO( "", DateTime.Now, new List<SaleCreateDTO>());
         IsCreating = true;
+        ErrorMessage = null;
+    }
+    
+    public void ClearError()
+    {
+        ErrorMessage = null;
     }
 
     public void SaveNewReceipt(ReceiptCreateDTO receipt)
     {
-        IsCreating = false;
-        NewReceipt = null;
-        // TODO: save receipt via service
-        LoadReceipts();
+        try
+        {
+            _receiptService.AddReceipt(receipt);
+            IsCreating = false;
+            NewReceipt = null;
+            ErrorMessage = null;
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
     }
 
     public void CancelCreate()
     {
         IsCreating = false;
         NewReceipt = null;
+        ErrorMessage = null;
     }
 
     public void DeleteReceipt(long id)
     {
-        // TODO: delete receipt via service
-        LoadReceipts();
+        _receiptService.DeleteReceipt(id);
     }
 }
