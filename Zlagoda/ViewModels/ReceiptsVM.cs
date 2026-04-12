@@ -34,6 +34,7 @@ public class ReceiptsVM
         _employeeService = employeeService;
         _storeProductService = storeProductService;
         _customerService = customerService;
+        SelectedEmployee = -1;
     }
     public IEnumerable<ReceiptDTO> FilterReceipts()
     {
@@ -57,18 +58,14 @@ public class ReceiptsVM
         {
             if (FromDate != null && ToDate != null)
             {
-                TotalSum = _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee, (FromDate.Value, ToDate.Value));
                 return _receiptService.GetReceiptsByCashier(SelectedEmployee, (FromDate.Value, ToDate.Value));
             }
-            //TotalSum = _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee);
             return _receiptService.GetReceiptsByCashier(SelectedEmployee);
         }
         if (FromDate != null && ToDate != null)
         {
-            TotalSum = _receiptService.GetReceiptsTotalSum((FromDate.Value, ToDate.Value));
             return _receiptService.GetReceipts((FromDate.Value, ToDate.Value));
         }
-        //TotalSum = _receiptService.GetReceiptsTotalSum();
         return _receiptService.GetReceipts();
     }
 
@@ -76,8 +73,26 @@ public class ReceiptsVM
     {
         return  _employeeService.GetEmployee(username);
     }
-    
-    public decimal TotalSum { get; private set; }
+
+    public decimal TotalSum
+    {
+        get
+        {
+            if (SelectedEmployee != -1)
+            {
+                if (FromDate != null && ToDate != null)
+                {
+                    return _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee, (FromDate.Value, ToDate.Value));
+                }
+                return _receiptService.GetReceiptsTotalSumByCashier(SelectedEmployee);
+            }
+            if (FromDate != null && ToDate != null)
+            {
+                return _receiptService.GetReceiptsTotalSum((FromDate.Value, ToDate.Value));
+            }
+            return _receiptService.GetReceiptsTotalSum();
+        }
+    }
     
     public void LoadData()
     {
