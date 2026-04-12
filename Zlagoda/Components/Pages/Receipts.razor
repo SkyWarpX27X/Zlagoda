@@ -33,6 +33,11 @@
             </AuthorizeView>
 
             <div class="d-flex align-items-end gap-3 flex-wrap">
+                <div>
+                    <label for="searchId" class="form-label fw-bold mb-1">Пошук за ID:</label>
+                    <input type="number" id="searchId" class="form-control" @bind="ViewModel.SearchReceiptId" @bind:after="StateHasChanged" placeholder="Введіть ID..."/>
+                </div>
+
                 <AuthorizeView Roles="Менеджер, Касир">
                     <Authorized>
                         <div>
@@ -46,7 +51,6 @@
                             }
                             else
                             {
-                                <span hidden>@(ViewModel.SelectedEmployee = -1)</span>
                                 <select id="employeeFilter" class="form-select" @bind="ViewModel.SelectedEmployee" @bind:after="StateHasChanged">
                                     <option value=-1>Всі касири</option>
                                     @foreach (var emp in ViewModel.Employees)

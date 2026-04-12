@@ -23,6 +23,7 @@ public class ReceiptsVM
     public long SelectedEmployee { get; set; }
     public DateOnly? FromDate { get; set; }
     public DateOnly? ToDate { get; set; }
+    public long? SearchReceiptId { get; set; }
     
     public bool IsCreating { get; private set; }
     public ReceiptCreateDTO? NewReceipt { get; private set; }
@@ -36,7 +37,22 @@ public class ReceiptsVM
     }
     public IEnumerable<ReceiptDTO> FilterReceipts()
     {
-        //TODO uncomment when null value for dates will be ready
+        if (SearchReceiptId.HasValue)
+        {
+            try
+            {
+                var receipt = _receiptService.GetReceipt(SearchReceiptId.Value);
+                if (receipt != null)
+                {
+                    return new List<ReceiptDTO> { receipt };
+                }
+            }
+            catch (Exception e)
+            {
+                return new List<ReceiptDTO>();
+            }
+        }
+
         if (SelectedEmployee != -1)
         {
             if (FromDate != null && ToDate != null)
@@ -74,6 +90,7 @@ public class ReceiptsVM
     {
         FromDate = null;
         ToDate = null;
+        SearchReceiptId = null;
     }
 
     public void ShowCreateNew()
