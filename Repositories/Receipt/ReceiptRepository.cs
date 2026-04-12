@@ -64,31 +64,38 @@ public class ReceiptRepository : IReceiptRepository
             yield return MapReceipt(reader);
     }
 
-    public decimal GetSumTotal((string StartDate, string EndDate) dates)
+    public decimal GetSumTotal((string StartDate, string EndDate)? dates)
     {
         using var command = _connection.CreateCommand();
-        command.CommandText = """
-                              SELECT COALESCE(SUM(sum_total), 0)
-                              FROM Receipt 
-                              WHERE print_date BETWEEN @startDate AND @endDate;
-                              """;
-        command.Parameters.AddWithValue("@startDate", dates.StartDate);
-        command.Parameters.AddWithValue("@endDate", dates.EndDate);
+        var query = "SELECT COALESCE(SUM(sum_total), 0) FROM Receipt";
+        if (dates != null)
+            query += "WHERE print_date BETWEEN @startDate AND @endDate;";
+        command.CommandText = query;
+        if (dates != null)
+        {
+            command.Parameters.AddWithValue("@startDate", dates?.StartDate);
+            command.Parameters.AddWithValue("@endDate", dates?.EndDate);        
+        }
         return Convert.ToDecimal(command.ExecuteScalar());
     }
 
-    public decimal GetSumByCashier(long employeeId, (string StartDate, string EndDate) dates)
+    public decimal GetSumByCashier(long employeeId, (string StartDate, string EndDate)? dates)
     {
         using var command = _connection.CreateCommand();
-        command.CommandText = """
-                              SELECT COALESCE(SUM(sum_total), 0)
-                              FROM Receipt 
-                              WHERE id_employee = @employeeId
-                              AND print_date BETWEEN @startDate AND @endDate;
-                              """;
+        var query = """
+                    SELECT COALESCE(SUM(sum_total), 0)
+                    FROM Receipt
+                    WHERE id_employee = @employeeId
+                    """;
+        if (dates != null)
+            query += "AND print_date BETWEEN @startDate AND @endDate;";
+        command.CommandText = query;
         command.Parameters.AddWithValue("@employeeId", employeeId);
-        command.Parameters.AddWithValue("@startDate", dates.StartDate);
-        command.Parameters.AddWithValue("@endDate", dates.EndDate);
+        if (dates != null)
+        {
+            command.Parameters.AddWithValue("@startDate", dates?.StartDate);
+            command.Parameters.AddWithValue("@endDate", dates?.EndDate);
+        }
         return Convert.ToDecimal(command.ExecuteScalar());
     }
     
