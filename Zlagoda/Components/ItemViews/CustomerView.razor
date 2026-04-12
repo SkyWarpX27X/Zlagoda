@@ -16,7 +16,7 @@ else
             <h6 class="card-subtitle mb-2 text-muted">Номер картки: @Customer.CardId</h6>
             <p class="card-text">
                 <strong>Телефон:</strong> @Customer.Phone<br />
-                <strong>Адреса:</strong> @Customer.Address
+                <strong>Адреса:</strong> @(Customer.Address == ", , " ? "Не вказана" : Customer.Address)
             </p>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-primary btn-sm" @onclick="EditCustomer">Редагувати</button>
@@ -41,7 +41,12 @@ else
         //Move to service layer if have time for it
         var address = customer.Address.Split(", ");
         var name = customer.FullName.Split();
-        return new CustomerModifyDTO(customer.CardId, name[1], name[0], name.Length == 3 ? name[2] : null, customer.Phone, address[0], address[1], address[2], customer.Percent);
+        if (address.Length == 0)
+        {
+            return new CustomerModifyDTO(customer.CardId, name[1], name[0], name.Length == 3 ? name[2] : null, customer.Phone, "", "", "", customer.Percent);
+        }
+        if (address.Length > 0 && address.Length < 3) throw new InvalidDataException("Invalid address");
+        return new CustomerModifyDTO(customer.CardId, name[1], name[0], name.Length == 3 ? name[2] : null, customer.Phone, address[0], string.Join(", ", address, 1, address.Length-2), address[^1], customer.Percent);
     }
 
     private void EditCustomer()
