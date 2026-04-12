@@ -7,6 +7,14 @@
 
 <h3>Постійні клієнти</h3>
 
+@if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewModel.ErrorMessage
+        <button type="button" class="btn-close" aria-label="Close" @onclick="ViewModel.ClearError"></button>
+    </div>
+}
+
 <div class="mb-3">
     @if (ViewModel.IsCreating && ViewModel.NewCustomer != null)
     {
@@ -30,14 +38,14 @@
 {
     <p><em>Завантаження...</em></p>
 }
-else if (!ViewModel.FilteredCustomers.Any())
+else if (!ViewModel.Customers.Any())
 {
     <p><em>Немає клієнтів за вказаними фільтрами</em></p>
 }
 else
 {
     <div class="customer-list" style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
-        @foreach (var customer in ViewModel.FilteredCustomers)
+        @foreach (var customer in ViewModel.Customers)
         {
             <CustomerView Customer="@customer" OnSave="ViewModel.EditCustomer" OnDelete="ViewModel.DeleteCustomer"/>
         }
@@ -46,8 +54,4 @@ else
 
 @code {
     
-    protected override void OnInitialized()
-    {
-        ViewModel.LoadCustomers();
-    }
 }
