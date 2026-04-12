@@ -7,6 +7,13 @@
 @inject EmployeesVM ViewModel
 
 <h3>Працівники</h3>
+@if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @ViewModel.ErrorMessage
+        <button type="button" class="btn-close" aria-label="Close" @onclick="ViewModel.ClearError"></button>
+    </div>
+}
 
 <div class="mb-3">
     @if (ViewModel.IsCreating && ViewModel.NewEmployee != null)
