@@ -9,7 +9,11 @@ using Repositories.Receipt;
 using Repositories.Sale;
 using Repositories.StoreProduct;
 using Services.Category;
+using Services.Customer;
 using Services.Employee;
+using Services.Product;
+using Services.ProductStore;
+using Services.Receipt;
 using Storage;
 using Zlagoda.Components;
 using Zlagoda.ViewModels;
@@ -43,6 +47,10 @@ builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLit
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
+builder.Services.AddSingleton<IStoreProductService, StoreProductService>();
+builder.Services.AddSingleton<IProductService, ProductService>();
+builder.Services.AddSingleton<ICustomerService, CustomerService>();
+builder.Services.AddSingleton<IReceiptService, ReceiptService>();
 
 builder.Services.AddSingleton<UserInfoVM>();
 builder.Services.AddSingleton<CategoriesVM>();
