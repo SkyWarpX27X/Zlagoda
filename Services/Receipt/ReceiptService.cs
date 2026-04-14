@@ -138,7 +138,7 @@ public class ReceiptService : IReceiptService
 
         return new(
             receipt.Id,
-            employee.Name,
+            $"{employee.Surname} {employee.Name} {employee.Patronymic}",
             customerName,
             DateTime.Parse(receipt.PrintDate),
             receipt.TotalSum,
