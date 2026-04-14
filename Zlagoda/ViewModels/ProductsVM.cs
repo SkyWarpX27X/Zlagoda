@@ -14,26 +14,31 @@ public class ProductsVM
     public bool IsCreating { get; private set; }
     public ProductDTO? NewProduct { get; private set; }
     public string? ErrorMessage { get; private set; }
-    
+
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }
-    
+
     public ProductsVM(IProductService productService, ICategoryService categoryService)
     {
         _productService = productService;
         _categoryService = categoryService;
     }
-    
+
     public int? GetSoldAmount(long productId)
     {
         if (!FromDate.HasValue || !ToDate.HasValue) return null;
-        
+
         // TODO: call real service method to get sold amount
         // return _productService.GetSoldAmount(productId, FromDate.Value, ToDate.Value);
         return 0;
     }
-    
-    public void ShowCreateNew()
+
+    public IEnumerable<ProductDTO> GetAllProducts()
+    {
+        return _productService.GetProducts();
+    }
+
+public void ShowCreateNew()
     {
         NewProduct = new ProductDTO();
         IsCreating = true;
