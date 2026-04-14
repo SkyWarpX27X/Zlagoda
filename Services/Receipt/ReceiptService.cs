@@ -123,7 +123,7 @@ public class ReceiptService : IReceiptService
         {
             var customer = _customerCardRepository.GetCustomer(receipt.CardNumber);
             if (customer is null) throw new InvalidDataException($"Customer {receipt.CardNumber} does not exist");
-            customerName = customer.Name;
+            customerName = $"{customer.Surname} {customer.Name} {customer.Patronymic}";
         }
         
         List<SaleDTO> sales = new();
