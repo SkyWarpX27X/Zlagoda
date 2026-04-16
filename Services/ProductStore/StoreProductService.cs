@@ -21,7 +21,8 @@ public class StoreProductService : IStoreProductService
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByQuantity: sortByQuantity))
         {
-            yield return StoreProductDbToDto(storeProduct);
+            if (storeProduct.UPCProm is null)
+                yield return StoreProductDbToDto(storeProduct);
         }
     }
 
