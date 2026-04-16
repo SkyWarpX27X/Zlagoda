@@ -30,12 +30,14 @@ public class CategoryService : ICategoryService
     public void AddCategory(CategoryDTO category)
     {
         if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
+        if (category.Name.Length > 50) throw new InvalidDataException("Name is too long");
         _categoryRepository.AddCategory(new(category.Id, category.Name));
     }
 
     public void UpdateCategory(CategoryDTO category)
     {
         if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
+        if (category.Name.Length > 50) throw new InvalidDataException("Name is too long");
         _categoryRepository.UpdateCategory(new(category.Id, category.Name));
     }
 

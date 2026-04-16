@@ -72,10 +72,12 @@ public class ProductService : IProductService
     private void ValidateProduct(ProductDTO product, out CategoryDBModel? category)
     {
         if (string.IsNullOrEmpty(product.Name)) throw new InvalidDataException("Name is required");
+        if (product.Name.Length > 50)  throw new InvalidDataException("Name is too long");
         if (string.IsNullOrEmpty(product.Category)) throw new InvalidDataException("Category is required");
         category = _categoryRepository.GetCategory(product.Category);
         if (category is null) throw new InvalidDataException($"Category {product.Category} does not exist");
         if (string.IsNullOrEmpty(product.Characteristics)) throw new InvalidDataException("Characteristics are required");
+        if (product.Characteristics.Length > 100) throw new InvalidDataException("Characteristics are too long");
         if (string.IsNullOrEmpty(product.Manufacturer)) throw new InvalidDataException("Manufacturer is required");
     }
 }

@@ -84,13 +84,18 @@ public class CustomerService : ICustomerService
 
     private void ValidateCustomer(CustomerModifyDTO customer)
     {
-        if (string.IsNullOrEmpty(customer.LastName)) throw new InvalidDataException("Customer last name is required");
-        if (string.IsNullOrEmpty(customer.FirstName)) throw new InvalidDataException("Customer first name is required");
-        if (string.IsNullOrEmpty(customer.Phone)) throw new InvalidDataException("Customer phone is required");
+        if (string.IsNullOrEmpty(customer.LastName)) throw new InvalidDataException("Last name is required");
+        if (customer.LastName.Length > 50) throw new InvalidDataException("Last name is too long");
+        if (string.IsNullOrEmpty(customer.FirstName)) throw new InvalidDataException("First name is required");
+        if (customer.FirstName.Length > 50) throw new InvalidDataException("First name is too long");
+        if (customer.Patronymic is not null && customer.Patronymic.Length > 50) throw new InvalidDataException("Patronymic is too long");
+        if (string.IsNullOrEmpty(customer.Phone)) throw new InvalidDataException("Phone is required");
         if (!Regex.IsMatch(customer.Phone, @"\+\d{1,12}"))
             throw new InvalidDataException("Invalid phone number");
-        if (customer.Percent < 0) throw new InvalidDataException("Customer percent can't be negative");
-        if (!string.IsNullOrEmpty(customer.ZipCode) && !Regex.IsMatch(customer.ZipCode, @"\d{5}"))
+        if (customer.Percent < 0) throw new InvalidDataException("Percent can't be negative");
+        if (customer.City is not null && customer.City.Length > 50) throw new InvalidDataException("City is too long");
+        if (customer.Street is not null && customer.Street.Length > 50) throw new InvalidDataException("Street is too long");
+        if (!string.IsNullOrEmpty(customer.ZipCode) && !Regex.IsMatch(customer.ZipCode, @"\d{1,9}"))
             throw new InvalidDataException("Invalid zip code");
     }
 }
