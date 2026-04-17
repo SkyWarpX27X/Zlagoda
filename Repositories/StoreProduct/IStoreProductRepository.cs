@@ -12,6 +12,8 @@ public interface IStoreProductRepository
 
     IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, 
         bool sortByQuantity = false);
+
+    StoreProductInfoDataModel? GetNonPromByProm(string upcProm);
     void AddStoreProduct(StoreProductDBModel storeProduct);
     void UpdateStoreProduct(StoreProductDBModel storeProduct);
     void DeleteStoreProduct(string upc);

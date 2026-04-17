@@ -82,6 +82,7 @@ public class StoreProductRepository : IStoreProductRepository
                               FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE UPC = @upc;
                               """;
+        command.Parameters.AddWithValue("@upc", upc);
         using var reader = command.ExecuteReader();
         return !reader.Read()
             ? null
@@ -90,6 +91,19 @@ public class StoreProductRepository : IStoreProductRepository
                 reader.GetInt32(reader.GetOrdinal("products_number")),
                 reader.GetString(reader.GetOrdinal("product_name")),
                 reader.GetString(reader.GetOrdinal("characteristics")));
+    }
+
+    public StoreProductInfoDataModel? GetNonPromByProm(string upcProm)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                              SELECT *
+                              FROM Store_Product 
+                              WHERE UPC_prom = @upcProm;
+                              """;
+        command.Parameters.AddWithValue("@upcProm", upcProm);
+        using var reader = command.ExecuteReader();
+        return reader.Read() ? MapStoreProduct(reader) : null;
     }
     
     public void AddStoreProduct(StoreProductDBModel storeProduct)
