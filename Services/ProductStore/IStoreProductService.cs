@@ -8,5 +8,7 @@ public interface IStoreProductService
     public StoreProductDTO GetStoreProduct(string upc);
     void AddStoreProduct(StoreProductModifyDTO storeProduct);
     void UpdateStoreProduct(StoreProductModifyDTO storeProduct);
+    void AddPromotionalStoreProduct(string originalUpc, string promotionalUpc);
+    void DeletePromotionalStoreProduct(string promotionalUpc);
     void DeleteStoreProduct(string upc);
 }

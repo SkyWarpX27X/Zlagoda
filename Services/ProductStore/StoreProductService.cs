@@ -59,6 +59,61 @@ public class StoreProductService : IStoreProductService
             storeProduct.Promotional));
     }
 
+    public void AddPromotionalStoreProduct(string originalUpc, string promotionalUpc)
+    {
+        if (!Regex.IsMatch(promotionalUpc, @"\d{12}"))
+            throw new InvalidDataException("Invalid promotional UPC");
+
+        {
+            var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
+            if (promotional is not null) throw new InvalidDataException($"Store product {promotionalUpc} already exists.");
+        }
+        
+        var original = _storeProductRepository.GetStoreProduct(originalUpc);
+        if (original is null) throw new InvalidDataException($"Store product {originalUpc} does not exist.");
+        if (original.Promotional) throw new InvalidDataException($"Store product {originalUpc} is promotional.");
+        if (original.UPCProm is not null) throw new InvalidDataException($"Store product {originalUpc} already has a promotional product.");
+
+        original.UPCProm = promotionalUpc;
+        _storeProductRepository.UpdateStoreProduct(new(
+            original.UPC,
+            promotionalUpc,
+            original.ProductId,
+            original.SellingPrice,
+            original.Quantity,
+            original.Promotional
+            ));
+        
+        _storeProductRepository.AddStoreProduct(new(
+            promotionalUpc,
+            null,
+            original.ProductId,
+            original.SellingPrice * 0.8m,
+            original.Quantity,
+            original.Promotional
+            ));
+    }
+
+    public void DeletePromotionalStoreProduct(string promotionalUpc)
+    {
+        var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
+        if (promotional is null) throw new InvalidDataException($"Promotional store product {promotionalUpc} doesn't exist.");
+        
+        var original = _storeProductRepository.GetNonPromByProm(promotionalUpc);
+        if (original is not null)
+        {
+            _storeProductRepository.UpdateStoreProduct(new(
+                original.UPC,
+                null,
+                original.ProductId,
+                original.SellingPrice,
+                promotional.Quantity,
+                original.Promotional
+            ));
+        }
+        _storeProductRepository.DeleteStoreProduct(promotionalUpc);
+    }
+
     public void DeleteStoreProduct(string upc)
     {
         _storeProductRepository.DeleteStoreProduct(upc);
