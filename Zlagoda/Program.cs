@@ -86,18 +86,7 @@ app.MapRazorComponents<App>()
 
 
 // TESTING EVERYTHING IN HERE
-var storage = app.Services.GetRequiredService<SQLiteStorageContext>();
-var employee = new EmployeeDBModel(2,"Мартиненко", "Анна", "Вікторівна", "Manager", 3000m,
-    "09-07-2004", "15-11-2022", "+380774328165", "Вінниця", "вул. Монастирська, 12", "21000", "ann_martynenko", "^HPQK8Xhe#@4wJJPD");
-var receipt = new ReceiptDBModel(1,1, null, "08-04-2026", 210.6m, 20);
-var sale = new SaleDBModel("192123823", 1, 10, 50m);
-storage.Employees.UpdateEmployee(employee);
-IEnumerable<ProductDBModel> products = storage.Products.GetProducts();
-Console.OutputEncoding = Encoding.UTF8;
-foreach (var cust in products)
-{
-    Console.WriteLine(cust.Name);
-} 
+
 
 
 app.Run();

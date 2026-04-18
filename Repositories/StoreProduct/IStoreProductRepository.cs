@@ -14,6 +14,7 @@ public interface IStoreProductRepository
         bool sortByQuantity = false);
 
     StoreProductInfoDataModel? GetNonPromByProm(string upcProm);
+    (StoreProductInfoDataModel? nonProm, StoreProductInfoDataModel? prom) GetStoreProductsByProductId(long productId);
     void AddStoreProduct(StoreProductDBModel storeProduct);
     void UpdateStoreProduct(StoreProductDBModel storeProduct);
     void DeleteStoreProduct(string upc);

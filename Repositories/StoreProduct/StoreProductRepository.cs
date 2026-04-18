@@ -105,7 +105,34 @@ public class StoreProductRepository : IStoreProductRepository
         using var reader = command.ExecuteReader();
         return reader.Read() ? MapStoreProduct(reader) : null;
     }
-    
+
+    public (StoreProductInfoDataModel? nonProm, StoreProductInfoDataModel? prom) GetStoreProductsByProductId(long productId)
+    {
+        using var nonPromCommand = _connection.CreateCommand();
+        nonPromCommand.CommandText = """
+                              SELECT *
+                              FROM Store_Product 
+                              JOIN Product ON Store_Product.id_product = Product.id_product
+                              WHERE Product.id_product = @productId
+                              AND UPC_prom IS NOT NULL;
+                              """;
+        nonPromCommand.Parameters.AddWithValue("@productId", productId);
+        using var nonPromReader = nonPromCommand.ExecuteReader();
+        var nonProm = nonPromReader.Read() ? MapStoreProduct(nonPromReader) : null;
+        using var promCommand = _connection.CreateCommand();
+        promCommand.CommandText = """
+                              SELECT *
+                              FROM Store_Product 
+                              JOIN Product ON Store_Product.id_product = Product.id_product
+                              WHERE Product.id_product = @productId
+                              AND UPC_prom IS NULL;
+                              """;
+        promCommand.Parameters.AddWithValue("@productId", productId);
+        using var promReader = promCommand.ExecuteReader();
+        var prom = promReader.Read() ? MapStoreProduct(promReader) : null;
+        return (nonProm, prom);
+    }
+
     public void AddStoreProduct(StoreProductDBModel storeProduct)
     {
         using var command = _connection.CreateCommand();
