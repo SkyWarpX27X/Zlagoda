@@ -122,7 +122,7 @@ public class StoreProductService : IStoreProductService
             original.ProductId,
             original.SellingPrice * 0.8m,
             original.Quantity,
-            original.Promotional
+            true
             ));
         _storeProductRepository.UpdateStoreProduct(new(
             original.UPC,
