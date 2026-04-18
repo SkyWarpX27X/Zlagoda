@@ -27,10 +27,7 @@ public class ProductsVM
     public int? GetSoldAmount(long productId)
     {
         if (!FromDate.HasValue || !ToDate.HasValue) return null;
-
-        // TODO: call real service method to get sold amount
-        // return _productService.GetSoldAmount(productId, FromDate.Value, ToDate.Value);
-        return 0;
+        return _productService.GetTotalUnits(productId, (FromDate.Value, ToDate.Value));
     }
 
     public IEnumerable<ProductDTO> GetAllProducts()
