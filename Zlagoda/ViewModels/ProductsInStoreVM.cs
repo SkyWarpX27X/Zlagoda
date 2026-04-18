@@ -11,35 +11,36 @@ public class ProductsInStoreVM
     public IEnumerable<StoreProductDTO> ProductsInStore { get; private set; }
     public string? ErrorMessage { get; private set; }
     
-    //TODO replace with service
     public IEnumerable<StoreProductDTO> FilteredAndSortedProducts
     {
         get
         {
-            var query = ProductsInStore.AsQueryable();
-
-            // Search
             if (!string.IsNullOrWhiteSpace(SearchUpc))
             {
-                query = query.Where(p => p.Upc == SearchUpc);
+                return new List<StoreProductDTO>(){_storeProductService.GetStoreProduct(SearchUpc)};
             }
-
-            // Filter
             if (PromFilter == "PromOnly")
             {
-                query = query.Where(p => p.IsProm);
-            }
-            else if (PromFilter == "NonPromOnly")
-            {
-                query = query.Where(p => !p.IsProm);
-            }
+                if (SortBy == "Name")
+                {
+                    return _storeProductService.GetPromotionalStoreProducts();
+                }
 
-            // Sort
-            return SortBy switch
+                return _storeProductService.GetPromotionalStoreProducts(true, false);
+            }
+            if (PromFilter == "NonPromOnly")
             {
-                "Name" => query.OrderBy(p => p.Name).ToList(),
-                "Quantity" => query.OrderBy(p => p.Quantity).ToList(),
-            };
+                if (SortBy == "Name")
+                {
+                    return _storeProductService.GetNonPromotionalStoreProducts();
+                }
+                return _storeProductService.GetNonPromotionalStoreProducts(true, false);
+            }
+            if (SortBy == "Name")
+            {
+                return _storeProductService.GetStoreProducts();
+            }
+            return _storeProductService.GetStoreProducts(true, false);
         }
     }
     
@@ -115,13 +116,27 @@ public class ProductsInStoreVM
     
     public void MakeProm((string originalUpc, string promUpc) data)
     {
-        // TODO: call make prom service method using data.originalUpc and data.promUpc
+        try
+        {
+            _storeProductService.AddPromotionalStoreProduct(data.originalUpc, data.promUpc);
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
         LoadProducts();
     }
 
     public void CancelProm(string promUpc)
     {
-        // TODO: call cancel prom service method
+        try
+        {
+            _storeProductService.DeletePromotionalStoreProduct(promUpc);
+        }
+        catch (InvalidDataException e)
+        {
+            ErrorMessage = e.Message;
+        }
         LoadProducts();
     }
 }
