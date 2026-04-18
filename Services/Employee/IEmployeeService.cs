@@ -9,7 +9,7 @@ public interface IEmployeeService
     bool AuthenticateEmployee(string username, string password, out long id);
     void DeleteEmployee(long id);
     
-    IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly = false);
+    IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly = false, bool sortBySurname = true);
     
     EmployeeDTO? GetEmployee(long id);
     EmployeeDTO? GetEmployee(string username);

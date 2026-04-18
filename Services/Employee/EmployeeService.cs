@@ -20,7 +20,7 @@ public class EmployeeService : IEmployeeService
 
     public void AddEmployee(EmployeeModifyDTO employee)
     {
-        ValidateEmployee(employee);
+        ValidateEmployee(employee, true);
         
         Span<byte> salt = stackalloc byte[SaltSize];
         RandomNumberGenerator.Fill(salt);
@@ -45,7 +45,7 @@ public class EmployeeService : IEmployeeService
     public void UpdateEmployee(EmployeeModifyDTO employee)
     {
         if (employee.Id is null) throw new InvalidDataException("Id is required");
-        ValidateEmployee(employee);
+        ValidateEmployee(employee, false);
 
         _employeeRepository.UpdateEmployee(new EmployeeDBModel(
             employee.Id ?? -1,
@@ -85,9 +85,9 @@ public class EmployeeService : IEmployeeService
         _employeeRepository.DeleteEmployee(id);
     }
 
-    public IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly)
+    public IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly, bool sortBySurname)
     {
-        foreach (var employee in _employeeRepository.GetEmployees(cashiersOnly: cashiersOnly))
+        foreach (var employee in _employeeRepository.GetEmployees(sortBySurname, cashiersOnly))
         {
             yield return EmployeeDbToDto(employee);
         }
@@ -148,15 +148,18 @@ public class EmployeeService : IEmployeeService
             $"{employee.City}, {employee.Street}, {employee.ZipCode}");
     }
 
-    private void ValidateEmployee(EmployeeModifyDTO employee)
+    private void ValidateEmployee(EmployeeModifyDTO employee, bool creating)
     {
         if (string.IsNullOrEmpty(employee.LastName)) throw new InvalidDataException("Last name is required");
         if (employee.LastName.Length > 50) throw new InvalidDataException("Last name is too long");
         if (string.IsNullOrEmpty(employee.FirstName)) throw new InvalidDataException("First name is required");
         if (employee.FirstName.Length > 50) throw new InvalidDataException("First name is too long");
         if (employee.Patronymic is not null && employee.Patronymic.Length > 50) throw new InvalidDataException("Patronymic is too long");
-        if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
-        if (employee.UserName.Length > 10) throw new InvalidDataException("Username is too long");
+        if (creating)
+        {
+            if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
+            if (employee.UserName.Length > 10) throw new InvalidDataException("Username is too long");   
+        }
         if (string.IsNullOrEmpty(employee.Role)) throw new InvalidDataException("Role is required");
         if (employee.Role.Length > 10) throw new InvalidDataException("Role is too long");
         if (employee.Salary < 0) throw new InvalidDataException("Salary is required");
