@@ -5,6 +5,7 @@
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
 @inject ReceiptsVM ViewModel
+@inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Чеки</h3>
@@ -83,7 +84,7 @@
                 </div>
 
                 <div>
-                    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Очистити фільтри</button>
+                    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Скинути дату</button>
                 </div>
             </div>
         </div>
@@ -126,8 +127,8 @@ else
         StateHasChanged();
     }
     
-    private async Task PrintReport()
+    private void PrintReport()
     {
-        // TODO: Implement printing logic
+        NavigationManager.NavigateTo("/ReceiptsReport");
     }
 }
