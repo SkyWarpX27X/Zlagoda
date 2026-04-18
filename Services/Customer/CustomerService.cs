@@ -16,9 +16,9 @@ public class CustomerService : ICustomerService
         _customerCardRepository = customerCardRepository;
     }
 
-    public IEnumerable<CustomerDTO> GetCustomers(int percent)
+    public IEnumerable<CustomerDTO> GetCustomers(int percent, bool sortByName)
     {
-        foreach (var customer in _customerCardRepository.GetCustomers(percent: percent))
+        foreach (var customer in _customerCardRepository.GetCustomers(sortByName, percent))
         {
             yield return CustomerDbToDto(customer);
         }
@@ -70,6 +70,14 @@ public class CustomerService : ICustomerService
     public void DeleteCustomer(string cardId)
     {
         _customerCardRepository.DeleteCustomerCard(cardId);
+    }
+
+    public IEnumerable<CustomerDTO> SearchCustomers(string query)
+    {
+        foreach (var customer in _customerCardRepository.GetCustomersBySurname(query))
+        {
+            yield return CustomerDbToDto(customer);
+        }
     }
 
     private CustomerDTO CustomerDbToDto(CustomerCardDBModel customer)
