@@ -73,16 +73,6 @@ public class StoreProductService : IStoreProductService
         if (original is null) throw new InvalidDataException($"Store product {originalUpc} does not exist.");
         if (original.Promotional) throw new InvalidDataException($"Store product {originalUpc} is promotional.");
         if (original.UPCProm is not null) throw new InvalidDataException($"Store product {originalUpc} already has a promotional product.");
-
-        original.UPCProm = promotionalUpc;
-        _storeProductRepository.UpdateStoreProduct(new(
-            original.UPC,
-            promotionalUpc,
-            original.ProductId,
-            original.SellingPrice,
-            original.Quantity,
-            original.Promotional
-            ));
         
         _storeProductRepository.AddStoreProduct(new(
             promotionalUpc,
@@ -92,6 +82,14 @@ public class StoreProductService : IStoreProductService
             original.Quantity,
             original.Promotional
             ));
+        _storeProductRepository.UpdateStoreProduct(new(
+            original.UPC,
+            promotionalUpc,
+            original.ProductId,
+            original.SellingPrice,
+            original.Quantity,
+            original.Promotional
+        ));
     }
 
     public void DeletePromotionalStoreProduct(string promotionalUpc)
