@@ -97,8 +97,8 @@ public class StoreProductRepository : IStoreProductRepository
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """
-                              SELECT *
-                              FROM Store_Product 
+                              SELECT * 
+                              FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE UPC_prom = @upcProm;
                               """;
         command.Parameters.AddWithValue("@upcProm", upcProm);
