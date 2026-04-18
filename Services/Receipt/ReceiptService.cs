@@ -105,6 +105,15 @@ public class ReceiptService : IReceiptService
                 sale.Quantity,
                 sale.Price
                 ));
+            var storeProduct = _storeProductRepository.GetStoreProduct(sale.ProductUPC)!;
+            _storeProductRepository.UpdateStoreProduct(new(
+                storeProduct.UPC,
+                storeProduct.UPCProm,
+                storeProduct.ProductId,
+                storeProduct.SellingPrice,
+                storeProduct.Quantity - sale.Quantity,
+                storeProduct.Promotional
+            ));
         }
     }
 
@@ -156,10 +165,12 @@ public class ReceiptService : IReceiptService
     {
         if (string.IsNullOrEmpty(sale.ProductUPC))
             throw new InvalidDataException("UPC is required");
-        if (_storeProductRepository.GetStoreProduct(sale.ProductUPC) is null)
+        var storeProduct = _storeProductRepository.GetStoreProduct(sale.ProductUPC);
+        if (storeProduct is null)
             throw new InvalidDataException($"Product {sale.ProductUPC} doesn't exist");
         if (sale.Price < 0) throw new InvalidDataException("Price can't be negative");
         if (sale.Quantity < 0) throw new InvalidDataException("Quantity can't be negative");
+        if (sale.Quantity > storeProduct.Quantity) throw new InvalidDataException("Not enough store product items");
     }
 
     private (string, string) DateRangeToStrings(DateTime start, DateTime end)
