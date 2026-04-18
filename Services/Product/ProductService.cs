@@ -31,6 +31,12 @@ public class ProductService : IProductService
         return ProductDbToDto(product);
     }
 
+    public int GetTotalUnits(long id, (DateTime StartDate, DateTime EndDate) dates)
+    {
+        var resultDates = DateRangeToStrings(dates.StartDate, dates.EndDate);
+        return _productRepository.GetTotalUnits(id, resultDates);
+    }
+
     public void AddProduct(ProductDTO product)
     {
         ValidateProduct(product, out CategoryDBModel? category);
@@ -79,5 +85,12 @@ public class ProductService : IProductService
         if (string.IsNullOrEmpty(product.Characteristics)) throw new InvalidDataException("Characteristics are required");
         if (product.Characteristics.Length > 100) throw new InvalidDataException("Characteristics are too long");
         if (string.IsNullOrEmpty(product.Manufacturer)) throw new InvalidDataException("Manufacturer is required");
+    }
+    
+    private (string, string) DateRangeToStrings(DateTime start, DateTime end)
+    {
+        var a = $"{start.ToShortDateString()} {start.ToShortTimeString()}";
+        var b = $"{end.ToShortDateString()} {end.ToShortTimeString()}";
+        return (a, b);
     }
 }
