@@ -47,7 +47,7 @@ public class StoreProductRepository : IStoreProductRepository
     public IEnumerable<StoreProductInfoDataModel> GetStoreProductsPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product ";
         if (sortByName || sortByQuantity) 
             query += $"""
                       WHERE promotional_product IS TRUE
@@ -62,7 +62,7 @@ public class StoreProductRepository : IStoreProductRepository
     public IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product ";
         if (sortByName || sortByQuantity) 
             query += $"""
                       WHERE promotional_product IS FALSE
