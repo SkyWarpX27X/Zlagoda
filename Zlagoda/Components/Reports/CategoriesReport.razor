@@ -1,7 +1,7 @@
 ﻿@page "/CategoriesReport"
 @rendermode InteractiveServer
-@using Services.Category
-@inject ICategoryService Service
+@using Repositories.Category
+@inject ICategoryRepository Repository
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
@@ -19,13 +19,12 @@
         <h2>Звіт: Категорії Товарів</h2>
     </div>
 
-    @if (!Service.GetCategories().Any())
+    @if (!Repository.GetCategories().Any())
     {
         <p><em>Немає даних для відображення</em></p>
     }
     else
     {
-        <!-- Table taking full width -->
         <table class="table table-bordered table-striped w-100">
             <thead class="table-light">
                 <tr>
@@ -34,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var category in Service.GetCategories())
+                @foreach (var category in Repository.GetCategories(false))
                 {
                     <tr>
                         <td>@category.Id</td>
@@ -58,7 +57,7 @@
         }
 
         body {
-            margin: 1cm;
+            margin-top: 1cm;
             padding: 0;
             
         }
