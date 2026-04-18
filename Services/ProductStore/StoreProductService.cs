@@ -17,9 +17,27 @@ public class StoreProductService : IStoreProductService
         _productRepository = productRepository;
     }
 
-    public IEnumerable<StoreProductDTO> GetStoreProducts(bool sortByQuantity)
+    public IEnumerable<StoreProductDTO> GetStoreProducts(bool sortByQuantity, bool sortByName)
     {
-        foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByQuantity: sortByQuantity))
+        foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByName, sortByQuantity))
+        {
+            if (storeProduct.UPCProm is null)
+                yield return StoreProductDbToDto(storeProduct);
+        }
+    }
+
+    public IEnumerable<StoreProductDTO> GetNonPromotionalStoreProducts(bool sortByQuantity, bool sortByName)
+    {
+        foreach (var storeProduct in _storeProductRepository.GetStoreProductsNonPromotional(sortByName, sortByQuantity))
+        {
+            if (storeProduct.UPCProm is null)
+                yield return StoreProductDbToDto(storeProduct);
+        }
+    }
+
+    public IEnumerable<StoreProductDTO> GetPromotionalStoreProducts(bool sortByQuantity, bool sortByName)
+    {
+        foreach (var storeProduct in _storeProductRepository.GetStoreProductsPromotional(sortByName, sortByQuantity))
         {
             if (storeProduct.UPCProm is null)
                 yield return StoreProductDbToDto(storeProduct);
