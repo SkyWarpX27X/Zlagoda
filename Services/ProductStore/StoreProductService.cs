@@ -54,13 +54,29 @@ public class StoreProductService : IStoreProductService
     public void AddStoreProduct(StoreProductModifyDTO storeProduct)
     {
         ValidateStoreProduct(storeProduct);
+        var upcProm = storeProduct.UpcProm;
+        var quantity = storeProduct.Quantity;
+        var existing = _storeProductRepository.GetStoreProductsByProductId(storeProduct.ProductId);
+        if (existing.nonProm is not null)
+        {
+            upcProm = existing.nonProm.UPCProm;
+            if (existing.prom is not null)
+            {
+                quantity += existing.prom.Quantity;
+            }
+            else
+            {
+                quantity += existing.nonProm.Quantity;
+            }
+            _storeProductRepository.DeleteStoreProduct(existing.nonProm.UPC);
+        }
         
         _storeProductRepository.AddStoreProduct(new(
             storeProduct.Upc,
-            storeProduct.UpcProm,
+            upcProm,
             storeProduct.ProductId,
             storeProduct.Price,
-            storeProduct.Quantity,
+            quantity,
             storeProduct.Promotional));
     }
 
