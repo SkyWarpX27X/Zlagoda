@@ -62,7 +62,15 @@ public class StoreProductService : IStoreProductService
             upcProm = existing.nonProm.UPCProm;
             if (existing.prom is not null)
             {
-                quantity += existing.prom.Quantity;
+                _storeProductRepository.UpdateStoreProduct(new(
+                    existing.prom.UPC,
+                    existing.prom.UPCProm,
+                    existing.prom.ProductId,
+                    existing.prom.SellingPrice,
+                    existing.prom.Quantity + quantity,
+                    existing.prom.Promotional
+                    ));
+                quantity = 0;
             }
             else
             {
@@ -121,7 +129,7 @@ public class StoreProductService : IStoreProductService
             promotionalUpc,
             original.ProductId,
             original.SellingPrice,
-            original.Quantity,
+            0,
             original.Promotional
         ));
     }
