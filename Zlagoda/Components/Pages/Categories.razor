@@ -1,5 +1,6 @@
 ﻿@page "/categories"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
 @using Zlagoda.ViewModels
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
@@ -8,9 +9,13 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Категорії</h3>
-    <button class="btn btn-outline-primary" @onclick="PrintReport">
-        <i class="bi bi-printer me-1"></i> Друк звіту
-    </button>
+    <AuthorizeView Roles="Менеджер">
+        <Authorized>
+            <button class="btn btn-outline-primary" @onclick="PrintReport">
+                <i class="bi bi-printer me-1"></i> Друк звіту
+            </button>
+        </Authorized>
+    </AuthorizeView>
 </div>
 
 @if (!string.IsNullOrEmpty(ViewModel.ErrorMessage))
