@@ -17,7 +17,6 @@
 <div class="report-container">
     <div class="print-header text-center mb-4">
         <h2>Звіт: Постійні клієнти</h2>
-        <p class="text-muted">Сформовано: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</p>
     </div>
 
     @if (!Repository.GetCustomers().Any())
@@ -41,7 +40,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var customer in Repository.GetCustomers())
+                @foreach (var customer in Repository.GetCustomers(false))
                 {
                     <tr>
                         <td>@customer.Number</td>
@@ -60,7 +59,7 @@
     }
     
     <div class="print-footer text-center mt-4">
-        <p class="text-muted mb-0">Звіт згенеровано системою "Zlagoda"</p>
+        <p class="text-muted mb-0">Сформовано: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</p>
     </div>
 </div>
 

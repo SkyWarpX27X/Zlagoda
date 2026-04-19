@@ -5,6 +5,7 @@
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
 @inject ProductsInStoreVM ViewModel
+@inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Товари в магазині</h3>
@@ -99,8 +100,8 @@ else
         ViewModel.LoadProducts();
     }
     
-    private async Task PrintReport()
+    private void PrintReport()
     {
-        // TODO: Implement printing logic
+        NavigationManager.NavigateTo("/ProductsInStoreReport");
     }
 }

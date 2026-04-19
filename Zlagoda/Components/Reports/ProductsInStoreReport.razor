@@ -1,7 +1,7 @@
-﻿@page "/CategoriesReport"
+﻿@page "/ProductsInStoreReport"
 @rendermode InteractiveServer
-@using Repositories.Category
-@inject ICategoryRepository Repository
+@using Repositories.StoreProduct
+@inject IStoreProductRepository Repository
 @inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
@@ -16,10 +16,10 @@
 
 <div class="report-container">
     <div class="print-header text-center mb-4">
-        <h2>Звіт: Категорії Товарів</h2>
+        <h2>Звіт: Товари в магазині</h2>
     </div>
 
-    @if (!Repository.GetCategories().Any())
+    @if (!Repository.GetStoreProducts().Any())
     {
         <p><em>Немає даних для відображення</em></p>
     }
@@ -28,16 +28,24 @@
         <table class="table table-bordered table-striped w-100">
             <thead class="table-light">
                 <tr>
-                    <th scope="col" style="width: 20%;">ID</th>
-                    <th scope="col">Назва категорії</th>
+                    <th scope="col">UPC</th>
+                    <th scope="col">UPC Акційний</th>
+                    <th scope="col">ID Товару</th>
+                    <th scope="col">Ціна продажу</th>
+                    <th scope="col">Кількість</th>
+                    <th scope="col">Акційний</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var category in Repository.GetCategories(false))
+                @foreach (var product in Repository.GetStoreProducts(false))
                 {
                     <tr>
-                        <td>@category.Id</td>
-                        <td>@category.Name</td>
+                        <td>@product.UPC</td>
+                        <td>@product.UPCProm</td>
+                        <td>@product.ProductId</td>
+                        <td>@product.SellingPrice.ToString("C")</td>
+                        <td>@product.Quantity</td>
+                        <td>@(product.Promotional ? "Так" : "Ні")</td>
                     </tr>
                 }
             </tbody>
@@ -59,7 +67,6 @@
         body {
             margin-top: 1cm;
             padding: 0;
-            
         }
 
         body * {
@@ -80,7 +87,7 @@
         .d-print-none {
             display: none !important;
         }
-        
+
         table {
             width: 100% !important;
             page-break-inside: auto;
@@ -121,7 +128,6 @@
 </style>
 
 @code {
-
     private async Task Print()
     {
         await JsRuntime.InvokeVoidAsync("window.print");
@@ -129,6 +135,6 @@
     
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/categories");
+        NavigationManager.NavigateTo("/productsInStore");
     }
 }
