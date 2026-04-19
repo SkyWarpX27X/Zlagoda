@@ -114,7 +114,7 @@ public class StoreProductRepository : IStoreProductRepository
                               FROM Store_Product 
                               JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE Product.id_product = @productId
-                              AND UPC_prom IS NOT NULL;
+                              AND promotional_product IS FALSE;
                               """;
         nonPromCommand.Parameters.AddWithValue("@productId", productId);
         using var nonPromReader = nonPromCommand.ExecuteReader();
@@ -125,7 +125,7 @@ public class StoreProductRepository : IStoreProductRepository
                               FROM Store_Product 
                               JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE Product.id_product = @productId
-                              AND UPC_prom IS NULL;
+                              AND promotional_product IS TRUE;
                               """;
         promCommand.Parameters.AddWithValue("@productId", productId);
         using var promReader = promCommand.ExecuteReader();
