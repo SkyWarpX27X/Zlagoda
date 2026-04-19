@@ -163,7 +163,7 @@ public class StoreProductRepository : IStoreProductRepository
                               WHERE
                                   UPC = @UPC;
                               """;
-        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm);
+        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm is null ? DBNull.Value : storeProduct.UPCProm);
         command.Parameters.AddWithValue("@id_product", storeProduct.ProductId);
         command.Parameters.AddWithValue("@selling_price", storeProduct.SellingPrice);
         command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
