@@ -156,7 +156,6 @@ public class StoreProductRepository : IStoreProductRepository
                               UPDATE Store_Product 
                               SET 
                                 UPC_prom = @UPC_prom,
-                                id_product = @id_product,
                                 selling_price = @selling_price,
                                 products_number = @products_number,
                                 promotional_product = @promotional_product
