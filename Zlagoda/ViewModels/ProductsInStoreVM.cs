@@ -17,7 +17,15 @@ public class ProductsInStoreVM
         {
             if (!string.IsNullOrWhiteSpace(SearchUpc))
             {
-                return new List<StoreProductDTO>(){_storeProductService.GetStoreProduct(SearchUpc)};
+                try
+                {
+                    return new List<StoreProductDTO>() { _storeProductService.GetStoreProduct(SearchUpc) };
+                }
+                catch (Exception e)
+                {
+                    return new List<StoreProductDTO>();
+                }
+                
             }
             if (PromFilter == "PromOnly")
             {
