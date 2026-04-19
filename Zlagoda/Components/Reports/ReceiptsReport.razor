@@ -1,0 +1,139 @@
+﻿@page "/ReceiptsReport"
+@rendermode InteractiveServer
+@using Repositories.Receipt
+@inject IReceiptRepository Repository
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <button class="btn btn-secondary" @onclick="GoBack">
+        <i class="bi bi-arrow-left me-1"></i> Назад
+    </button>
+    <button class="btn btn-primary" @onclick="Print">
+        <i class="bi bi-printer me-1"></i> Друкувати
+    </button>
+</div>
+
+<div class="report-container">
+    <div class="print-header text-center mb-4">
+        <h2>Звіт: Чеки</h2>
+    </div>
+
+    @if (!Repository.GetReceipts().Any())
+    {
+        <p><em>Немає даних для відображення</em></p>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped w-100">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">ID Працівника</th>
+                    <th scope="col">Номер картки</th>
+                    <th scope="col">Дата друку</th>
+                    <th scope="col">Загальна сума</th>
+                    <th scope="col">ПДВ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var receipt in Repository.GetReceipts())
+                {
+                    <tr>
+                        <td>@receipt.Id</td>
+                        <td>@receipt.EmployeeId</td>
+                        <td>@receipt.CardNumber</td>
+                        <td>@receipt.PrintDate</td>
+                        <td>@receipt.TotalSum.ToString("C")</td>
+                        <td>@receipt.Vat.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <div class="print-footer text-center mt-4">
+        <p class="text-muted mb-0">Сформовано: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        @@page {
+            margin: 0;
+            size: landscape;
+        }
+
+        body {
+            margin-top: 1cm;
+            padding: 0;
+        }
+
+        body * {
+            visibility: hidden;
+        }
+
+        .report-container, .report-container * {
+            visibility: visible;
+        }
+
+        .report-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .d-print-none {
+            display: none !important;
+        }
+        
+        table {
+            width: 100% !important;
+            page-break-inside: auto;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+        
+        .print-header {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .print-footer {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    
+    @@media screen {
+        .print-header { display: block; }
+        .print-footer { display: block; padding-top: 20px; }
+        table { width: 100%; }
+    }
+</style>
+
+@code {
+    private async Task Print()
+    {
+        await JsRuntime.InvokeVoidAsync("window.print");
+    }
+    
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/receipts");
+    }
+}

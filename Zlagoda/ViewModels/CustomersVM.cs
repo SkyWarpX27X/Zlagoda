@@ -13,7 +13,7 @@ public class CustomersVM
         {
             if (!string.IsNullOrWhiteSpace(SearchSurname))
             {
-                //return _customerService.GetCustomer(SearchSurname);
+                return _customerService.SearchCustomers(SearchSurname);
             }
             return SearchPercent.HasValue
                 ? _customerService.GetCustomers(SearchPercent.Value)

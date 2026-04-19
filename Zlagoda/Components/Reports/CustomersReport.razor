@@ -1,0 +1,146 @@
+﻿@page "/CustomersReport"
+@rendermode InteractiveServer
+@using Repositories.CustomerCard
+@inject ICustomerCardRepository Repository
+@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <button class="btn btn-secondary" @onclick="GoBack">
+        <i class="bi bi-arrow-left me-1"></i> Назад
+    </button>
+    <button class="btn btn-primary" @onclick="Print">
+        <i class="bi bi-printer me-1"></i> Друкувати
+    </button>
+</div>
+
+<div class="report-container">
+    <div class="print-header text-center mb-4">
+        <h2>Звіт: Постійні клієнти</h2>
+    </div>
+
+    @if (!Repository.GetCustomers().Any())
+    {
+        <p><em>Немає даних для відображення</em></p>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped w-100">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Номер</th>
+                    <th scope="col">Прізвище</th>
+                    <th scope="col">Ім'я</th>
+                    <th scope="col">По-батькові</th>
+                    <th scope="col">Телефон</th>
+                    <th scope="col">Місто</th>
+                    <th scope="col">Вулиця</th>
+                    <th scope="col">Індекс</th>
+                    <th scope="col">Відсоток</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in Repository.GetCustomers(false))
+                {
+                    <tr>
+                        <td>@customer.Number</td>
+                        <td>@customer.Surname</td>
+                        <td>@customer.Name</td>
+                        <td>@customer.Patronymic</td>
+                        <td>@customer.PhoneNumber</td>
+                        <td>@customer.City</td>
+                        <td>@customer.Street</td>
+                        <td>@customer.ZipCode</td>
+                        <td>@customer.Percent</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    
+    <div class="print-footer text-center mt-4">
+        <p class="text-muted mb-0">Сформовано: @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</p>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        @@page {
+            margin: 0;
+            size: auto;
+        }
+
+        body {
+            margin-top: 1cm;
+            padding: 0;
+        }
+
+        body * {
+            visibility: hidden;
+        }
+
+        .report-container, .report-container * {
+            visibility: visible;
+        }
+
+        .report-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .d-print-none {
+            display: none !important;
+        }
+        
+        table {
+            width: 100% !important;
+            page-break-inside: auto;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+        
+        .print-header {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .print-footer {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    
+    @@media screen {
+        .print-header { display: block; }
+        .print-footer { display: block; padding-top: 20px; }
+        table { width: 100%; }
+    }
+</style>
+
+@code {
+    private async Task Print()
+    {
+        await JsRuntime.InvokeVoidAsync("window.print");
+    }
+    
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/customers");
+    }
+}

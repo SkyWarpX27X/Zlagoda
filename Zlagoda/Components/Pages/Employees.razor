@@ -4,6 +4,7 @@
 @using Zlagoda.Components.ItemViews
 @using Zlagoda.Components.ItemModifies
 @inject EmployeesVM ViewModel
+@inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Працівники</h3>
@@ -73,8 +74,8 @@ else
 }
 
 @code {
-    private async Task PrintReport()
+    private void PrintReport()
     {
-        // TODO: Implement printing logic
+        NavigationManager.NavigateTo("/EmployeesReport");
     }
 }

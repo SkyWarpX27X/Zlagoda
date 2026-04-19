@@ -5,6 +5,7 @@
 @using Zlagoda.Components.ItemModifies
 @using Zlagoda.ViewModels
 @inject CustomersVM ViewModel
+@inject NavigationManager NavigationManager
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Постійні клієнти</h3>
@@ -71,8 +72,8 @@ else
 }
 
 @code {
-    private async Task PrintReport()
+    private void PrintReport()
     {
-        // TODO: Implement printing logic
+        NavigationManager.NavigateTo("/CustomersReport");
     }
 }

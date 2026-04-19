@@ -47,7 +47,7 @@ public class StoreProductRepository : IStoreProductRepository
     public IEnumerable<StoreProductInfoDataModel> GetStoreProductsPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product ";
         if (sortByName || sortByQuantity) 
             query += $"""
                       WHERE promotional_product IS TRUE
@@ -62,7 +62,7 @@ public class StoreProductRepository : IStoreProductRepository
     public IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, bool sortByQuantity = false)
     {
         using var command = _connection.CreateCommand();
-        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product";
+        var query = "SELECT * FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product ";
         if (sortByName || sortByQuantity) 
             query += $"""
                       WHERE promotional_product IS FALSE
@@ -97,8 +97,8 @@ public class StoreProductRepository : IStoreProductRepository
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """
-                              SELECT *
-                              FROM Store_Product 
+                              SELECT * 
+                              FROM Store_Product JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE UPC_prom = @upcProm;
                               """;
         command.Parameters.AddWithValue("@upcProm", upcProm);
@@ -114,7 +114,7 @@ public class StoreProductRepository : IStoreProductRepository
                               FROM Store_Product 
                               JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE Product.id_product = @productId
-                              AND UPC_prom IS NOT NULL;
+                              AND promotional_product IS FALSE;
                               """;
         nonPromCommand.Parameters.AddWithValue("@productId", productId);
         using var nonPromReader = nonPromCommand.ExecuteReader();
@@ -125,7 +125,7 @@ public class StoreProductRepository : IStoreProductRepository
                               FROM Store_Product 
                               JOIN Product ON Store_Product.id_product = Product.id_product
                               WHERE Product.id_product = @productId
-                              AND UPC_prom IS NULL;
+                              AND promotional_product IS TRUE;
                               """;
         promCommand.Parameters.AddWithValue("@productId", productId);
         using var promReader = promCommand.ExecuteReader();
@@ -156,14 +156,13 @@ public class StoreProductRepository : IStoreProductRepository
                               UPDATE Store_Product 
                               SET 
                                 UPC_prom = @UPC_prom,
-                                id_product = @id_product,
                                 selling_price = @selling_price,
                                 products_number = @products_number,
                                 promotional_product = @promotional_product
                               WHERE
                                   UPC = @UPC;
                               """;
-        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm);
+        command.Parameters.AddWithValue("@UPC_prom", storeProduct.UPCProm is null ? DBNull.Value : storeProduct.UPCProm);
         command.Parameters.AddWithValue("@id_product", storeProduct.ProductId);
         command.Parameters.AddWithValue("@selling_price", storeProduct.SellingPrice);
         command.Parameters.AddWithValue("@products_number", storeProduct.Quantity);
