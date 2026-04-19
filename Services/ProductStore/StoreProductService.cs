@@ -164,11 +164,11 @@ public class StoreProductService : IStoreProductService
         var product = _productRepository.GetProduct(storeProduct.ProductId);
         if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
         var oldPrice = storeProduct.SellingPrice;
-        if (!string.IsNullOrEmpty(storeProduct.UPCProm))
+        if (storeProduct.Promotional)
         {
-            var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
-            if (promotional is null) throw new InvalidDataException($"Promotional {storeProduct.UPCProm} does not exist");
-            oldPrice = promotional.SellingPrice;
+            var nonPromotional = _storeProductRepository.GetNonPromByProm(storeProduct.UPC);
+            if (nonPromotional is null) throw new InvalidDataException($"Promotional {storeProduct.UPCProm} does not exist");
+            oldPrice = nonPromotional.SellingPrice;
         }
         return new(
             storeProduct.UPC,
