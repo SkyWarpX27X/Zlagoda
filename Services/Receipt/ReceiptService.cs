@@ -175,8 +175,8 @@ public class ReceiptService : IReceiptService
 
     private (string, string) DateRangeToStrings(DateTime start, DateTime end)
     {
-        var a = $"{start.ToShortDateString()} {start.ToShortTimeString()}";
-        var b = $"{end.ToShortDateString()} {end.ToShortTimeString()}";
+        var a = start.ToString("yyyy-MM-dd HH:mm:ss");
+        var b = end.ToString("yyyy-MM-dd HH:mm:ss");
         return (a, b);
     }
 }
