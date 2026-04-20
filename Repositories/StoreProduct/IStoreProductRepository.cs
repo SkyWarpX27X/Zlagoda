@@ -12,9 +12,11 @@ public interface IStoreProductRepository
 
     IEnumerable<StoreProductInfoDataModel> GetStoreProductsNonPromotional(bool sortByName = true, 
         bool sortByQuantity = false);
+    
 
     StoreProductInfoDataModel? GetNonPromByProm(string upcProm);
     (StoreProductInfoDataModel? nonProm, StoreProductInfoDataModel? prom) GetStoreProductsByProductId(long productId);
+    bool IsInReceipt(string upc);
     void AddStoreProduct(StoreProductDBModel storeProduct);
     void UpdateStoreProduct(StoreProductDBModel storeProduct);
     void DeleteStoreProduct(string upc);
