@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using DBModels;
 using DTOModels;
 using Repositories.Product;
@@ -19,17 +18,23 @@ public class StoreProductService : IStoreProductService
 
     public IEnumerable<StoreProductDTO> GetStoreProducts(bool sortByQuantity, bool sortByName)
     {
-        foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByName, sortByQuantity))
+        foreach (var storeProduct in _storeProductRepository.GetStoreProductsNonPromotional(sortByName, sortByQuantity))
         {
-            if (storeProduct.Promotional)
-                continue;
-            if (!string.IsNullOrEmpty(storeProduct.UPCProm))
+            if (storeProduct.UPCProm is null)
             {
-                var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
-                if (promotional is null) continue;
-                yield return StoreProductDbToDto(promotional);
+                yield return StoreProductDbToDto(storeProduct);
+                continue;
             }
-            else yield return StoreProductDbToDto(storeProduct);
+            
+            var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm)
+                              ?? throw new InvalidDataException("Promotional store product does not exist.");
+            if (promotional.Quantity > 0)
+            {
+                yield return StoreProductDbToDto(promotional);
+                continue;
+            }
+            
+            yield return StoreProductDbToDto(storeProduct);
         }
     }
 
@@ -38,6 +43,14 @@ public class StoreProductService : IStoreProductService
         foreach (var storeProduct in _storeProductRepository.GetStoreProductsNonPromotional(sortByName, sortByQuantity))
         {
             if (storeProduct.UPCProm is null)
+            {
+                yield return StoreProductDbToDto(storeProduct);
+                continue;
+            }
+            
+            var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm)
+                              ?? throw new InvalidDataException("Promotional store product does not exist.");
+            if (promotional.Quantity == 0)
                 yield return StoreProductDbToDto(storeProduct);
         }
     }
@@ -45,131 +58,141 @@ public class StoreProductService : IStoreProductService
     public IEnumerable<StoreProductDTO> GetPromotionalStoreProducts(bool sortByQuantity, bool sortByName)
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProductsPromotional(sortByName, sortByQuantity))
-        {
-            yield return StoreProductDbToDto(storeProduct);
-        }
+            if (storeProduct.Quantity > 0)
+                yield return StoreProductDbToDto(storeProduct);
     }
 
     public StoreProductDTO GetStoreProduct(string upc)
     {
         var storeProduct = _storeProductRepository.GetStoreProduct(upc);
-        if (storeProduct is null) throw new InvalidDataException($"Product {upc} does not exist");
+        if (storeProduct is null) throw new InvalidDataException("Product does not exist");
         return StoreProductDbToDto(storeProduct);
     }
 
     public void AddStoreProduct(StoreProductModifyDTO storeProduct)
     {
-        ValidateStoreProduct(storeProduct);
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
-        var upcProm = storeProduct.UpcProm;
-        var quantity = storeProduct.Quantity;
-        var existing = _storeProductRepository.GetStoreProductsByProductId(storeProduct.ProductId);
-        if (existing.nonProm is not null)
-        {
-            upcProm = existing.nonProm.UPCProm;
-            if (existing.prom is not null)
-            {
-                _storeProductRepository.UpdateStoreProduct(new(
-                    existing.prom.UPC,
-                    existing.prom.UPCProm,
-                    existing.prom.ProductId,
-                    existing.prom.SellingPrice,
-                    existing.prom.Quantity + quantity,
-                    existing.prom.Promotional
-                    ));
-                quantity = 0;
-            }
-            else
-            {
-                quantity += existing.nonProm.Quantity;
-            }
-            _storeProductRepository.DeleteStoreProduct(existing.nonProm.UPC);
-        }
-        
-        _storeProductRepository.AddStoreProduct(new(
-            storeProduct.Upc,
-            upcProm,
+        Validation.ValidateStoreProductCreate(storeProduct);
+
+        StoreProductDBModel result = new(
+            storeProduct.Upc, 
+            null,
             storeProduct.ProductId,
             storeProduct.Price,
-            quantity,
-            storeProduct.Promotional));
+            storeProduct.Quantity, 
+            false);
+        
+        var existing = _storeProductRepository.GetStoreProduct(storeProduct.Upc);
+        if (existing is not null)
+        {
+            result.UPCProm = existing.UPCProm;
+            result.Quantity += existing.Quantity;
+            _storeProductRepository.UpdateStoreProduct(result);
+
+            if (existing.UPCProm is null) return;
+            var promo = _storeProductRepository.GetStoreProduct(existing.UPCProm)
+                        ?? throw new InvalidDataException("Store product does not exist.");
+            result.UPC = promo.UPC;
+            result.UPCProm = null;
+            result.Quantity += promo.Quantity;
+            result.SellingPrice *= 0.8m;
+            _storeProductRepository.UpdateStoreProduct(result);
+            
+            return;
+        }
+        
+        _storeProductRepository.AddStoreProduct(result);
     }
 
     public void UpdateStoreProduct(StoreProductModifyDTO storeProduct)
     {
-        ValidateStoreProduct(storeProduct);
+        Validation.ValidateStoreProductUpdate(storeProduct);
         
-        _storeProductRepository.UpdateStoreProduct(new(
-            storeProduct.Upc,
-            storeProduct.UpcProm,
+        var existing = _storeProductRepository.GetStoreProduct(storeProduct.Upc)
+            ?? throw new InvalidDataException("Store product does not exist.");
+        
+        StoreProductDBModel result = new(
+            storeProduct.Upc, 
+            existing.UPCProm,
             storeProduct.ProductId,
             storeProduct.Price,
-            storeProduct.Quantity,
-            storeProduct.Promotional));
+            storeProduct.Quantity, 
+            false);
+        
+        _storeProductRepository.UpdateStoreProduct(result);
     }
 
     public void AddPromotionalStoreProduct(string originalUpc, string promotionalUpc)
     {
-        if (!Regex.IsMatch(promotionalUpc, @"\d{12}"))
-            throw new InvalidDataException("Invalid promotional UPC");
+        Validation.ValidateStoreProductMakePromotional(promotionalUpc);
+        
+        var storeProduct = _storeProductRepository.GetStoreProduct(originalUpc)
+                       ?? throw new InvalidDataException("Store product does not exist.");
 
-        {
-            var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
-            if (promotional is not null) throw new InvalidDataException($"Store product {promotionalUpc} already exists.");
-        }
-        
-        var original = _storeProductRepository.GetStoreProduct(originalUpc);
-        if (original is null) throw new InvalidDataException($"Store product {originalUpc} does not exist.");
-        if (original.Promotional) throw new InvalidDataException($"Store product {originalUpc} is promotional.");
-        if (original.UPCProm is not null) throw new InvalidDataException($"Store product {originalUpc} already has a promotional product.");
-        
-        _storeProductRepository.AddStoreProduct(new(
-            promotionalUpc,
+        StoreProductDBModel result = new(
+            promotionalUpc, 
             null,
-            original.ProductId,
-            original.SellingPrice * 0.8m,
-            original.Quantity,
-            true
-            ));
-        _storeProductRepository.UpdateStoreProduct(new(
-            original.UPC,
-            promotionalUpc,
-            original.ProductId,
-            original.SellingPrice,
-            0,
-            original.Promotional
-        ));
+            storeProduct.ProductId,
+            storeProduct.SellingPrice * 0.8m,
+            storeProduct.Quantity, 
+            true);
+        
+        var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
+        if (promotional is not null) _storeProductRepository.UpdateStoreProduct(result);
+        else _storeProductRepository.AddStoreProduct(result);
+        
+        result.UPC = originalUpc;
+        result.UPCProm = promotionalUpc;
+        result.Quantity = 0;
+        _storeProductRepository.UpdateStoreProduct(result);
     }
 
     public void DeletePromotionalStoreProduct(string promotionalUpc)
     {
-        var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
-        if (promotional is null) throw new InvalidDataException($"Promotional store product {promotionalUpc} doesn't exist.");
+        var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc)
+                          ?? throw new InvalidDataException("Promotional store product doesn't exist.");
+        var original = _storeProductRepository.GetNonPromByProm(promotionalUpc)
+                       ?? throw new InvalidDataException("Store product doesn't exist.");
         
-        var original = _storeProductRepository.GetNonPromByProm(promotionalUpc);
-        if (original is not null)
-        {
-            _storeProductRepository.UpdateStoreProduct(new(
-                original.UPC,
-                null,
-                original.ProductId,
-                original.SellingPrice,
-                promotional.Quantity,
-                original.Promotional
-            ));
-        }
+        StoreProductDBModel result = new(
+            original.UPC, 
+            original.UPCProm,
+            original.ProductId,
+            original.SellingPrice,
+            promotional.Quantity, 
+            false);
+        _storeProductRepository.UpdateStoreProduct(result);
+        
+        result = new(
+            promotional.UPC, 
+            null,
+            promotional.ProductId,
+            promotional.SellingPrice,
+            0, 
+            true);
+        _storeProductRepository.UpdateStoreProduct(result);
     }
 
     public void DeleteStoreProduct(string upc)
     {
-        _storeProductRepository.DeleteStoreProduct(upc);
+        if (_storeProductRepository.IsInReceipt(upc))
+            throw new InvalidOperationException("Can't delete a store product which is already in a receipt.");
+        
+        var storeProduct = _storeProductRepository.GetStoreProduct(upc)
+                           ?? throw new InvalidDataException("Store product doesn't exist.");
+        if (storeProduct.UPCProm is not null)
+        {
+            if (_storeProductRepository.IsInReceipt(storeProduct.UPCProm))
+                throw new InvalidOperationException("Can't delete a store product which is already in receipt.");
+            _storeProductRepository.DeleteStoreProduct(storeProduct.UPCProm);
+        }
+            
+        _storeProductRepository.DeleteStoreProduct(storeProduct.UPC);
     }
 
     private StoreProductDTO StoreProductDbToDto(StoreProductInfoDataModel storeProduct)
     {
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
+        var product = _productRepository.GetProduct(storeProduct.ProductId) ??
+                      throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
         var oldPrice = storeProduct.SellingPrice;
         if (storeProduct.Promotional)
         {
@@ -185,19 +208,5 @@ public class StoreProductService : IStoreProductService
             storeProduct.Quantity,
             storeProduct.Promotional,
             oldPrice);
-    }
-
-    private void ValidateStoreProduct(StoreProductModifyDTO storeProduct)
-    {
-        if (string.IsNullOrEmpty(storeProduct.Upc))
-            throw new InvalidDataException("UPC is required");
-        if (!Regex.IsMatch(storeProduct.Upc, @"\d{12}"))
-            throw new InvalidDataException("Invalid UPC");
-        if (storeProduct.Quantity < 0)
-            throw new InvalidDataException("Quantity cannot be negative");
-        if (storeProduct.Price < 0)
-            throw new InvalidDataException("Price cannot be negative");
-        if (!string.IsNullOrEmpty(storeProduct.UpcProm) && !Regex.IsMatch(storeProduct.UpcProm, @"\d{12}"))
-            throw new InvalidDataException("Invalid promotion UPC");
     }
 }

@@ -157,6 +157,8 @@ public class ReceiptService : IReceiptService
 
     private void ValidateReceipt(ReceiptCreateDTO receipt)
     {
+        if (string.IsNullOrEmpty(receipt.CustomerCardId))
+            receipt.CustomerCardId = null;
     }
 
     private void ValidateSale(SaleCreateDTO sale)
