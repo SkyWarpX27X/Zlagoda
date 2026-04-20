@@ -1,0 +1,50 @@
+﻿@page "/ExperiencedEmployees"
+@rendermode InteractiveServer
+@using Repositories
+@inject IOstapchukQueries OstapchukQueries
+
+<h3>Касири, які обслуговували кожного постійного клієнта</h3>
+
+@if (_employees == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!_employees.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Прізвище</th>
+                <th>Ім'я</th>
+                <th>По-батькові</th>
+                <th>Зарплата</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in _employees)
+            {
+                <tr>
+                    <td>@employee.Id</td>
+                    <td>@employee.Surname</td>
+                    <td>@employee.Name</td>
+                    <td>@employee.Patronymic</td>
+                    <td>@employee.Salary.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<(long Id, string Surname, string Name, string? Patronymic, decimal Salary)>? _employees;
+
+    protected override void OnInitialized()
+    {
+        _employees = OstapchukQueries.GetExperiencedCashiers();
+    }
+}

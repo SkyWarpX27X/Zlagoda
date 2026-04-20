@@ -1,6 +1,7 @@
 using System.Text;
 using DBModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Repositories;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
@@ -45,6 +46,8 @@ builder.Services.AddSingleton<IStoreProductRepository>(sp => sp.GetRequiredServi
 builder.Services.AddSingleton<IReceiptRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Receipts);
 builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Sales);
 
+builder.Services.AddSingleton<IOstapchukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().OstapchukQueries);
+
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
 builder.Services.AddSingleton<IStoreProductService, StoreProductService>();
@@ -59,6 +62,7 @@ builder.Services.AddSingleton<CustomersVM>();
 builder.Services.AddSingleton<EmployeesVM>();
 builder.Services.AddSingleton<ProductsVM>();
 builder.Services.AddSingleton<ReceiptsVM>();
+builder.Services.AddSingleton<ProductCountVM>();
 
 var app = builder.Build();
 

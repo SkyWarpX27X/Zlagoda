@@ -1,0 +1,45 @@
+﻿@page "/ProductCountByCategories"
+@rendermode InteractiveServer
+@using Zlagoda.ViewModels
+@inject ProductCountVM ViewModel
+
+<h3>Кількість акційних/неакційних товарів по категоріям</h3>
+
+<div class="mb-3" style="max-width: 300px;">
+    <label class="form-label">Оберіть тип товарів:</label>
+    <select class="form-select" @bind="ViewModel.IsPromotional">
+        <option value="prom">Акційні</option>
+        <option value="non-prom">Неакційні</option>
+    </select>
+</div>
+
+@if (!ViewModel.ProductCounts.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID Категорії</th>
+                <th>Назва категорії</th>
+                <th>Кількість товарів</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in ViewModel.ProductCounts)
+            {
+                <tr>
+                    <td>@item.CategoryId</td>
+                    <td>@item.CategoryName</td>
+                    <td>@item.ProductCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+}

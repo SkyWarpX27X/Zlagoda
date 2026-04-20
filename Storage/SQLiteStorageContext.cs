@@ -3,6 +3,7 @@ using DBModels;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Hosting;
+using Repositories;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
@@ -23,6 +24,8 @@ public class SQLiteStorageContext
     public IStoreProductRepository StoreProducts { get; private set; }
     public IReceiptRepository Receipts { get; private set; }
     public ISaleRepository Sales { get; private set; }
+    
+    public IOstapchukQueries OstapchukQueries { get; private set; }
 
     public SQLiteStorageContext(string databaseFilePath)
     {
@@ -36,6 +39,9 @@ public class SQLiteStorageContext
         StoreProducts = new StoreProductRepository(_connection);
         Receipts = new ReceiptRepository(_connection);
         Sales = new SaleRepository(_connection);
+        
+        OstapchukQueries = new OstapchukQueries(_connection);
+        
         if (isFirstLaunch) CreateDatabase();
     }
     
