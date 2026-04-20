@@ -7,6 +7,7 @@ using Repositories;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
+using Repositories.Filiushkin;
 using Repositories.Product;
 using Repositories.Receipt;
 using Repositories.Sale;
@@ -26,6 +27,7 @@ public class SQLiteStorageContext
     public ISaleRepository Sales { get; private set; }
     
     public IOstapchukQueries OstapchukQueries { get; private set; }
+    public IFiliushkinQueries FiliushkinQueries { get; private set; }
 
     public SQLiteStorageContext(string databaseFilePath)
     {
@@ -41,6 +43,7 @@ public class SQLiteStorageContext
         Sales = new SaleRepository(_connection);
         
         OstapchukQueries = new OstapchukQueries(_connection);
+        FiliushkinQueries = new FiliushkinQueries(_connection);
         
         if (isFirstLaunch) CreateDatabase();
     }

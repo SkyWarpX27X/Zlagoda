@@ -5,6 +5,7 @@ using Repositories;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
+using Repositories.Filiushkin;
 using Repositories.Product;
 using Repositories.Receipt;
 using Repositories.Sale;
@@ -47,6 +48,7 @@ builder.Services.AddSingleton<IReceiptRepository>(sp => sp.GetRequiredService<SQ
 builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Sales);
 
 builder.Services.AddSingleton<IOstapchukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().OstapchukQueries);
+builder.Services.AddSingleton<IFiliushkinQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().FiliushkinQueries);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
