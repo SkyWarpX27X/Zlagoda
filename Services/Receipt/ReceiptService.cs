@@ -93,7 +93,7 @@ public class ReceiptService : IReceiptService
         long id = _receiptRepository.AddReceipt(new(
             receipt.EmployeeId,
             receipt.CustomerCardId,
-            $"{receipt.PrintDate.ToShortDateString()} {receipt.PrintDate.ToShortTimeString()}",
+            receipt.PrintDate.ToString("yyyy-MM-dd HH:mm:ss"),
             total,
             total * 0.2m
             ));
