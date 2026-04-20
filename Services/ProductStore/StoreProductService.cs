@@ -21,8 +21,15 @@ public class StoreProductService : IStoreProductService
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProducts(sortByName, sortByQuantity))
         {
-            if (storeProduct.UPCProm is null)
-                yield return StoreProductDbToDto(storeProduct);
+            if (storeProduct.Promotional)
+                continue;
+            if (!string.IsNullOrEmpty(storeProduct.UPCProm))
+            {
+                var promotional = _storeProductRepository.GetStoreProduct(storeProduct.UPCProm);
+                if (promotional is null) continue;
+                yield return StoreProductDbToDto(promotional);
+            }
+            else yield return StoreProductDbToDto(storeProduct);
         }
     }
 
@@ -39,8 +46,7 @@ public class StoreProductService : IStoreProductService
     {
         foreach (var storeProduct in _storeProductRepository.GetStoreProductsPromotional(sortByName, sortByQuantity))
         {
-            if (storeProduct.UPCProm is null)
-                yield return StoreProductDbToDto(storeProduct);
+            yield return StoreProductDbToDto(storeProduct);
         }
     }
 
@@ -153,7 +159,6 @@ public class StoreProductService : IStoreProductService
                 original.Promotional
             ));
         }
-        _storeProductRepository.DeleteStoreProduct(promotionalUpc);
     }
 
     public void DeleteStoreProduct(string upc)
