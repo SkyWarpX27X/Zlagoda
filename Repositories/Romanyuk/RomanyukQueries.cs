@@ -19,15 +19,24 @@ public class RomanyukQueries : IRomanyukQueries
                               SELECT card_number, cust_surname, cust_name, cust_patronymic, phone_number, category_number, category_name
                               FROM Customer_Card cc
                               JOIN Category c
-                              ON NOT EXISTS  (SELECT 1
+                              ON NOT EXISTS (
+                              		SELECT 1
                               		FROM Product p
                               		WHERE p.category_number = c.category_number
-                              		AND NOT EXISTS (SELECT 1
+                              		AND NOT EXISTS (
+                              				SELECT 1
                               				FROM Receipt r 
                               				JOIN Sale s on r.receipt_number = s.receipt_number
                               				JOIN Store_Product sp ON s.UPC = sp.UPC
                               				WHERE r.card_number = cc.card_number
-                              				AND sp.id_product = p.id_product));
+                              				AND sp.id_product = p.id_product
+                              				)
+                              		)
+                              AND EXISTS (
+                                  SELECT 1
+                                  FROM Product 
+                                  WHERE Product.category_number = c.category_number
+                                  );
                               """;
         using var reader = command.ExecuteReader();
         while (reader.Read())
@@ -51,12 +60,12 @@ public class RomanyukQueries : IRomanyukQueries
 	    var res = new List<(long, string, decimal)>();
 	    using var command = _connection.CreateCommand();
 	    command.CommandText = """
-	                          SELECT c.category_number, category_name, COALESCE(AVG(selling_price), 0) as avg_price
+	                          SELECT c.category_number, category_name, COALESCE(AVG(selling_price), 0) AS avg_price
 	                          FROM Category c
 	                          JOIN Product p ON p.category_number = c.category_number
 	                          JOIN Store_Product sp ON sp.id_product = p.id_product 
-	                          		AND (sp.promotional_product IS TRUE AND sp.products_number > 0) 
-	                          		OR (sp.promotional_product IS FALSE AND UPC_prom IS NULL)
+	                          		AND sp.products_number > 0 
+	                          		OR sp.promotional_product IS FALSE
 	                          GROUP BY c.category_number, c.category_name
 	                          HAVING avg_price >= @min AND avg_price <= @max
 	                          ORDER BY avg_price DESC;
