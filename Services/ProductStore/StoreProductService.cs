@@ -84,17 +84,28 @@ public class StoreProductService : IStoreProductService
         var existing = _storeProductRepository.GetStoreProduct(storeProduct.Upc);
         if (existing is not null)
         {
-            result.UPCProm = existing.UPCProm;
-            result.Quantity += existing.Quantity;
-            _storeProductRepository.UpdateStoreProduct(result);
+            if (existing.Promotional || existing.ProductId != storeProduct.ProductId)
+                throw new InvalidDataException("Can't use UPC of another product for a new product.");
 
-            if (existing.UPCProm is null) return;
-            var promo = _storeProductRepository.GetStoreProduct(existing.UPCProm)
-                        ?? throw new InvalidDataException("Store product does not exist.");
-            result.UPC = promo.UPC;
-            result.UPCProm = null;
-            result.Quantity += promo.Quantity;
-            result.SellingPrice *= 0.8m;
+            if (existing.UPCProm is not null)
+            {
+                var promo = _storeProductRepository.GetStoreProduct(existing.UPCProm)
+                            ?? throw new InvalidDataException("Store product does not exist.");
+                if (promo.Quantity > 0)
+                {
+                    StoreProductDBModel promoResult = new(
+                        promo.UPC,
+                        null,
+                        promo.ProductId,
+                        result.SellingPrice * 0.8m,
+                        promo.Quantity + result.Quantity,
+                        true
+                    );
+                    _storeProductRepository.UpdateStoreProduct(promoResult);
+                }
+            }
+            result.Quantity += existing.Quantity;
+            result.UPCProm = existing.UPCProm;
             _storeProductRepository.UpdateStoreProduct(result);
             
             return;
@@ -142,7 +153,7 @@ public class StoreProductService : IStoreProductService
         if (promotional is not null)
         {
             if (!promotional.Promotional || promotional.ProductId != storeProduct.ProductId)
-                throw new InvalidDataException("Can't use taken UPC of another product for a promotional");
+                throw new InvalidDataException("Can't use UPC of another product for a promotional.");
             _storeProductRepository.UpdateStoreProduct(result);
         }
         else _storeProductRepository.AddStoreProduct(result);
