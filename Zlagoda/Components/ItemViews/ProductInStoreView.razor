@@ -63,7 +63,7 @@ else
                             }
                         }
                 
-                        @if (!_isMakingProm)
+                        @if (!_isMakingProm && !Product.IsProm)
                         {
                             <button class="btn btn-primary btn-sm" @onclick="EditProduct">Редагувати</button>
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(Product.Upc)">Видалити</button>
