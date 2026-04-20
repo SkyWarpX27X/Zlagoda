@@ -11,9 +11,14 @@
     <h3 class="mb-0">Постійні клієнти</h3>
     <AuthorizeView Roles="Менеджер">
         <Authorized>
-            <button class="btn btn-outline-primary" @onclick="PrintReport">
-                <i class="bi bi-printer me-1"></i> Друк звіту
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-info" @onclick="NavigateToCustomersBoughtCategory">
+                    <i class="bi bi-star me-1"></i> Клієнти, що викупили категорію
+                </button>
+                <button class="btn btn-outline-primary" @onclick="PrintReport">
+                    <i class="bi bi-printer me-1"></i> Друк звіту
+                </button>
+            </div>
         </Authorized>
     </AuthorizeView>
 </div>
@@ -79,5 +84,10 @@ else
     private void PrintReport()
     {
         NavigationManager.NavigateTo("/CustomersReport");
+    }
+
+    private void NavigateToCustomersBoughtCategory()
+    {
+        NavigationManager.NavigateTo("/CustomersBoughtCategory");
     }
 }

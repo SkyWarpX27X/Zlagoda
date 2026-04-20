@@ -2,10 +2,11 @@ using System.Text;
 using DBModels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Repositories;
+using Repositories.Filiushkin;
+using Repositories.Romanyuk;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
-using Repositories.Filiushkin;
 using Repositories.Product;
 using Repositories.Receipt;
 using Repositories.Sale;
@@ -49,6 +50,7 @@ builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLit
 
 builder.Services.AddSingleton<IOstapchukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().OstapchukQueries);
 builder.Services.AddSingleton<IFiliushkinQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().FiliushkinQueries);
+builder.Services.AddSingleton<IRomanyukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().RomanyukQueries);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();

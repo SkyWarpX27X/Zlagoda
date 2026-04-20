@@ -4,10 +4,11 @@ using DBModels;
 using Microsoft.Data.Sqlite;
 using Microsoft.AspNetCore.Hosting;
 using Repositories;
+using Repositories.Filiushkin;
+using Repositories.Romanyuk;
 using Repositories.Category;
 using Repositories.CustomerCard;
 using Repositories.Employee;
-using Repositories.Filiushkin;
 using Repositories.Product;
 using Repositories.Receipt;
 using Repositories.Sale;
@@ -28,6 +29,7 @@ public class SQLiteStorageContext
     
     public IOstapchukQueries OstapchukQueries { get; private set; }
     public IFiliushkinQueries FiliushkinQueries { get; private set; }
+    public IRomanyukQueries RomanyukQueries { get; private set; }
 
     public SQLiteStorageContext(string databaseFilePath)
     {
@@ -44,6 +46,7 @@ public class SQLiteStorageContext
         
         OstapchukQueries = new OstapchukQueries(_connection);
         FiliushkinQueries = new FiliushkinQueries(_connection);
+        RomanyukQueries = new RomanyukQueries(_connection);
         
         if (isFirstLaunch) CreateDatabase();
     }

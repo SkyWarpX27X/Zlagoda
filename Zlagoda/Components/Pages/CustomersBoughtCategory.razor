@@ -1,0 +1,56 @@
+﻿@page "/CustomersBoughtCategory"
+@rendermode InteractiveServer
+@using Repositories.Romanyuk
+@inject IRomanyukQueries RomanyukQueries
+
+
+<h3>Постійні клієнти, які купили кожен товар в якій-небудь категорії товарів (+ категорії, які викупили) </h3>
+
+@if (_customers == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!_customers.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>Номер карти клієнта</th>
+            <th>Прізвище</th>
+            <th>Ім'я</th>
+            <th>По-батькові</th>
+            <th>Контактний телефон</th>
+            <th>Номер категорії</th>
+            <th>Назва категорії</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var customer in _customers)
+        {
+            <tr>
+                <td>@customer.cardNumber</td>
+                <td>@customer.customerName</td>
+                <td>@customer.customerSurname</td>
+                <td>@customer.customerPatronymic</td>
+                <td>@customer.customerPhone</td>
+                <td>@customer.categoryNumber</td>
+                <td>@customer.categoryName</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    IEnumerable<(long cardNumber, string customerSurname, string customerName, string? customerPatronymic,
+        string customerPhone, long categoryNumber, string categoryName)>? _customers;
+
+    protected override void OnInitialized()
+    {
+        _customers = RomanyukQueries.GetCustomersWhoBoughtWholeCategory();
+    }
+}
