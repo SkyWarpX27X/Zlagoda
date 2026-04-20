@@ -64,8 +64,8 @@ public class StoreProductService : IStoreProductService
 
     public StoreProductDTO GetStoreProduct(string upc)
     {
-        var storeProduct = _storeProductRepository.GetStoreProduct(upc);
-        if (storeProduct is null) throw new InvalidDataException("Product does not exist");
+        var storeProduct = _storeProductRepository.GetStoreProduct(upc)
+                           ?? throw new InvalidDataException("Product does not exist");
         return StoreProductDbToDto(storeProduct);
     }
 
@@ -127,6 +127,8 @@ public class StoreProductService : IStoreProductService
         
         var storeProduct = _storeProductRepository.GetStoreProduct(originalUpc)
                        ?? throw new InvalidDataException("Store product does not exist.");
+        if (storeProduct.UPCProm is not null && storeProduct.UPCProm != promotionalUpc)
+            throw new InvalidOperationException("Can't use another UPC to create promotional");
 
         StoreProductDBModel result = new(
             promotionalUpc, 
@@ -137,7 +139,12 @@ public class StoreProductService : IStoreProductService
             true);
         
         var promotional = _storeProductRepository.GetStoreProduct(promotionalUpc);
-        if (promotional is not null) _storeProductRepository.UpdateStoreProduct(result);
+        if (promotional is not null)
+        {
+            if (!promotional.Promotional || promotional.ProductId != storeProduct.ProductId)
+                throw new InvalidOperationException("Can't use taken UPC of another product for a promotional");
+            _storeProductRepository.UpdateStoreProduct(result);
+        }
         else _storeProductRepository.AddStoreProduct(result);
         
         result.UPC = originalUpc;

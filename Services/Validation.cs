@@ -10,12 +10,14 @@ public static class Validation
     {
         List<string> errors = new();
         errors.AddRange(ValidateUPC(storeProduct.Upc));
+        if (storeProduct.ProductId == 0)
+            errors.Add("Product must be selected");
         if (storeProduct.Quantity < 0)
             errors.Add("Quantity can't be negative");
-        if (storeProduct.Price < 0.0m)
-            errors.Add("Price can't be negative");
+        if (storeProduct.Price <= 0.0m)
+            errors.Add("Price must be positive");
         if (errors.Count > 0)
-            throw new Exception(string.Join(Environment.NewLine, errors));
+            throw new InvalidDataException(string.Join(Environment.NewLine, errors));
     }
     
     public static void ValidateStoreProductUpdate(StoreProductModifyDTO storeProduct)
@@ -26,14 +28,14 @@ public static class Validation
         if (storeProduct.Price < 0.0m)
             errors.Add("Price can't be negative");
         if (errors.Count > 0)
-            throw new Exception(string.Join(Environment.NewLine, errors));
+            throw new InvalidDataException(string.Join(Environment.NewLine, errors));
     }
 
     public static void ValidateStoreProductMakePromotional(string promotionalUpc)
     {
         var errors = ValidateUPC(promotionalUpc);
         if (errors.Count > 0)
-            throw new Exception(string.Join(Environment.NewLine, errors));
+            throw new InvalidDataException(string.Join(Environment.NewLine, errors));
     }
 
     private static List<string> ValidateUPC(string upc)
