@@ -44,4 +44,38 @@ public class RomanyukQueries : IRomanyukQueries
         }
         return res;
     }
+
+    public IEnumerable<(long categoryNumber, string categoryName, decimal avgPrice)> GetAvgPriceOfCategory(
+	    long min = 0, long max = 9999)
+    {
+	    var res = new List<(long, string, decimal)>();
+	    using var command = _connection.CreateCommand();
+	    command.CommandText = """
+	                          SELECT c.category_number, category_name, COALESCE(AVG(selling_price), 0) as avg_price
+	                          FROM Category c
+	                          JOIN Product p ON p.category_number = c.category_number
+	                          JOIN Store_Product sp ON sp.id_product = p.id_product 
+	                          		AND (sp.promotional_product IS TRUE AND sp.products_number > 0) 
+	                          		OR (sp.promotional_product IS FALSE AND UPC_prom IS NULL)
+	                          GROUP BY c.category_number, c.category_name
+	                          HAVING avg_price >= @min AND avg_price <= @max
+	                          ORDER BY avg_price DESC;
+	                          """;
+	    command.Parameters.AddWithValue("@min", min);
+	    command.Parameters.AddWithValue("@max", max);
+	    using var reader = command.ExecuteReader();
+	    while (reader.Read())
+	    {
+		    res.Add(
+			    (
+				    reader.GetInt64(reader.GetOrdinal("category_number")),
+				    reader.GetString(reader.GetOrdinal("category_name")),
+				    reader.GetDecimal(reader.GetOrdinal("avg_price"))
+			    )
+		    );
+	    }
+	    return res;
+    }
+    
+    
 }
