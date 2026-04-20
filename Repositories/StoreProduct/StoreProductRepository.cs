@@ -133,6 +133,23 @@ public class StoreProductRepository : IStoreProductRepository
         return (nonProm, prom);
     }
 
+    public bool IsInReceipt(string upc)
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = """
+                                  SELECT EXISTS (
+                                      SELECT 1
+                                      FROM Store_Product sp
+                                      LEFT JOIN Sale s ON sp.UPC = s.UPC
+                                      LEFT JOIN Sale s1 ON sp.UPC_prom = s1.UPC
+                                      WHERE s.UPC = @upc OR s1.UPC = @upc
+                                      AND (s.UPC IS NOT NULL OR s1.UPC IS NOT NULL)
+                                      );
+                              """;
+        command.Parameters.AddWithValue("@upc", upc);
+        return Convert.ToBoolean(command.ExecuteScalar());
+    }
+
     public void AddStoreProduct(StoreProductDBModel storeProduct)
     {
         using var command = _connection.CreateCommand();
