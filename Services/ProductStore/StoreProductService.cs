@@ -142,7 +142,9 @@ public class StoreProductService : IStoreProductService
         
         result.UPC = originalUpc;
         result.UPCProm = promotionalUpc;
+        result.SellingPrice = storeProduct.SellingPrice;
         result.Quantity = 0;
+        result.Promotional = false;
         _storeProductRepository.UpdateStoreProduct(result);
     }
 
