@@ -54,6 +54,8 @@ public class StoreProductService : IStoreProductService
     public void AddStoreProduct(StoreProductModifyDTO storeProduct)
     {
         ValidateStoreProduct(storeProduct);
+        var product = _productRepository.GetProduct(storeProduct.ProductId);
+        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
         var upcProm = storeProduct.UpcProm;
         var quantity = storeProduct.Quantity;
         var existing = _storeProductRepository.GetStoreProductsByProductId(storeProduct.ProductId);
@@ -192,7 +194,5 @@ public class StoreProductService : IStoreProductService
             throw new InvalidDataException("Price cannot be negative");
         if (!string.IsNullOrEmpty(storeProduct.UpcProm) && !Regex.IsMatch(storeProduct.UpcProm, @"\d{12}"))
             throw new InvalidDataException("Invalid promotion UPC");
-        var product = _productRepository.GetProduct(storeProduct.ProductId);
-        if (product is null) throw new InvalidDataException($"Product {storeProduct.ProductId} does not exist");
     }
 }
