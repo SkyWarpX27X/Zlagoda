@@ -157,8 +157,6 @@ public class ReceiptService : IReceiptService
 
     private void ValidateReceipt(ReceiptCreateDTO receipt)
     {
-        if (_customerCardRepository.GetCustomer(receipt.CustomerCardId) is null)
-            throw new InvalidDataException($"Customer card {receipt.CustomerCardId} does not exist");
     }
 
     private void ValidateSale(SaleCreateDTO sale)
