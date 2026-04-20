@@ -7,6 +7,7 @@ using Repositories.CustomerCard;
 using Repositories.Employee;
 using Repositories.Product;
 using Repositories.Receipt;
+using Repositories.Romanyuk;
 using Repositories.Sale;
 using Repositories.StoreProduct;
 using Services.Category;
@@ -47,6 +48,7 @@ builder.Services.AddSingleton<IReceiptRepository>(sp => sp.GetRequiredService<SQ
 builder.Services.AddSingleton<ISaleRepository>(sp => sp.GetRequiredService<SQLiteStorageContext>().Sales);
 
 builder.Services.AddSingleton<IOstapchukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().OstapchukQueries);
+builder.Services.AddSingleton<IRomanyukQueries>(sp => sp.GetRequiredService<SQLiteStorageContext>().RomanyukQueries);
 
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 builder.Services.AddSingleton<ICategoryService, CategoryService>();
