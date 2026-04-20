@@ -1,0 +1,104 @@
+﻿@page "/AvgPriceOfCategory"
+@rendermode InteractiveServer
+@using Repositories
+@using Repositories.Romanyuk
+@inject IRomanyukQueries RomanyukQueries
+
+<h3>Середня ціна продажів по категоріях</h3>
+
+<div class="card p-3 mb-3">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="fw-semibold">Діапазон середньої ціни:</span>
+
+        <div class="d-flex align-items-center gap-2">
+            <label class="mb-0 text-muted small">Від</label>
+            <input type="number" class="form-control" style="width: 130px"
+                   min="0" value="@_minValue"
+                   @onchange="OnMinChanged" />
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <label class="mb-0 text-muted small">До</label>
+            <input type="number" class="form-control" style="width: 130px"
+                   min="0" value="@_maxValue"
+                   @onchange="OnMaxChanged" />
+        </div>
+
+        <button class="btn btn-sm btn-outline-secondary" @onclick="ResetFilter">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Скинути
+        </button>
+    </div>
+</div>
+
+@if (_results == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!_results.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>Номер категорії</th>
+            <th>Назва категорії</th>
+            <th>Середня ціна</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in _results)
+        {
+            <tr>
+                <td>@row.categoryNumber</td>
+                <td>@row.categoryName</td>
+                <td>@row.totalSum.ToString("F2")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<(long categoryNumber, string categoryName, decimal totalSum)>? _results;
+    private long _minValue;
+    private long _maxValue = 9999;
+
+    protected override void OnInitialized()
+    {
+        _results = RomanyukQueries.GetAvgPriceOfCategory();
+    }
+
+    private void OnMinChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var val))
+        {
+            _minValue = val;
+            LoadData();
+        }
+    }
+
+    private void OnMaxChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var val))
+        {
+            _maxValue = val;
+            LoadData();
+        }
+    }
+
+    private void ResetFilter()
+    {
+        _minValue = 0;
+        _maxValue = 9999;
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        _results = RomanyukQueries.GetAvgPriceOfCategory(_minValue, _maxValue);
+    }
+    
+}

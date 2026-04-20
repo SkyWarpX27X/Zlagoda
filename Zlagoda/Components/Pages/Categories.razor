@@ -12,6 +12,9 @@
     <AuthorizeView Roles="Менеджер">
         <Authorized>
             <div>
+                <button class="btn btn-outline-info" @onclick="NavigateToCategoryAvg">
+                <i class="bi bi-bar-chart me-1"></i> Середнє цін категорії
+                </button>
                 <button class="btn btn-outline-info" @onclick="NavigateToProductCount">
                     <i class="bi bi-bar-chart me-1"></i> Кількість товарів
                 </button>
@@ -76,5 +79,10 @@ else
     private void NavigateToProductCount()
     {
         NavigationManager.NavigateTo("/ProductCountByCategories");
+    }
+
+    private void NavigateToCategoryAvg()
+    {
+        NavigationManager.NavigateTo("/AvgPriceOfCategory");
     }
 }
