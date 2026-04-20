@@ -123,12 +123,12 @@ public class StoreProductService : IStoreProductService
 
     public void AddPromotionalStoreProduct(string originalUpc, string promotionalUpc)
     {
-        Validation.ValidateStoreProductMakePromotional(promotionalUpc);
-        
         var storeProduct = _storeProductRepository.GetStoreProduct(originalUpc)
                        ?? throw new InvalidDataException("Store product does not exist.");
-        if (storeProduct.UPCProm is not null && storeProduct.UPCProm != promotionalUpc)
-            throw new InvalidOperationException("Can't use another UPC to create promotional");
+        if (storeProduct.UPCProm is not null)
+            promotionalUpc = storeProduct.UPCProm;
+        else
+            Validation.ValidateStoreProductMakePromotional(promotionalUpc);
 
         StoreProductDBModel result = new(
             promotionalUpc, 
@@ -142,7 +142,7 @@ public class StoreProductService : IStoreProductService
         if (promotional is not null)
         {
             if (!promotional.Promotional || promotional.ProductId != storeProduct.ProductId)
-                throw new InvalidOperationException("Can't use taken UPC of another product for a promotional");
+                throw new InvalidDataException("Can't use taken UPC of another product for a promotional");
             _storeProductRepository.UpdateStoreProduct(result);
         }
         else _storeProductRepository.AddStoreProduct(result);
@@ -184,14 +184,14 @@ public class StoreProductService : IStoreProductService
     public void DeleteStoreProduct(string upc)
     {
         if (_storeProductRepository.IsInReceipt(upc))
-            throw new InvalidOperationException("Can't delete a store product which is already in a receipt.");
+            throw new InvalidDataException("Can't delete a store product which is already in a receipt.");
         
         var storeProduct = _storeProductRepository.GetStoreProduct(upc)
                            ?? throw new InvalidDataException("Store product doesn't exist.");
         if (storeProduct.UPCProm is not null)
         {
             if (_storeProductRepository.IsInReceipt(storeProduct.UPCProm))
-                throw new InvalidOperationException("Can't delete a store product which is already in receipt.");
+                throw new InvalidDataException("Can't delete a store product which is already in receipt.");
             _storeProductRepository.DeleteStoreProduct(storeProduct.UPCProm);
         }
             
