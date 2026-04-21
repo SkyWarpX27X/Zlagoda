@@ -1,0 +1,46 @@
+@page "/EmployeeSoldAllProducts"
+@rendermode InteractiveServer
+@using Repositories.Filiushkin
+@inject IFiliushkinQueries FiliushkinQueries
+
+<h3>Касири, які продали усі товари</h3>
+
+@if (_employees == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!_employees.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>Прізвище</th>
+            <th>Ім'я</th>
+            <th>По-батькові</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var employee in _employees)
+        {
+            <tr>
+                <td>@employee.Surname</td>
+                <td>@employee.Name</td>
+                <td>@employee.Patronymic</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<IFiliushkinQueries.EmployeesSoldAllProductsRow>? _employees;
+
+    protected override void OnInitialized()
+    {
+        _employees = FiliushkinQueries.EmployeesSoldAllProducts();
+    }
+}

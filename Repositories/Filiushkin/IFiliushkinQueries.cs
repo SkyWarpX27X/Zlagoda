@@ -7,7 +7,6 @@ public interface IFiliushkinQueries
         string Name,
         string? Patronymic,
         string Category,
-        DateTime PrintTime,
         decimal Total);
 
     public readonly record struct EmployeesSoldAllProductsRow(

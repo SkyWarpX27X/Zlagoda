@@ -1,0 +1,52 @@
+@page "/EmployeeSalesByCategory"
+@rendermode InteractiveServer
+@using Zlagoda.ViewModels
+@inject EmployeeSalesByCategoryVM ViewModel
+
+<h3>Продажі касирів за категоріями</h3>
+
+<div class="mb-3">
+    <div>
+        <label for="fromDate" class="form-label fw-bold mb-1">З дати/часу:</label>
+        <input type="datetime-local" id="fromDate" class="form-control" @bind="ViewModel.StartDate" @bind:after="StateHasChanged"/>
+    </div>
+    <div>
+        <label for="toDate" class="form-label fw-bold mb-1">По дату/час:</label>
+        <input type="datetime-local" id="toDate" class="form-control" @bind="ViewModel.EndDate" @bind:after="StateHasChanged"/>
+    </div>
+</div>
+
+@if (!ViewModel.EmployeeSalesByCategory.Any())
+{
+    <p><em>Немає даних для відображення</em></p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>Прізвище працівника</th>
+            <th>Ім'я працівника</th>
+            <th>По-батькові працівника</th>
+            <th>Назва категорії</th>
+            <th>Загальна сума</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in ViewModel.EmployeeSalesByCategory)
+        {
+            <tr>
+                <td>@item.Surname</td>
+                <td>@item.Name</td>
+                <td>@item.Patronymic</td>
+                <td>@item.Category</td>
+                <td>@item.Total</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    
+}

@@ -67,6 +67,7 @@ builder.Services.AddSingleton<EmployeesVM>();
 builder.Services.AddSingleton<ProductsVM>();
 builder.Services.AddSingleton<ReceiptsVM>();
 builder.Services.AddSingleton<ProductCountVM>();
+builder.Services.AddSingleton<EmployeeSalesByCategoryVM>();
 
 var app = builder.Build();
 
