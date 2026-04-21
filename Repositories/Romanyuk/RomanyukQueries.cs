@@ -73,7 +73,7 @@ public class RomanyukQueries : IRomanyukQueries
 	                                    	WHERE sp1.UPC = sp.UPC_prom
 	                                    	AND sp1.products_number > 0
 	                                    	)
-	                          GROUP BY c.category_number, c.category_name
+	                          GROUP BY c.category_number
 	                          HAVING avg_price >= @min AND avg_price <= @max
 	                          ORDER BY avg_price DESC;
 	                          """;
