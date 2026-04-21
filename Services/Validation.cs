@@ -133,6 +133,7 @@ public static class Validation
     {
         List<string> errors = new();
         if (string.IsNullOrWhiteSpace(input)) errors.Add("Phone number must be specified.");
+        else if (input.Length > 13) errors.Add("Phone number is too long.");
         else if (!Regex.IsMatch(input, @"\+\d{1,12}")) errors.Add("Invalid phone number format.");
         return errors;
     }
@@ -150,6 +151,7 @@ public static class Validation
     {
         List<string> errors = new();
         if (string.IsNullOrWhiteSpace(input)) errors.Add("Zip code must be specified.");
+        else if (input.Length > 9) errors.Add("Zip code is too long.");
         else if (!Regex.IsMatch(input, @"\d{1,9}")) errors.Add("Invalid zip code format.");
         return errors;
     }
@@ -167,6 +169,7 @@ public static class Validation
     {
         List<string> errors = new();
         if (string.IsNullOrWhiteSpace(upc)) errors.Add("UPC must be specified.");
+        else if (upc.Length > 12) errors.Add("UPC is too long.");
         else if (!Regex.IsMatch(upc, @"\d{12}")) errors.Add("Invalid UPC format.");
         return errors;
     }

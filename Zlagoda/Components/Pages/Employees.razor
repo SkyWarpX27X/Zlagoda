@@ -15,6 +15,12 @@
                 <button class="btn btn-outline-info me-2" @onclick="GoToExperiencedEmployees">
                     <i class="bi bi-star me-1"></i> Досвідчені касири
                 </button>
+                <button class="btn btn-outline-info me-2" @onclick="NavigateToSalesByCategory">
+                    <i class="bi bi-star me-1"></i> Сума продажів за категоріями
+                </button>
+                <button class="btn btn-outline-info me-2" @onclick="NavigateToSoldAllProducts">
+                    <i class="bi bi-star me-1"></i> Касири, що продали всі продукти
+                </button>
                 <button class="btn btn-outline-primary" @onclick="PrintReport">
                     <i class="bi bi-printer me-1"></i> Друк звіту
                 </button>
@@ -92,5 +98,15 @@ else
     private void GoToExperiencedEmployees()
     {
         NavigationManager.NavigateTo("/ExperiencedEmployees");
+    }
+    
+    private void NavigateToSalesByCategory()
+    {
+        NavigationManager.NavigateTo("/EmployeeSalesByCategory");
+    }
+    
+    private void NavigateToSoldAllProducts()
+    {
+        NavigationManager.NavigateTo("/EmployeeSoldAllProducts");
     }
 }

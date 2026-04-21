@@ -46,7 +46,7 @@ public class FiliushkinQueries : IFiliushkinQueries
     {
         using var command = _connection.CreateCommand();
         command.CommandText = """
-                              SELECT Employee.empl_surname, Employee.empl_name
+                              SELECT Employee.empl_surname, Employee.empl_name, Employee.empl_patronymic
                               FROM Employee
                               WHERE NOT EXISTS(
                                   SELECT Product.id_product
@@ -65,9 +65,9 @@ public class FiliushkinQueries : IFiliushkinQueries
         while (reader.Read())
         {
             yield return new(
-                reader.GetString(0),
-                reader.GetString(1),
-                reader.GetString(2)
+                reader.GetString(reader.GetOrdinal("empl_surname")),
+                reader.GetString(reader.GetOrdinal("empl_name")),
+                reader.GetString(reader.GetOrdinal("empl_patronymic"))
             );
         }
     }
