@@ -60,12 +60,19 @@ public class RomanyukQueries : IRomanyukQueries
 	    var res = new List<(long, string, decimal)>();
 	    using var command = _connection.CreateCommand();
 	    command.CommandText = """
-	                          SELECT c.category_number, category_name, COALESCE(AVG(selling_price), 0) AS avg_price
+	                          SELECT c.category_number, category_name, AVG(selling_price) AS avg_price
 	                          FROM Category c
 	                          JOIN Product p ON p.category_number = c.category_number
 	                          JOIN Store_Product sp ON sp.id_product = p.id_product 
-	                          		AND sp.products_number > 0 
-	                          		OR sp.promotional_product IS FALSE
+	                          WHERE sp.promotional_product IS TRUE 
+	                                    AND sp.products_number > 0
+	                                    OR sp.promotional_product IS FALSE 
+	                                    AND NOT EXISTS (
+	                                    	SELECT 1 
+	                                    	FROM Store_Product sp1
+	                                    	WHERE sp1.UPC = sp.UPC_prom
+	                                    	AND sp1.products_number > 0
+	                                    	)
 	                          GROUP BY c.category_number, c.category_name
 	                          HAVING avg_price >= @min AND avg_price <= @max
 	                          ORDER BY avg_price DESC;

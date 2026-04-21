@@ -66,7 +66,7 @@ public class StoreProductRepository : IStoreProductRepository
         if (sortByName || sortByQuantity) 
             query += $"""
                       WHERE promotional_product IS FALSE
-                      ORDER BY {(sortByName ? "product_name" : "products_number")}
+                      ORDER BY {(sortByName ? "product_name" : "products_number DESC")}
                       """;
         command.CommandText = query;
         using var reader = command.ExecuteReader();
