@@ -1,5 +1,4 @@
 ﻿using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using DBModels;
 using DTOModels;
 using Repositories.Employee;
@@ -11,7 +10,7 @@ public class EmployeeService : IEmployeeService
     private const int HashSize = 32;
     private const int SaltSize = 16;
     
-    private IEmployeeRepository _employeeRepository;
+    private readonly IEmployeeRepository _employeeRepository;
 
     public EmployeeService(IEmployeeRepository employeeRepository)
     {
@@ -20,7 +19,7 @@ public class EmployeeService : IEmployeeService
 
     public void AddEmployee(EmployeeModifyDTO employee)
     {
-        ValidateEmployee(employee, true);
+        Validation.ValidateEmployeeCreate(employee);
         
         Span<byte> salt = stackalloc byte[SaltSize];
         RandomNumberGenerator.Fill(salt);
@@ -45,10 +44,10 @@ public class EmployeeService : IEmployeeService
     public void UpdateEmployee(EmployeeModifyDTO employee)
     {
         if (employee.Id is null) throw new InvalidDataException("Id is required");
-        ValidateEmployee(employee, false);
+        Validation.ValidateEmployeeUpdate(employee);
 
         _employeeRepository.UpdateEmployee(new EmployeeDBModel(
-            employee.Id ?? -1,
+            employee.Id.Value,
             employee.LastName,
             employee.FirstName,
             employee.Patronymic,
@@ -88,39 +87,27 @@ public class EmployeeService : IEmployeeService
     public IEnumerable<EmployeeDTO> GetEmployees(bool cashiersOnly, bool sortBySurname)
     {
         foreach (var employee in _employeeRepository.GetEmployees(sortBySurname, cashiersOnly))
-        {
             yield return EmployeeDbToDto(employee);
-        }
     }
 
     public EmployeeDTO? GetEmployee(long id)
     {
-        var employee = _employeeRepository.GetEmployee(id);
-        if (employee is null) throw new InvalidDataException($"Employee {id} doesn't exist'");
+        var employee = _employeeRepository.GetEmployee(id)
+                       ?? throw new InvalidDataException($"Employee {id} doesn't exist'");
         return EmployeeDbToDto(employee);
     }
 
     public EmployeeDTO GetEmployee(string username)
     {
-        var employee = _employeeRepository.GetEmployee(username);
-        if (employee is null) throw new InvalidDataException($"Employee {username} doesn't exist");
+        var employee = _employeeRepository.GetEmployee(username)
+                       ?? throw new InvalidDataException($"Employee {username} doesn't exist");
         return EmployeeDbToDto(employee);
     }
 
     public IEnumerable<EmployeeDTO> SearchEmployees(string query, bool cashiersOnly = false)
     {
         foreach (var employee in _employeeRepository.GetEmployeeBySearch(query, cashiersOnly))
-        {
-            yield return new EmployeeDTO(
-                employee.Id,
-                $"{employee.Surname} {employee.Name} {employee.Patronymic}",
-                employee.Role,
-                employee.Salary,
-                DateOnly.Parse(employee.DateOfBirth),
-                DateOnly.Parse(employee.DateOfStart),
-                employee.PhoneNumber,
-                $"{employee.City}, {employee.Street}, {employee.ZipCode}");
-        }
+            yield return EmployeeDbToDto(employee);
     }
 
     private static byte[] HashPassword(string password, ReadOnlySpan<byte> salt)
@@ -146,35 +133,5 @@ public class EmployeeService : IEmployeeService
             DateOnly.Parse(employee.DateOfStart),
             employee.PhoneNumber,
             $"{employee.City}, {employee.Street}, {employee.ZipCode}");
-    }
-
-    private void ValidateEmployee(EmployeeModifyDTO employee, bool creating)
-    {
-        if (string.IsNullOrEmpty(employee.LastName)) throw new InvalidDataException("Last name is required");
-        if (employee.LastName.Length > 50) throw new InvalidDataException("Last name is too long");
-        if (string.IsNullOrEmpty(employee.FirstName)) throw new InvalidDataException("First name is required");
-        if (employee.FirstName.Length > 50) throw new InvalidDataException("First name is too long");
-        if (employee.Patronymic is not null && employee.Patronymic.Length > 50) throw new InvalidDataException("Patronymic is too long");
-        if (creating)
-        {
-            if (string.IsNullOrEmpty(employee.UserName)) throw new InvalidDataException("Username is required");
-            if (employee.UserName.Length > 10) throw new InvalidDataException("Username is too long");   
-        }
-        if (string.IsNullOrEmpty(employee.Role)) throw new InvalidDataException("Role is required");
-        if (employee.Role.Length > 10) throw new InvalidDataException("Role is too long");
-        if (employee.Salary < 0) throw new InvalidDataException("Salary is required");
-        if (string.IsNullOrEmpty(employee.Phone)) throw new InvalidDataException("Phone number is required");
-        if (!Regex.IsMatch(employee.Phone, @"\+\d{1,12}"))
-            throw new InvalidDataException("Invalid phone number");
-        int age = DateTime.Now.Year - employee.BirthDate.Year;
-        if (employee.BirthDate.AddYears(age).ToDateTime(new(0, 0)) > DateTime.Now) --age;
-        if (age < 18) throw new InvalidDataException("Worker can't be younger than 18 years old");
-        if (string.IsNullOrEmpty(employee.City)) throw new InvalidDataException("City is required");
-        if (employee.City.Length > 50) throw new InvalidDataException("City is too long");
-        if (string.IsNullOrEmpty(employee.Street)) throw new InvalidDataException("Street is required");
-        if (employee.Street.Length > 50) throw new InvalidDataException("Street is too long");
-        if (string.IsNullOrEmpty(employee.ZipCode)) throw new InvalidDataException("Zip code is required");
-        if (!Regex.IsMatch(employee.ZipCode, @"\d{1,9}"))
-            throw new InvalidDataException("Invalid zip code");
     }
 }

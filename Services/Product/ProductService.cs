@@ -39,9 +39,11 @@ public class ProductService : IProductService
 
     public void AddProduct(ProductDTO product)
     {
-        ValidateProduct(product, out CategoryDBModel? category);
+        Validation.ValidateProduct(product);
+        var category = _categoryRepository.GetCategory(product.Category)
+                       ?? throw new InvalidDataException("Category does not exist");
         _productRepository.AddProduct(new(
-            category!.Id,
+            category.Id,
             product.Name,
             product.Characteristics,
             product.Manufacturer));
@@ -49,10 +51,12 @@ public class ProductService : IProductService
 
     public void UpdateProduct(ProductDTO product)
     {
-        ValidateProduct(product, out CategoryDBModel? category);
+        Validation.ValidateProduct(product);
+        var category = _categoryRepository.GetCategory(product.Category)
+                       ?? throw new InvalidDataException("Category does not exist");
         _productRepository.UpdateProduct(new(
             product.Id,
-            category!.Id,
+            category.Id,
             product.Name,
             product.Characteristics,
             product.Manufacturer));
@@ -73,18 +77,6 @@ public class ProductService : IProductService
             category.Name,
             product.Characteristics,
             product.Manufacturer);
-    }
-
-    private void ValidateProduct(ProductDTO product, out CategoryDBModel? category)
-    {
-        if (string.IsNullOrEmpty(product.Name)) throw new InvalidDataException("Name is required");
-        if (product.Name.Length > 50)  throw new InvalidDataException("Name is too long");
-        if (string.IsNullOrEmpty(product.Category)) throw new InvalidDataException("Category is required");
-        category = _categoryRepository.GetCategory(product.Category);
-        if (category is null) throw new InvalidDataException($"Category {product.Category} does not exist");
-        if (string.IsNullOrEmpty(product.Characteristics)) throw new InvalidDataException("Characteristics are required");
-        if (product.Characteristics.Length > 100) throw new InvalidDataException("Characteristics are too long");
-        if (string.IsNullOrEmpty(product.Manufacturer)) throw new InvalidDataException("Manufacturer is required");
     }
     
     private (string, string) DateRangeToStrings(DateTime start, DateTime end)

@@ -15,9 +15,7 @@ public class CategoryService : ICategoryService
     public IEnumerable<CategoryDTO> GetCategories()
     {
         foreach (var category in _categoryRepository.GetCategories())
-        {
             yield return new(category.Id, category.Name);
-        }
     }
 
     public CategoryDTO? GetCategory(long id)
@@ -29,15 +27,13 @@ public class CategoryService : ICategoryService
 
     public void AddCategory(CategoryDTO category)
     {
-        if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
-        if (category.Name.Length > 50) throw new InvalidDataException("Name is too long");
+        Validation.ValidateCategory(category);
         _categoryRepository.AddCategory(new(category.Id, category.Name));
     }
 
     public void UpdateCategory(CategoryDTO category)
     {
-        if (string.IsNullOrEmpty(category.Name)) throw new InvalidDataException("Name is required");
-        if (category.Name.Length > 50) throw new InvalidDataException("Name is too long");
+        Validation.ValidateCategory(category);
         _categoryRepository.UpdateCategory(new(category.Id, category.Name));
     }
 
