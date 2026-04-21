@@ -83,12 +83,21 @@ public class ReceiptService : IReceiptService
     public void AddReceipt(ReceiptCreateDTO receipt)
     {
         Validation.ValidateReceiptCreate(receipt);
+        
+        decimal factor = 1.0m;
         if (string.IsNullOrEmpty(receipt.CustomerCardId))
             receipt.CustomerCardId = null;
+        else
+        {
+            var customerCard = _customerCardRepository.GetCustomer(receipt.CustomerCardId)
+                               ?? throw new InvalidDataException("Customer card doesn't exist");
+            factor -= customerCard.Percent / 100.0m;
+        }
         
         decimal total = 0;
         foreach (var sale in receipt.Sales)
             total += sale.Price * sale.Quantity;
+        total *= factor;
 
         ReceiptDBModel receiptResult = new(
             receipt.EmployeeId,
