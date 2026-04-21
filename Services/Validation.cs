@@ -20,8 +20,7 @@ public static class Validation
         errors.AddRange(ValidateName(customer.FirstName, 50, "First name"));
         if (!string.IsNullOrEmpty(customer.Patronymic))
             errors.AddRange(ValidateName(customer.Patronymic, 50, "Patronymic"));
-        if (!string.IsNullOrEmpty(customer.Phone))
-            errors.AddRange(ValidatePhone(customer.Phone));
+        errors.AddRange(ValidatePhone(customer.Phone));
         if (customer.Percent < 0) errors.Add("Percent can't be negative.");
         if (!string.IsNullOrEmpty(customer.City))
             errors.AddRange(ValidateName(customer.City, 50, "City"));
@@ -125,15 +124,16 @@ public static class Validation
     private static List<string> ValidateName(string? input, int maxLength, string inputName)
     {
         List<string> errors = new();
-        if (string.IsNullOrWhiteSpace(input)) errors.Add($"{inputName} must be specificed.");
-        else if (input?.Length > maxLength) errors.Add($"{inputName} is too long.");
+        if (string.IsNullOrWhiteSpace(input)) errors.Add($"{inputName} must be specified.");
+        else if (input.Length > maxLength) errors.Add($"{inputName} is too long.");
         return errors;
     }
     
     private static List<string> ValidatePhone(string input)
     {
         List<string> errors = new();
-        if (!Regex.IsMatch(input, @"\+\d{1,12}")) errors.Add("Invalid phone number format.");
+        if (string.IsNullOrWhiteSpace(input)) errors.Add("Phone number must be specified.");
+        else if (!Regex.IsMatch(input, @"\+\d{1,12}")) errors.Add("Invalid phone number format.");
         return errors;
     }
 
@@ -149,7 +149,8 @@ public static class Validation
     private static List<string> ValidateZipCode(string input)
     {
         List<string> errors = new();
-        if (!Regex.IsMatch(input, @"\d{1,9}")) errors.Add("Invalid zip code format.");
+        if (string.IsNullOrWhiteSpace(input)) errors.Add("Zip code must be specified.");
+        else if (!Regex.IsMatch(input, @"\d{1,9}")) errors.Add("Invalid zip code format.");
         return errors;
     }
     
@@ -165,8 +166,8 @@ public static class Validation
     private static List<string> ValidateUPC(string upc)
     {
         List<string> errors = new();
-        if (!Regex.IsMatch(upc, @"\d{12}"))
-            errors.Add("Invalid UPC format.");
+        if (string.IsNullOrWhiteSpace(upc)) errors.Add("UPC must be specified.");
+        else if (!Regex.IsMatch(upc, @"\d{12}")) errors.Add("Invalid UPC format.");
         return errors;
     }
 }
